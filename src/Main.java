@@ -16,6 +16,8 @@ public class Main {
 //		return array;
 //	}
 	
+	
+	//setDefaultBoard: reinitializes board array with starting positions.
 	private static void setDefaultBoard(){
 		for(int i = 0; i < 8; i ++){
 			board[i][1] = 1; //set pawns
