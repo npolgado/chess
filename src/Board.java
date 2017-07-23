@@ -35,7 +35,7 @@ public class Board {
 				{
 					count ++;
 				}
-				//new shit
+				//new new new shit
 				
 				if (count % 2 == 0)
 				{
