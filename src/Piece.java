@@ -23,6 +23,11 @@ public class Piece {
 		return sb.toString();
 	}
 	
+	//isLegal: takes a piece of destination and determines if this piece is allowed to make that move
+//	public boolean isLegal(Piece toPiece) {
+//		
+//	}
+	
 	
 
 }

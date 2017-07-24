@@ -9,12 +9,11 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 public class Board {
-
+	
 	private int WIDTH = 800;
 	private int HEIGHT = 800;
 	private int OFFSETHEIGHT = 25;
 	JFrame frame;
-	
 	
 	public Board() {
 		frame = new JFrame ("Chess");
@@ -23,9 +22,22 @@ public class Board {
 		frame.setVisible(true);
 	}
 	
+	//move: takes the moving piece, the destination piece, and the board, and moves coords, color, and pieceType
+	//	of the moving piece to the destination piece, then sets the piece in the array where the moving piece was to an empty space.
+	public ArrayList<Piece> move(Piece thisOne, Piece toHere, ArrayList<Piece> board){
+		for (Piece piece : board) {
+			if(piece.x == thisOne.x && piece.y == thisOne.y && piece.color == thisOne.color && piece.type == thisOne.type)
+			{
+				board.set(piece.hashCode(), toHere);
+				board.set(piece.hashCode(), new Piece(piece.x, piece.y, Color.BLUE, pieceType.EMPTY));
+			}
+		}
+		drawBoard(board);
+		return board;
+	}
 	
 	//setDefaultBoard: takes arraylist of the board and clears it, then add's the default start to the game
-	public void setDefaultBoard(ArrayList<Piece> board){
+	public ArrayList<Piece> setDefaultBoard(ArrayList<Piece> board){
 		board.clear();
 		board.add(new Piece(0, 0, Color.BLACK, pieceType.ROOK));
 		board.add(new Piece(7, 0, Color.BLACK, pieceType.ROOK));
@@ -55,11 +67,14 @@ public class Board {
 				board.add(new Piece(i, j, Color.BLUE, pieceType.EMPTY));
 			}
 		}
+		drawBoard(board);
+		return board;
 	}
 	
 	//drawBoard: takes array of currentBoard and adds buttons 
     public void drawBoard(ArrayList<Piece> board) 
     {
+    	frame.repaint();
     	for (Piece piece : board) 
     	{
     		createButton(piece);
@@ -67,6 +82,7 @@ public class Board {
     	createButton(new Piece(0,0,Color.black,null));//fuker button
 	}
     
+    //Needed Comment
     /*int count = 0;
 	int secCount = 0;
 	for (int a = 0; a < ar.length; a++) {
