@@ -97,9 +97,7 @@ public class Piece {
 			}
 			else
 			{
-				if(p.equals(that)){
-					return p.color != that.color;
-				}
+				return p.color != that.color;
 			}
 		}	
 		else if((that.y - this.y) == 0)
