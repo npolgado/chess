@@ -137,6 +137,7 @@ public class Board {
 		button.setOpaque(true);
 		button.setBorderPainted(false);
 		button.addActionListener(new EndingListener ());
+		button.setBackground(Color.WHITE);
 		
 		if (p.type != null)
 		{
@@ -207,7 +208,8 @@ public class Board {
 					destinationPiece = board.get(indexOf);
 					isSecond = false;
 					System.out.println("moving to " + board.get(indexOf).type + "...");
-					System.out.println("result: " + movingPiece.isLegal(destinationPiece, board) + "\n");
+					boolean isItLegal = movingPiece.isLegal(destinationPiece, board);
+					System.out.println("result: " + isItLegal + "\n");
 					return;
 				}
 				else
