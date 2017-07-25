@@ -18,14 +18,6 @@ public class Piece {
 		this.index = index;
 	}
 	
-	//OVERRIDE: formatting instead of memory address
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder ();
-		sb.append(this.index);
-		return sb.toString();
-	}
-	
 	//isLegal: takes a piece of destination and determines if this piece is allowed to make that move
 	public boolean isLegal(Piece that, ArrayList<Piece> b) {
 		switch (this.type) {
@@ -144,6 +136,31 @@ public class Piece {
 			}
 		}
 		return p.RookLegal(that, brd);
+	}
+	
+	
+	
+	/* OVERRIDE: prints out the index in array (which is converted to an 
+	 * int later to find the corresponding Piece) instead of memory address
+	 */
+	   
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder ();
+		sb.append(this.index);
+		return sb.toString();
+	}
+	
+	/* Overrides the equals method so we can compare temporary objects to the 
+	 * original object in the array
+	 */
+	public boolean equals (Piece comparable)
+	{
+		return (this.color == comparable.color &&
+				this.index == comparable.index &&
+				this.type == comparable.type &&
+				this.x == comparable.x &&
+				this.y == comparable.y);
 	}
 	
 

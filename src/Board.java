@@ -26,6 +26,13 @@ public class Board {
 	public static void main(String[] args) {		
 		Board b = new Board();
 		b.setDefaultBoard(board);
+		
+		
+		Piece p1 = new Piece (5, 3, Color.black, pieceType.BISHOP, 0);
+		Piece p2 = new Piece (5, 3, Color.black, pieceType.BISHOP, 0);
+		
+		System.out.println(p1.equals(p2));
+		
 	}
 	
 	//move: takes the moving piece, the destination piece, and the board, and moves coords, color, and pieceType
