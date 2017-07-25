@@ -1,7 +1,10 @@
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class Board {
@@ -26,13 +29,6 @@ public class Board {
 	public static void main(String[] args) {		
 		Board b = new Board();
 		b.setDefaultBoard(board);
-		
-		
-		Piece p1 = new Piece (5, 3, Color.black, pieceType.BISHOP, 0);
-		Piece p2 = new Piece (5, 3, Color.black, pieceType.BISHOP, 0);
-		
-		System.out.println(p1.equals(p2));
-		
 	}
 	
 	//move: takes the moving piece, the destination piece, and the board, and moves coords, color, and pieceType
@@ -102,6 +98,7 @@ public class Board {
     	{
     		createButton(piece);
 		}
+    	
     	createButton(new Piece(0,0,Color.black,null,100));//fuker button
 	}
     
@@ -162,7 +159,40 @@ public class Board {
 		button.setBounds(((this.WIDTH/8)*p.x), ((this.HEIGHT/8)*p.y), this.WIDTH/8, this.HEIGHT/8);
 		button.setOpaque(true);
 		button.setBorderPainted(false);
-		button.addActionListener(new EndingListener ());		
+		button.addActionListener(new EndingListener ());
+		
+		if (p.type == null)
+		{
+			return;
+		}
+		
+		//adding an image to the button, corresponding to their piece and color
+		String img = null;
+		switch (p.type)
+		{
+		case PAWN:
+			img = "pawn.png";
+			break;
+		case KNIGHT:
+			img = "knight";
+			break;
+		case BISHOP:
+			img = "bishop";
+			break;
+		case ROOK:
+			img = "rook";
+			break;
+		case QUEEN:
+			img = "queen";
+			break;
+		case KING:
+			img = "king";
+			break;
+		default:
+			break;
+		}
+		button.addImage (img);
+		
 		frame.add(button);
 	}
 
