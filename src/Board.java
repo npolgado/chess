@@ -167,9 +167,11 @@ public class Board {
 			if(isSecond == false && board.get(indexOf).type != pieceType.EMPTY){
 				 movingPiece = board.get(indexOf);
 				 isSecond = true;
-			}else{
+			}
+			else if(isSecond == true)
+			{
 				 destinationPiece = board.get(indexOf);
-				 movingPiece.isLegal(destinationPiece);
+				 movingPiece.isLegal(destinationPiece, board);
 				 isSecond = false;
 			}
 			

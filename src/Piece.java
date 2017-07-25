@@ -26,19 +26,17 @@ public class Piece {
 	}
 	
 	//isLegal: takes a piece of destination and determines if this piece is allowed to make that move
-	public boolean isLegal(Piece that) {
+	public boolean isLegal(Piece that, ArrayList<Piece> b) {
 		switch (this.type) {
 		case KNIGHT:
 			return this.KnightLegal(that);
 		case KING: 
 			return this.KingLegal(that);
-		case BISHOP:
-			//return this.BishopLegal(that);
-			break;
+		case ROOK:
+			return this.RookLegal(that, b);
 		default:
 			return false;
 		}
-		return false;
 	}
 	
 //	private boolean BishopLegal(Piece that) {
@@ -82,7 +80,7 @@ public class Piece {
 
 	private boolean KingLegal(Piece that)
 	{
-		if(Math.abs(that.x - this.x) == 1 && Math.abs(that.y - this.y) == 1)
+		if(Math.abs(that.x - this.x) <= 1 && Math.abs(that.y - this.y) <= 1)
 		{
 			if(this.color == that.color)
 			{
@@ -93,6 +91,58 @@ public class Piece {
 			}
 		}
 		return false;
+	}
+
+	private boolean RookLegal(Piece that, ArrayList<Piece> brd)
+	{
+		int a, b;
+		Piece p = this;
+		
+		if((that.x - this.x) == 0)
+		{
+			if((that.y - this.y) < 0) //straight down
+			{
+				a = 0;
+				b = -1;
+			}else if (that.y - this.y > 0) //straight up
+			{
+				a = 0;
+				b = 1;
+			}
+			else
+			{
+				return false;
+			}
+		}	
+		else if((that.y - this.y) == 0)
+		{
+			if((that.x - this.x) < 0) //left
+			{
+				a = -1;
+				b = 0;
+			}else //right
+			{
+				a = 1;
+				b = 0;
+			}
+		}else{
+			return false;
+		}
+		
+		for (int i = 0; i < brd.size(); i++)
+		{
+			if(p.equals(that)){
+				return p.color != that.color;
+			}
+			if (brd.get(i).x == this.x + a && brd.get(i).y == this.y + b)
+			{
+				if(brd.get(i).type != pieceType.EMPTY){
+					return false;
+				}
+				p = brd.get(i);
+			}
+		}
+		return p.RookLegal(that, brd);
 	}
 	
 
