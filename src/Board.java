@@ -148,21 +148,26 @@ public class Board {
 				img = "pawn.png";
 				button.addImage (img);
 				break;
-//			case KNIGHT:
-//				img = "knight";
-//				break;
-//			case BISHOP:
-//				img = "bishop";
-//				break;
-//			case ROOK:
-//				img = "rook";
-//				break;
-//			case QUEEN:
-//				img = "queen";
-//				break;
-//			case KING:
-//				img = "king";
-//				break;
+			case KNIGHT:
+				img = "knight.jpg";
+				button.addImage (img);
+				break;
+			case BISHOP:
+				img = "bishop.png";
+				button.addImage (img);
+				break;
+			case ROOK:
+				img = "rook.png";
+				button.addImage (img);
+				break;
+			case QUEEN:
+				img = "queen.png";
+				button.addImage (img);
+				break;
+			case KING:
+				img = "king.png";
+				button.addImage (img);
+				break;
 			default:
 				break;
 			}

@@ -35,7 +35,7 @@ public class ButtonExtend extends JButton{
 		} 
 		catch (Exception ex) 
 		{
-		    System.out.println(ex + " buttonExtend line 38 -eric");
+		    System.out.println(ex);
 		}
 		
 	}
