@@ -68,10 +68,7 @@ public class Piece {
 	{
 		if(Math.abs(that.x - this.x) <= 1 && Math.abs(that.y - this.y) <= 1)
 		{
-			if(this.color == that.color)
-			{
-				return false;
-			}else
+			if(this.color != that.color)
 			{
 				return true;
 			}
@@ -97,6 +94,9 @@ public class Piece {
 			}
 			else
 			{
+				if(p.color == Color.BLUE && that.color == Color.BLUE){
+					return true;
+				}
 				return p.color != that.color;
 			}
 		}	
@@ -121,7 +121,7 @@ public class Piece {
 		{
 			if (brd.get(i).x == this.x + a && brd.get(i).y == this.y + b)
 			{
-				if(brd.get(i).type != pieceType.EMPTY){
+				if(brd.get(i).type != pieceType.EMPTY && !brd.get(i).equals(that)){
 					return false;
 				}
 				p = brd.get(i);
