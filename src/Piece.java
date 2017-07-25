@@ -79,7 +79,6 @@ public class Piece {
 	private boolean RookLegal(Piece that, ArrayList<Piece> brd)
 	{
 		int a, b;
-		Piece p = this;
 		
 		if((that.x - this.x) == 0)
 		{
@@ -94,10 +93,7 @@ public class Piece {
 			}
 			else
 			{
-				if(p.color == Color.BLUE && that.color == Color.BLUE){
-					return true;
-				}
-				return p.color != that.color;
+				return this.color != that.color;
 			}
 		}	
 		else if((that.y - this.y) == 0)
@@ -124,10 +120,11 @@ public class Piece {
 				if(brd.get(i).type != pieceType.EMPTY && !brd.get(i).equals(that)){
 					return false;
 				}
-				p = brd.get(i);
+				this.x = brd.get(i).x;
+				this.y = brd.get(i).y;
 			}
 		}
-		return p.RookLegal(that, brd);
+		return this.RookLegal(that, brd);
 	}
 	
 	
