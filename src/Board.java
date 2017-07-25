@@ -3,6 +3,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -19,6 +20,11 @@ public class Board {
 	Piece destinationPiece;
 	boolean isSecond = false;
 	
+	public static void main(String[] args) {		
+		Board b = new Board();
+		b.setDefaultBoard(board);
+	}
+	
 	public Board() {
 		frame = new JFrame ("Chess");
 		frame.setSize(WIDTH, HEIGHT + OFFSETHEIGHT);
@@ -26,33 +32,7 @@ public class Board {
 		movingPiece = null;
 		destinationPiece = null;
 	}
-	
-	public static void main(String[] args) {		
-		Board b = new Board();
-		b.setDefaultBoard(board);
-	}
-	
-	//move: takes the moving piece, the destination piece, and the board, and moves coords, color, and pieceType
-	//	of the moving piece to the destination piece, then sets the piece in the array where the moving piece was to an empty space.
-//	public ArrayList<Piece> move(Piece oldSpace, Piece destination, ArrayList<Piece> board){
-//		for (Piece piece : board) {
-//			if(piece.x == oldSpace.x && piece.y == oldSpace.y && piece.color == oldSpace.color && piece.type == oldSpace.type)
-//			{
-//				//board.set(board.indexOf(toHere), thisOne);				
-//				board.get(board.indexOf(oldSpace)).color = Color.BLUE;
-//				board.get(board.indexOf(oldSpace)).type = pieceType.EMPTY;
-//				board.get(board.indexOf(oldSpace)).x = oldSpace.x;
-//				board.get(board.indexOf(oldSpace)).y = oldSpace.y;
-//				//board.set(board.indexOf(piece), new Piece(piece.x, piece.y, Color.BLUE, pieceType.EMPTY));
-//			}else if(piece.x == destination.x && piece.y == destination.y && piece.color == destination.color && piece.type == destination.type){
-//				board.get(board.indexOf(destination)).color = oldSpace.color;
-//				board.get(board.indexOf(destination)).type = oldSpace.type;
-//			}
-//		}
-//		drawBoard(board);
-//		return board;
-//	}
-	
+			
 	//setDefaultBoard: takes arraylist of the board and clears it, then add's the default start to the game
 	public void setDefaultBoard(ArrayList<Piece> board){
 		board.clear();
@@ -86,6 +66,7 @@ public class Board {
 				num++;
 			}
 		}
+		
 		this.board = board;
 		drawBoard(board);
 		frame.setVisible(true);
@@ -99,11 +80,9 @@ public class Board {
     	{
     		createButton(piece);
 		}
-    	
-    	createButton(new Piece(0,0,Color.black,null,100));//fuker button
+    	createButton(new Piece(0,0,Color.black,null,65)); //the fuker button
 	}
-    
-    
+      
     /*
      Needed Comment
    
@@ -145,17 +124,14 @@ public class Board {
     	if(p.type == null)
     	{
     		button = new ButtonExtend();
-    	}
-    	else if (p.type.equals(pieceType.EMPTY))
-    	{
-    		button = new ButtonExtend(" - ");
-    		button.setActionCommand(p.toString());
+    		frame.add(button);
+    		return;
     	}
     	else
     	{
     		button = new ButtonExtend(p.type.toString().substring(0,2));
     		button.setActionCommand(p.toString());
-   		}
+    	}
     	button.setPiece(p);
 		button.setBounds(((this.WIDTH/8)*p.x), ((this.HEIGHT/8)*p.y), this.WIDTH/8, this.HEIGHT/8);
 		button.setOpaque(true);
@@ -196,22 +172,47 @@ public class Board {
 		
 	}
 
-    private class EndingListener extends Board implements ActionListener
+    private class EndingListener implements ActionListener
     { 
+		//goal 1: click first piece, click landing spot. Print "no" is cannot be done. Print "yes" if it can
 		public void actionPerformed(ActionEvent e) 
 		{
 			int indexOf = Integer.parseInt(e.getActionCommand());
-			if(isSecond == false && board.get(indexOf).type != pieceType.EMPTY){
-				 movingPiece = board.get(indexOf);
-				 isSecond = true;
+			//System.out.println("Clicked on index: " + e.getActionCommand() + ", isSecond: " + isSecond);
+			
+			if(isSecond == false){
+				if(board.get(indexOf).type != pieceType.EMPTY)
+				{
+					movingPiece = board.get(indexOf);
+					isSecond = true;
+					System.out.println("Where do you want the " + board.get(indexOf).type + " to go?");
+					return;
+					
+				}else
+				{
+					isSecond = false;
+					System.out.println("was empty.");
+					return;
+				}
 			}
 			else if(isSecond == true)
 			{
-				 destinationPiece = board.get(indexOf);
-				 movingPiece.isLegal(destinationPiece, board);
-				 isSecond = false;
+				if(board.get(indexOf).type == pieceType.EMPTY || board.get(indexOf).color != movingPiece.color)
+				{
+					destinationPiece = board.get(indexOf);
+					isSecond = false;
+					System.out.println("moving to " + board.get(indexOf).type + "...");
+					System.out.println("result: " + movingPiece.isLegal(destinationPiece, board) + "\n");
+					return;
+				}
+				else
+				{
+//					isSecond = false;
+					System.out.println("can't move to your own piece.");
+					return;
+				}
+				 
 			}
-			
 		}
     }
 	
