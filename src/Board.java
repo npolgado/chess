@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public class Board {
 	
@@ -137,7 +138,6 @@ public class Board {
 		button.setOpaque(true);
 		button.setBorderPainted(false);
 		button.addActionListener(new EndingListener ());
-		button.setBackground(Color.WHITE);
 		
 		if (p.type != null)
 		{
@@ -172,6 +172,9 @@ public class Board {
 			default:
 				break;
 			}
+			button.setBackground(Color.WHITE);
+			button.setBorder(new LineBorder (Color.BLACK, 1));
+			button.setBorderPainted(true);
 			frame.add(button);
 		}
 		
