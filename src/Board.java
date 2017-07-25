@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public class Board {
 		}
 	}    
 	
-	//if ur reading this, stay woke lil fucker
+	//if ur reading this, stay woke lil fuker
 	JButton fuker = new JButton ();
 	frame.add(fuker);
 	frame.setVisible(true);
@@ -161,39 +162,38 @@ public class Board {
 		button.setBorderPainted(false);
 		button.addActionListener(new EndingListener ());
 		
-		if (p.type == null)
+		if (p.type != null)
 		{
-			return;
+			//adding an image to the button, corresponding to their piece and color
+			String img = null;
+			switch (p.type)
+			{
+			case PAWN:
+				img = "pawn.png";
+				button.addImage (img);
+				break;
+//			case KNIGHT:
+//				img = "knight";
+//				break;
+//			case BISHOP:
+//				img = "bishop";
+//				break;
+//			case ROOK:
+//				img = "rook";
+//				break;
+//			case QUEEN:
+//				img = "queen";
+//				break;
+//			case KING:
+//				img = "king";
+//				break;
+			default:
+				break;
+			}
+			frame.add(button);
 		}
 		
-		//adding an image to the button, corresponding to their piece and color
-		String img = null;
-		switch (p.type)
-		{
-		case PAWN:
-			img = "pawn.png";
-			break;
-		case KNIGHT:
-			img = "knight";
-			break;
-		case BISHOP:
-			img = "bishop";
-			break;
-		case ROOK:
-			img = "rook";
-			break;
-		case QUEEN:
-			img = "queen";
-			break;
-		case KING:
-			img = "king";
-			break;
-		default:
-			break;
-		}
-		button.addImage (img);
 		
-		frame.add(button);
 	}
 
     private class EndingListener extends Board implements ActionListener
