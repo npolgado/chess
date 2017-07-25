@@ -1,11 +1,8 @@
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.*;
-import javax.swing.border.Border;
 
 public class Board {
 	
@@ -163,8 +160,7 @@ public class Board {
 	}
 
     private class EndingListener extends Board implements ActionListener
-    {
-    	
+    { 
 		public void actionPerformed(ActionEvent e) 
 		{
 			int indexOf = Integer.parseInt(e.getActionCommand());
