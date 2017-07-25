@@ -32,19 +32,12 @@ public class Piece {
 		}
 	}
 	
-//	private boolean BishopLegal(Piece that) {
-//		if(Math.abs(that.x - this.x)/Math.abs(that.y - this.y) == 1)
-//		{
-//			if(this.color == that.color)
-//			{
-//				return false;
-//			}else
-//			{
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
+	private boolean BishopLegal(Piece that, ArrayList<Piece> brd)
+	{
+		int upR, upL, dwnR, dwnL;
+		Piece p = this;
+		return false;
+	}
 
 	private boolean KnightLegal(Piece that)
 	{
@@ -93,18 +86,20 @@ public class Piece {
 		
 		if((that.x - this.x) == 0)
 		{
-			if((that.y - this.y) < 0) //straight down
+			if((that.y - this.y) < 0) //straight up
 			{
 				a = 0;
 				b = -1;
-			}else if (that.y - this.y > 0) //straight up
+			}else if (that.y - this.y > 0) //straight down
 			{
 				a = 0;
 				b = 1;
 			}
 			else
 			{
-				return false;
+				if(p.equals(that)){
+					return p.color != that.color;
+				}
 			}
 		}	
 		else if((that.y - this.y) == 0)
@@ -118,15 +113,14 @@ public class Piece {
 				a = 1;
 				b = 0;
 			}
-		}else{
+		}
+		else
+		{
 			return false;
 		}
 		
 		for (int i = 0; i < brd.size(); i++)
 		{
-			if(p.equals(that)){
-				return p.color != that.color;
-			}
 			if (brd.get(i).x == this.x + a && brd.get(i).y == this.y + b)
 			{
 				if(brd.get(i).type != pieceType.EMPTY){
