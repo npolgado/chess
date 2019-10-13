@@ -36,18 +36,19 @@ def draw_board():
     # screen.blit(textsurface, (side - 100, 10))
     # screen.blit(textsurface2, (side - 100, 30))
 
-    a= 6
+    a= 8
     for i in range (a):
         for j in range(a):
-            pygame.draw.rect(screen, RED, (i *(side/a), j + (side/a), SQ_SZ * 2 / 2, SQ_SZ * 2 / 2))
+            len = (side/a)
+            pygame.draw.rect(screen, BLACK, (i * len + len / 4, j * len + len / 4, len-1, len-1))
+            pygame.draw.rect(screen, RED, (i *len +len/4, j * len +len/4, len*(4/5), len*(4/5)))
 
     pygame.display.update()
 
     pygame.time.wait(5000)
 
 
-
-
-
-
 draw_board()
+
+while True:
+    pass
