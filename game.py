@@ -35,12 +35,13 @@ def draw_board():
         for j in range(a):
             len = (side/a)
             if (i+j) % 2 == 0:
-                pygame.draw.rect(screen, RED, (i*len+len/4, j * len +len/4, len*(4/5), len*(4/5)))
+                pygame.draw.rect(screen, RED, (i*len, j*len , len-1, len-1))
             else:
-                pygame.draw.rect(screen, BLACK, (i*len+len/4, j * len +len/4, len-1, len-1))
-            myfont = pygame.font.SysFont('Comic Sans MS', 15)
+                pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
+
+            myfont = pygame.font.SysFont('Comic Sans MS', 50)
             textsurface = myfont.render(str(board[j][i]), False, GREEN)
-            screen.blit(textsurface, (i *len +len/4, j *len +len/4))
+            screen.blit(textsurface, (i*len, j*len))
 
     pygame.display.update()
 
