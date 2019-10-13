@@ -11,7 +11,7 @@ screen = pygame.display.set_mode(size)
 
 
 pygame.init()
-pygame.display.set_caption('SNEK')
+pygame.display.set_caption('Chess')
 
 
 
@@ -22,9 +22,12 @@ WHITE = (255, 255, 255)
 
 
 
-
+board = [[5, 2, 3, 9, 6, 3, 2, 5],
+         [1]*8, [0]*8, [0]*8, [0]*8, [0]*8, [1]*8,
+         [5, 2, 3, 9, 6, 3, 2, 5]]
 
 def draw_board():
+    global board
 
     screen.fill(WHITE)
 
@@ -36,17 +39,19 @@ def draw_board():
     # screen.blit(textsurface, (side - 100, 10))
     # screen.blit(textsurface2, (side - 100, 30))
 
-    a= 8
+    a = 8
     for i in range (a):
         for j in range(a):
             len = (side/a)
-            pygame.draw.rect(screen, BLACK, (i * len + len / 4, j * len + len / 4, len-1, len-1))
-            pygame.draw.rect(screen, RED, (i *len +len/4, j * len +len/4, len*(4/5), len*(4/5)))
+            # pygame.draw.rect(screen, BLACK, (i * len + len / 4, j * len + len / 4, len-1, len-1))
+            # pygame.draw.rect(screen, RED, (i *len +len/4, j * len +len/4, len*(4/5), len*(4/5)))
+            myfont = pygame.font.SysFont('Comic Sans MS', 15)
+            textsurface = myfont.render(str(board[j][i]), False, BLACK)
+            screen.blit(textsurface, (i *len +len/4, j *len +len/4))
 
     pygame.display.update()
 
     pygame.time.wait(5000)
-
 
 draw_board()
 
