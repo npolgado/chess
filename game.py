@@ -22,7 +22,7 @@ BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
 
 side = SQ_SZ * NUM_BLOCKS
 size = (side, side)
-
+print ("side=", side)
 def is_check():
     '''Checks to see if the gamestate is in check/checkmate, and flags'''
     pass
@@ -70,8 +70,9 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
-                print ("mouse = ", pos)
-                print ("   ")
+                pos = (int(pos[0] / (side/8)), int(pos[1] / (side/8)))
+
+                print (BOARD[pos[1]][pos[0]])
             if event.type == pygame.QUIT:
                 running = False
 
