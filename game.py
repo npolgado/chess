@@ -18,12 +18,28 @@ PIECES = {
 
 
 BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
-         [1]*8, [0]*8, [0]*8, [0]*8, [0]*8, [1]*8,
+         [1]*8, [0]*8, [0]*8, [0,0,0,0,3,0,0,0], [0]*8, [1]*8,
          [5, 2, 3, 9, 6, 3, 2, 5]]
 
 side = SQ_SZ * NUM_BLOCKS
 size = (side, side)
 
+def get_valid_moves (p, x, y):
+
+    moves = []
+    if (p == 'Knight'):
+        # KNIGHTS
+        a = [-2, -2, -1, -1, 1, 1, 2, 2]    # x vectors
+        b = [-1, 1, -2, 2, -2, 2, -1, 1]    # y vectors
+        for i in range (0, 8):
+            if (x + a[i] < 8 and x + a[i] >= 0):
+                if (y + b[i] < 8 and y + b[i] >= 0):
+                    moves.append((x+a[i], y+b[i]))
+
+        # TODO: remove squares with friendly pieces on them.
+
+    '''Given a piece and location (ex: rook (4, 5), return a list of valid moves'''
+    return moves
 def is_check():
     '''Checks to see if the gamestate is in check/checkmate, and flags'''
     pass
@@ -74,8 +90,23 @@ if __name__ == '__main__':
                 y = int(pos[0] / (side/8))
                 x = int(pos[1] / (side/8))
 
-                print (x, ",", y)
+                # coorLet = chr(y + 65)
+                # coorNum = 8-x
+                piece = PIECES[BOARD[x][y]];
 
+
+                print ("Loc: ({}, {})   = {}".format(x, y, piece))
+
+
+                # Click a piece, and it shows valid moves
+                # Working:
+                # In progress:   knight
+                valids = get_valid_moves (piece, x, y)
+
+                print ("Valid Moves: ", end = " ")
+                for i in range (0, len(valids)):
+                    print (valids[i], end = ", ")
+                print()
 
             if event.type == pygame.QUIT:
                 running = False
