@@ -71,9 +71,12 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
-                pos = (int(pos[0] / (side/8)), int(pos[1] / (side/8)))
+                y = int(pos[0] / (side/8))
+                x = int(pos[1] / (side/8))
 
-                print (PIECES[BOARD[pos[1]][pos[0]]])
+                print (x, ",", y)
+
+
             if event.type == pygame.QUIT:
                 running = False
 
