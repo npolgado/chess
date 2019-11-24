@@ -16,9 +16,10 @@ PIECES = {
     9: 'Queen'
 }
 
+# TODO: make object that contains [piece, color, position] and maybe [alive/dead, path to image]
 
 BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
-         [1]*8, [0]*8, [0]*8, [0,0,0,0,3,0,0,0], [0]*8, [1]*8,
+         [1]*8, [0]*8, [0]*8, [0,0,0,0,2,0,0,0], [0]*8, [1]*8,
          [5, 2, 3, 9, 6, 3, 2, 5]]
 
 side = SQ_SZ * NUM_BLOCKS
@@ -27,16 +28,35 @@ size = (side, side)
 def get_valid_moves (p, x, y):
 
     moves = []
+
+    # KNIGHT
     if (p == 'Knight'):
-        # KNIGHTS
         a = [-2, -2, -1, -1, 1, 1, 2, 2]    # x vectors
         b = [-1, 1, -2, 2, -2, 2, -1, 1]    # y vectors
-        for i in range (0, 8):
+        for i in range (0, len(a)):
             if (x + a[i] < 8 and x + a[i] >= 0):
                 if (y + b[i] < 8 and y + b[i] >= 0):
                     moves.append((x+a[i], y+b[i]))
 
-        # TODO: remove squares with friendly pieces on them.
+        # TODO: remove squares with friendly pieces on them. (REQ: must have access to the pieces color)
+
+    if (p == "Bishop"):
+        a = [j for j in range(-4, 5) if j is not 0]  # x vectors
+        b = [j for j in range(-4, 5) if j is not 0]  # y vectors
+
+        for i in range(0, len(a)):
+            if (x + a[i] < 8 and x + a[i] >= 0):
+                if (y + b[i] < 8 and y + b[i] >= 0):
+                    moves.append((x + a[i], y + b[i]))
+
+            # Problem: bishops need (x-4, y-4), (x-3, y-3), and (x-4, y+4), (x-3, y+3). This takes case
+            #       second case, so array is only half as long as valids.
+            if (x + a[i] < 8 and x + a[i] >= 0):
+                if (y - b[i] < 8 and y - b[i] >= 0):
+                    moves.append((x + a[i], y - b[i]))
+                    
+        # TODO: remove squares with friendly pieces on them (AND ANYTHING PASSED THEM FOR BISHOPS, QUEENS,
+        #       and ROOKS, special case for pawns). (REQ: must have access to the pieces color)
 
     '''Given a piece and location (ex: rook (4, 5), return a list of valid moves'''
     return moves
