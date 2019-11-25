@@ -6,8 +6,15 @@ SQ_SZ = 25
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
-BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+
+BLUEGREEN = (71,255,207)
+BLUEGREEN_shaded = (60, 174, 144)
+BLACK = (0, 0, 0)
+shd = 32
+BLACK_shaded = (shd, shd, shd)
+
 
 PIECES = {
     0: 'Empty',    1: 'Pawn',
@@ -54,7 +61,7 @@ def get_valid_moves (p, x, y):
             if (x + a[i] < 8 and x + a[i] >= 0):
                 if (y - b[i] < 8 and y - b[i] >= 0):
                     moves.append((x + a[i], y - b[i]))
-                    
+
         # TODO: remove squares with friendly pieces on them (AND ANYTHING PASSED THEM FOR BISHOPS, QUEENS,
         #       and ROOKS, special case for pawns). (REQ: must have access to the pieces color)
 
@@ -71,7 +78,7 @@ def init():
     pygame.display.set_caption('Chess')
     screen.fill(WHITE)
 
-def draw_board():
+def draw_board(valid_moves = None):
     global BOARD, screen
     pygame.font.init()  # you have to call this at the start,
 
@@ -80,12 +87,18 @@ def draw_board():
         for j in range(a):
             len = (side/a)
             if (i+j) % 2 == 0:
-                pygame.draw.rect(screen, RED, (i*len, j*len , len-1, len-1))
+                if (valid_moves is not None and (j, i) in valid_moves):
+                    pygame.draw.rect(screen, BLUEGREEN_shaded, (i * len, j * len, len - 1, len - 1))
+                else:
+                    pygame.draw.rect(screen, BLUEGREEN, (i*len, j*len , len-1, len-1))
             else:
-                pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
+                if (valid_moves is not None and (j, i) in valid_moves):
+                    pygame.draw.rect(screen, BLACK_shaded, (i * len, j * len, len - 1, len - 1))
+                else:
+                    pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
 
             myfont = pygame.font.SysFont('Comic Sans MS', 50)
-            textsurface = myfont.render(str(BOARD[j][i]), False, GREEN)
+            textsurface = myfont.render(str(BOARD[j][i]), False, BLUE)
             screen.blit(textsurface, (i*len, j*len))
 
     pygame.display.update()
@@ -122,7 +135,7 @@ if __name__ == '__main__':
                 # Working:
                 # In progress:   knight
                 valids = get_valid_moves (piece, x, y)
-
+                draw_board(valids)
                 print ("Valid Moves: ", end = " ")
                 for i in range (0, len(valids)):
                     print (valids[i], end = ", ")
