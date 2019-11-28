@@ -235,20 +235,46 @@ if __name__ == '__main__':
     pygame.display.flip()
     running = True
 
+    valids = []
+
+    clicked = False
+    last_loc = (-1, -1)
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 3:
+                    clicked = False
+                    draw_board()
+                    break
                 pos = pygame.mouse.get_pos()
                 c = int(pos[0] / (side/8))
                 r = int(pos[1] / (side/8))
 
+                if clicked:
+                    print ("SECOND CLICK")
+
+                    if (r, c) in valids:
+                        print ("reached {}".format(last_loc))
+                        BOARD[r][c] = BOARD[last_loc[0]][last_loc[1]]
+                        BOARD[last_loc[0]][last_loc[1]] = 0
+                        clicked = False
+                        draw_board()
+                        break
+                    else:
+                        clicked = False
+                        draw_board()
+                        if BOARD[r][c] == 'Empty':
+                            break
+
+                last_loc = (r, c)
                 # coorLet = chr(c + 65)
                 # coorNum = 8-r
                 piece = PIECES[BOARD[r][c]];
 
-
+                if piece == 'Empty':
+                    break
                 print ("Loc: ({}, {})   = {}".format(r, c, piece))
-
 
                 # Click a piece, and it shows valid moves
                 # Working:
@@ -259,6 +285,9 @@ if __name__ == '__main__':
                 for i in range (0, len(valids)):
                     print (valids[i], end = ", ")
                 print()
+
+                print ("FIRST CLICK")
+                clicked = True
 
             if event.type == pygame.QUIT:
                 running = False
