@@ -47,8 +47,14 @@ class Piece:
         self.id = num       # ID/KEY of PIECES global (Int)
         self.type = PIECES[self.id]     # from enum, use type number (String)
 
-        if side == -1:
+        if self.type == 'Empty':
             return
+
+        if self.type == 'Rook' or self.type == 'King':
+            self.moved = False  # bool to determine if castling is possible
+        else:
+            self.moved = None
+
         s = "images/"
         if self.side == 0:
             s += 'White/'
@@ -177,10 +183,9 @@ def get_valid_moves (r, c):
             if (r + a[i] < 8 and r + a[i] >= 0):
                 if (c + b[i] < 8 and c + b[i] >= 0):
                     # a piece is here
-                    # if friendly, break. otherwise add it as valid move
-                    if BOARD[r+a[i]][c+b[i]].side == p.side:
-                        break
-                    moves.append((r+a[i], c+b[i]))
+                    # if not same team, add as valid move
+                    if BOARD[r+a[i]][c+b[i]].side != p.side:
+                        moves.append((r+a[i], c+b[i]))
 
     # BISHOP
     if p.type == 'Bishop':
@@ -204,10 +209,9 @@ def get_valid_moves (r, c):
 
                 else:
                     # a piece is here
-                    # if friendly, break. otherwise add it as valid move
-                    if BOARD[locX][locY].side == p.side:
-                        break
-                    moves.append((locX, locY))
+                    # if not same team, add as valid move
+                    if BOARD[locX][locY].side != p.side:
+                        moves.append((locX, locY))
                     break
 
     # ROOK
@@ -232,10 +236,9 @@ def get_valid_moves (r, c):
 
                 else:
                     # a piece is here
-                    # if friendly, break. otherwise add it as valid move
-                    if BOARD[locX][locY].side == p.side:
-                        break
-                    moves.append((locX, locY))
+                    # if not same team, add as valid move
+                    if BOARD[locX][locY].side != p.side:
+                        moves.append((locX, locY))
                     break
 
     # QUEEN
@@ -261,13 +264,11 @@ def get_valid_moves (r, c):
                     break
                 if BOARD[locX][locY].id == 0:
                     moves.append((locX, locY))
-
                 else:
                     # a piece is here
-                    # if friendly, break. otherwise add it as valid move
-                    if BOARD[locX][locY].side == p.side:
-                        break
-                    moves.append((locX, locY))
+                    # if not same team, add as valid move
+                    if BOARD[locX][locY].side != p.side:
+                        moves.append((locX, locY))
                     break
 
     if p.type == "King":
@@ -278,11 +279,23 @@ def get_valid_moves (r, c):
             if (r + a[i] < 8 and r + a[i] >= 0):
                 if (c + b[i] < 8 and c + b[i] >= 0):
                     # a piece is here
-                    # if friendly, break. otherwise add it as valid move
-                    if BOARD[locX][locY].side == p.side:
-                        break
-                    moves.append((r + a[i], c + b[i]))
-
+                    # if not same team, add as valid move
+                    if BOARD[r + a[i]][c + b[i]].side != p.side:
+                        moves.append((r + a[i], c + b[i]))
+        # castling rules: kings and rooks have extra variable, moved, which is False only when the piece hasn't moved
+        if not p.moved:  # king hasnt moved
+            # Short Castle
+            if BOARD[r][c + 1].id == 0 and BOARD[r][c + 2].id == 0:  # space
+                rCornerPiece = BOARD[r][c + 3]
+                if rCornerPiece.type == 'Rook':
+                    if not rCornerPiece.moved:
+                        moves.append((r, c + 2))
+            # Long Castle
+            if BOARD[r][c - 1].id == 0 and BOARD[r][c - 2].id == 0 and BOARD[r][c - 3].id == 0:  # space
+                rCornerPiece = BOARD[r][c - 4]
+                if rCornerPiece.type == 'Rook':
+                    if not rCornerPiece.moved:
+                        moves.append((r, c-2))
 
     '''Given a piece and location (er: rook (4, 5), return a list of valid moves'''
     return moves
@@ -320,6 +333,27 @@ if __name__ == '__main__':
                         BOARD[last_loc[0]][last_loc[1]] = Piece(0)
                         clicked = False
                         turn = 1 - turn
+
+                        print ("p =", p.type)
+                        print ("moved =", p.moved)
+                        # special case for castling
+                        if p.type == 'Rook':
+                            p.moved = True
+                        if p.type == 'King':
+                            p.moved = True
+                            # short castle!
+                            print ("Dist = ", c - last_loc[1])
+                            if c - last_loc[1] == 2:
+                                print ("Short Castle")
+                                # move rook (king already moved)
+                                BOARD[r][last_loc[1]+1] = BOARD[r][last_loc[1]+3]
+                                BOARD[r][last_loc[1] + 3] = Piece(0)    # r is same as last_loc[0] so this works
+                            # long castle!
+                            if c - last_loc[1] == -2:
+                                print ("Long Castle")
+                                # move rook (king already moved)
+                                BOARD[r][last_loc[1] - 1] = BOARD[r][last_loc[1] - 4]
+                                BOARD[r][last_loc[1] - 4] = Piece(0)
                         draw_board()
                         break
                     else:
