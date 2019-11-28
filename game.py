@@ -1,7 +1,7 @@
 import pygame, os
 import numpy as np
 
-#game constants 
+#game constants
 IM_BLACK = 'images/Black/'
 IM_WHITE = 'images/White/'
 
@@ -42,27 +42,28 @@ class Piece:
     Num = ID of piece, based on PIECES global
     Im_path = string path to image, based on type
     '''
-    def __init__(self, num, side):
-        self.side = side #0-->WHITE, 1-->BLACK (Bool)
-        self.id = num #ID/KEY of PIECES global (Int)
-        self.type = PIECES[self.id] #from enum, use type number (String)
+    def __init__(self, num, side=-1):
+        self.side = side    # 0-->WHITE, 1-->BLACK (Bool)
+        self.id = num       # ID/KEY of PIECES global (Int)
+        self.type = PIECES[self.id]     # from enum, use type number (String)
 
+        if side == -1:
+            return
         s = "images/"
         if self.side == 0:
             s += 'White/'
         else:
             s += 'Black/'
-
         s += str(self.type)
         s += '.png'
-        self.im_path = s # string path to piece image (String)
+        self.im_path = s    # string path to piece image (String)
 
 
-BOARD = [[Piece(5, 1), Piece(2, 1), Piece(3, 1), Piece(9, 1), Piece(6, 1), Piece(3, 1), Piece(2, 1), Piece(5, 1)],
+BOARD = [[Piece(5, 1), Piece(3, 1), Piece(2, 1), Piece(9, 1), Piece(6, 1), Piece(2, 1), Piece(3, 1), Piece(5, 1)],
          [Piece(1, 1)]*8,
-         [None]*8, [None]*8, [None]*8, [None]*8,
+         [Piece (0)]*8, [Piece (0)]*8, [Piece (0)]*8, [Piece (0)]*8,
          [Piece(1, 0)]*8,
-         [Piece(5, 0), Piece(2, 0), Piece(3, 0), Piece(9, 0), Piece(6, 0), Piece(3, 0), Piece(2, 0), Piece(5, 0)]]
+         [Piece(5, 0), Piece(3, 0), Piece(2, 0), Piece(9, 0), Piece(6, 0), Piece(2, 0), Piece(3, 0), Piece(5, 0)]]
 
 # game state globals (not constant)
 
@@ -103,7 +104,7 @@ def draw_board(valid_moves = None):
 
             myfont = pygame.font.SysFont('Comic Sans MS', 50)
             ele = BOARD[j][i]
-            if ele is not None:
+            if ele.side != -1:
                 image = pygame.image.load(ele.im_path).convert()
                 screen.blit(image, (i * len, j * len))
             # textsurface = myfont.render(BOARD[j][i].im_path, False, BLUE)
@@ -120,62 +121,69 @@ def draw_board(valid_moves = None):
 
 
 
-def get_valid_moves (p, r, c):
+def get_valid_moves (r, c):
 
     moves = []
 
+    p = BOARD[r][c]
     # PAWN
-    if p == 'Pawn':
+    if p.type == 'Pawn':
         # two cases, one for white, one for black
         #       different for au queening, moving 2 at start, and au passant
 
-        # if p.color == white:
+        if p.side == 0:
             # diagonal attacks
-        if (r-1 >= 0) and (c-1 >= 0):
-            if BOARD[r-1][c-1] != 0:
-                moves.append((r-1, c-1))
-        if (r-1 >= 0) and (c+1 < 8):
-            if BOARD[r-1][c+1] != 0:
-                moves.append((r-1, c+1))
+            if (r-1 >= 0) and (c-1 >= 0):
+                if BOARD[r-1][c-1].id != 0:
+                    if BOARD[r-1][c-1].side != p.side:
+                        moves.append((r-1, c-1))
+            if (r-1 >= 0) and (c+1 < 8):
+                if BOARD[r-1][c+1].id != 0:
+                    if BOARD[r-1][c+1].side != p.side:
+                        moves.append((r-1, c+1))
 
             #forward
-        if r-1 >= 0:
-            if BOARD[r-1][c] == 0:
-                moves.append((r-1, c))
-                if r == 6:
-                    if BOARD[r-2][c] == 0:
-                        moves.append((r-2, c))
+            if r-1 >= 0:
+                if BOARD[r-1][c].id == 0:
+                    moves.append((r-1, c))
+                    if r == 6:
+                        if BOARD[r-2][c].id == 0:
+                            moves.append((r-2, c))
 
-        # if p.color == black:
+        if p.side == 1:
             # diagonal attacks
-            # if (r+1 < 8) and (c-1 >= 0):
-            #     if BOARD[r+1][c-1] != 0:
-            #         moves.append((r+1, c-1))
-            # if (r+1 < 8) and (c+1 < 8):
-            #     if BOARD[r+1][c+1] != 0:
-            #         moves.append((r+1, c+1))
-            #
-            #     #forward
-            # if r+1 < 8:
-            #     if BOARD[r+1][c] == 0:
-            #         moves.append((r+1, c))
-            #         if r == 1:
-            #             if BOARD[r+2][c] == 0:
-            #                 moves.append((r+2, c))
+            if (r+1 < 8) and (c-1 >= 0):
+                if BOARD[r+1][c-1].id != 0:
+                    if BOARD[r+1][c-1].side != p.side:
+                        moves.append((r+1, c-1))
+            if (r+1 < 8) and (c+1 < 8):
+                if BOARD[r+1][c+1].id != 0:
+                    if BOARD[r+1][c+1].side != p.side:
+                        moves.append((r+1, c+1))
+
+            # forward
+            if r+1 < 8:
+                if BOARD[r+1][c].id == 0:
+                    moves.append((r+1, c))
+                    if r == 1:
+                        if BOARD[r+2][c].id == 0:
+                            moves.append((r+2, c))
 
     # KNIGHT
-    if p == 'Knight':
+    if p.type == 'Knight':
         a = [-2, -2, -1, -1, 1, 1, 2, 2]    # r vectors
         b = [-1, 1, -2, 2, -2, 2, -1, 1]    # c vectors
         for i in range (0, len(a)):
             if (r + a[i] < 8 and r + a[i] >= 0):
                 if (c + b[i] < 8 and c + b[i] >= 0):
+                    # a piece is here
+                    # if friendly, break. otherwise add it as valid move
+                    if BOARD[r+a[i]][c+b[i]].side == p.side:
+                        break
                     moves.append((r+a[i], c+b[i]))
 
-        # TODO: remove squares with friendly pieces on them. (REQ: must have access to the pieces color)
-
     # BISHOP
-    if p == 'Bishop':
+    if p.type == 'Bishop':
         v1 = (-1, -1)       # top-left
         v2 = (-1, 1)        # top-right
         v3 = (1, 1)         # bot-right
@@ -189,19 +197,21 @@ def get_valid_moves (p, r, c):
                 v = vectors[i]
                 locX += v[0]
                 locY += v[1]
-                if (locX > 7 or locX < 0 or locX > 7 or locY < 0):
+                if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                     break
-                if BOARD[locX][locY] == 0:
+                if BOARD[locX][locY].id == 0:
                     moves.append((locX, locY))
 
                 else:
-                    # a piece is here. if allc, invalid. if enemy, valid.
+                    # a piece is here
+                    # if friendly, break. otherwise add it as valid move
+                    if BOARD[locX][locY].side == p.side:
+                        break
                     moves.append((locX, locY))
-                    # TODO: if enemy piece, valid move
                     break
 
     # ROOK
-    if p == 'Rook':
+    if p.type == 'Rook':
         v1 = (-1, 0)  # top
         v2 = (0, 1)  # right
         v3 = (0, -1)  # bot
@@ -217,17 +227,19 @@ def get_valid_moves (p, r, c):
                 locY += v[1]
                 if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                     break
-                if BOARD[locX][locY] == 0:
+                if BOARD[locX][locY].id == 0:
                     moves.append((locX, locY))
 
                 else:
-                    # a piece is here. if allc, invalid. if enemc, valid.
+                    # a piece is here
+                    # if friendly, break. otherwise add it as valid move
+                    if BOARD[locX][locY].side == p.side:
+                        break
                     moves.append((locX, locY))
-                    # TODO: if enemc piece, valid move
                     break
 
     # QUEEN
-    if p == 'Queen':
+    if p.type == 'Queen':
         v1 = (-1, 0)    # top
         v2 = (0, 1)     # right
         v3 = (0, -1)    # bot
@@ -247,22 +259,28 @@ def get_valid_moves (p, r, c):
                 locY += v[1]
                 if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                     break
-                if BOARD[locX][locY] == 0:
+                if BOARD[locX][locY].id == 0:
                     moves.append((locX, locY))
 
                 else:
-                    # a piece is here. if allc, invalid. if enemc, valid.
+                    # a piece is here
+                    # if friendly, break. otherwise add it as valid move
+                    if BOARD[locX][locY].side == p.side:
+                        break
                     moves.append((locX, locY))
-                    # TODO: if enemy piece, valid move
                     break
 
-    if p == "King":
+    if p.type == "King":
         a = [-1, 0, 1, -1, 1, -1, 0, 1]  # r vectors
         b = [-1, -1, -1, 0, 0, 1, 1, 1]  # c vectors
         print ("reached", r+a[0])
         for i in range(0, len(a)):
             if (r + a[i] < 8 and r + a[i] >= 0):
                 if (c + b[i] < 8 and c + b[i] >= 0):
+                    # a piece is here
+                    # if friendly, break. otherwise add it as valid move
+                    if BOARD[locX][locY].side == p.side:
+                        break
                     moves.append((r + a[i], c + b[i]))
 
 
@@ -299,21 +317,26 @@ if __name__ == '__main__':
                     if (r, c) in valids:
                         print ("reached {}".format(last_loc))
                         BOARD[r][c] = BOARD[last_loc[0]][last_loc[1]]
-                        BOARD[last_loc[0]][last_loc[1]] = 0
+                        BOARD[last_loc[0]][last_loc[1]] = Piece(0)
                         clicked = False
+                        turn = 1 - turn
                         draw_board()
                         break
                     else:
                         clicked = False
                         draw_board()
-                        if BOARD[r][c] == 'Empty':
+                        if BOARD[r][c].id == 0:
                             break
 
                 last_loc = (r, c)
-                # coorLet = chr(c + 65)
-                # coorNum = 8-r
-                piece = BOARD[r][c];
 
+                print ("FIRST CLICK")
+
+                p = BOARD[r][c]
+                piece = p.type
+
+                if p.side != turn:
+                    break
                 if piece == 'Empty':
                     break
                 print ("Loc: ({}, {})   = {}".format(r, c, piece))
@@ -321,14 +344,13 @@ if __name__ == '__main__':
                 # Click a piece, and it shows valid moves
                 # Working:
                 # In progress:   knight
-                valids = get_valid_moves (piece, r, c)
+                valids = get_valid_moves (r, c)
                 draw_board(valids)
                 print ("Valid Moves: ", end = " ")
                 for i in range (0, len(valids)):
                     print (valids[i], end = ", ")
                 print()
 
-                print ("FIRST CLICK")
                 clicked = True
 
             if event.type == pygame.QUIT:
