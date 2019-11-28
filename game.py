@@ -1,5 +1,10 @@
-import pygame
+import pygame, os
 import numpy as np
+
+IM_BLACK = '/images/Black/'
+IM_WHITE = '/images/White/'
+
+print(os.path.join(IM_WHITE, 'Queen.png'))
 
 # 0 == WHITE
 # 1 == BLACK
