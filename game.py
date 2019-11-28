@@ -1,6 +1,10 @@
 import pygame
 import numpy as np
 
+# 0 == WHITE
+# 1 == BLACK
+turn = 0
+
 NUM_BLOCKS = 30
 SQ_SZ = 25
 
@@ -52,12 +56,12 @@ def draw_board(valid_moves = None):
         for j in range(a):
             len = (side/a)
             if (i+j) % 2 == 0:
-                if (valid_moves is not None and (j, i) in valid_moves):
+                if valid_moves is not None and (j, i) in valid_moves:
                     pygame.draw.rect(screen, BLUEGREEN_shaded, (i * len, j * len, len - 1, len - 1))
                 else:
                     pygame.draw.rect(screen, BLUEGREEN, (i*len, j*len , len-1, len-1))
             else:
-                if (valid_moves is not None and (j, i) in valid_moves):
+                if valid_moves is not None and (j, i) in valid_moves:
                     pygame.draw.rect(screen, BLACK_shaded, (i * len, j * len, len - 1, len - 1))
                 else:
                     pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
