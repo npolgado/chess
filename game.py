@@ -19,7 +19,6 @@ BLACK = (0, 0, 0)
 shd = 32
 BLACK_shaded = (shd, shd, shd)
 
-
 PIECES = {
     0: 'Empty',    1: 'Pawn',
     2: 'Bishop',    3: 'Knight',
@@ -34,15 +33,17 @@ BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
          [5, 2, 3, 9, 6, 3, 2, 5]]
 
 class Piece:
-    def __init__(self, num, color):
-        # color: 0 or 1
-        self.id = num
-        self.type = PIECES[self.id] #from enum, use type number
-        self.color = color
-        self.image = 0 # which image is based on color and type. maybe have switch statement for this
+    ''' 
+    Side = True means WHITE, False means BLACK
+    Num = ID of piece, based on PIECES global
+    Im_path = string path to image, based on type
+    '''
+    def __init__(self, num, side, im_path):
+        self.side = side #T-->WHITE, F-->BLACK (Bool)
+        self.id = num #ID/KEY of PIECES global (Int)
+        self.type = PIECES[self.id] #from enum, use type number (String)
+        self.im_path = im_path # string path to piece image (String)
 
-    def is_valid_move(self, x, y):
-        '''Returns T if new location x/y is valid, F otherwise'''
 
 side = SQ_SZ * NUM_BLOCKS
 size = (side, side)
