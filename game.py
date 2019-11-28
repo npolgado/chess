@@ -1,6 +1,7 @@
 import pygame, os
 import numpy as np
 
+#game constants 
 IM_BLACK = 'images/Black/'
 IM_WHITE = 'images/White/'
 
@@ -9,12 +10,6 @@ IM_KING = 'King.png'
 IM_ROOK = 'Rook.png'
 IM_BISHOP = 'Bishop.png'
 IM_PAWN = 'Pawn.png'
-
-print(os.path.join(IM_WHITE, IM_KING))
-
-# 0 == WHITE
-# 1 == BLACK
-turn = 0
 
 NUM_BLOCKS = 30
 SQ_SZ = 25
@@ -36,8 +31,6 @@ PIECES = {
     5: 'Rook',    6: 'King',
     9: 'Queen'
 }
-
-# TODO: make object that contains [piece, color, path to image]
 
 BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
          [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
@@ -71,8 +64,12 @@ BOARD = [[Piece(5, 1), Piece(2, 1), Piece(3, 1), Piece(9, 1), Piece(6, 1), Piece
          [Piece(1, 0)]*8,
          [Piece(5, 0), Piece(2, 0), Piece(3, 0), Piece(9, 0), Piece(6, 0), Piece(3, 0), Piece(2, 0), Piece(5, 0)]]
 
+# game state globals (not constant)
+
+turn = 0 # turn_count for game state
 side = SQ_SZ * NUM_BLOCKS
 size = (side, side)
+
 
 def is_check():
     '''Checks to see if the gamestate is in check/checkmate, and flags'''
