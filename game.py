@@ -1,8 +1,8 @@
 import pygame, os
 import numpy as np
 
-IM_BLACK = '/images/Black/'
-IM_WHITE = '/images/White/'
+IM_BLACK = 'images/Black/'
+IM_WHITE = 'images/White/'
 
 IM_QUEEN = 'Queen.png'
 IM_KING = 'King.png'
@@ -53,7 +53,17 @@ class Piece:
         self.side = side #0-->WHITE, 1-->BLACK (Bool)
         self.id = num #ID/KEY of PIECES global (Int)
         self.type = PIECES[self.id] #from enum, use type number (String)
-        self.im_path = im_path # string path to piece image (String)
+
+        s = "images/"
+        if self.side == 0:
+            s += 'White/'
+        else:
+            s += 'Black/'
+
+        s += str(self.type)
+        s += '.png'
+        self.im_path = s # string path to piece image (String)
+
 
 BOARD = [[Piece(5, 1), Piece(2, 1), Piece(3, 1), Piece(9, 1), Piece(6, 1), Piece(3, 1), Piece(2, 1), Piece(5, 1)],
          [Piece(1, 1)]*8,
@@ -95,8 +105,12 @@ def draw_board(valid_moves = None):
                     pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
 
             myfont = pygame.font.SysFont('Comic Sans MS', 50)
-            textsurface = myfont.render(BOARD[j][i].im_path, False, BLUE)
-            screen.blit(textsurface, (i*len, j*len))
+            ele = BOARD[j][i]
+            if ele is not None:
+                image = pygame.image.load(ele.im_path).convert()
+                screen.blit(image, (i * len, j * len))
+            # textsurface = myfont.render(BOARD[j][i].im_path, False, BLUE)
+            # screen.blit(textsurface, (i*len, j*len))
 
     pygame.display.update()
 
