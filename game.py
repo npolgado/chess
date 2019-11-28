@@ -4,7 +4,13 @@ import numpy as np
 IM_BLACK = '/images/Black/'
 IM_WHITE = '/images/White/'
 
-print(os.path.join(IM_WHITE, 'Queen.png'))
+IM_QUEEN = 'Queen.png'
+IM_KING = 'King.png'
+IM_ROOK = 'Rook.png'
+IM_BISHOP = 'Bishop.png'
+IM_PAWN = 'Pawn.png'
+
+print(os.path.join(IM_WHITE, IM_KING))
 
 # 0 == WHITE
 # 1 == BLACK
