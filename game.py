@@ -44,6 +44,11 @@ class Piece:
         self.type = PIECES[self.id] #from enum, use type number (String)
         self.im_path = im_path # string path to piece image (String)
 
+# BOARD = [[Piece(5, 1), Piece(2, 1), Piece(3, 1), Piece(9, 1), Piece(6, 1), Piece(3, 1), Piece(2, 1), Piece(5, 1)],
+#          [Piece(1, 1)]*8,
+#          [None]*8, [None]*8, [None]*8, [None]*8,
+#          [Piece(1, 0)]*8,
+#          [Piece(5, 0), Piece(2, 0), Piece(3, 0), Piece(9, 0), Piece(6, 0), Piece(3, 0), Piece(2, 0), Piece(5, 0)]]
 
 side = SQ_SZ * NUM_BLOCKS
 size = (side, side)
