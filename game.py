@@ -28,9 +28,9 @@ PIECES = {
 
 # TODO: make object that contains [piece, color, path to image]
 
-# BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
-#          [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
-#          [5, 2, 3, 9, 6, 3, 2, 5]]
+BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
+         [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
+         [5, 2, 3, 9, 6, 3, 2, 5]]
 
 class Piece:
     ''' 
@@ -84,8 +84,8 @@ def draw_board(valid_moves = None):
                     pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
 
             myfont = pygame.font.SysFont('Comic Sans MS', 50)
-            tertsurface = myfont.render(str(BOARD[j][i]), False, BLUE)
-            screen.blit(tertsurface, (i*len, j*len))
+            textsurface = myfont.render(BOARD[j][i].im_path, False, BLUE)
+            screen.blit(textsurface, (i*len, j*len))
 
     pygame.display.update()
 
