@@ -28,9 +28,9 @@ PIECES = {
 
 # TODO: make object that contains [piece, color, path to image]
 
-BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
-         [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
-         [5, 2, 3, 9, 6, 3, 2, 5]]
+# BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
+#          [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
+#          [5, 2, 3, 9, 6, 3, 2, 5]]
 
 class Piece:
     ''' 
@@ -38,17 +38,17 @@ class Piece:
     Num = ID of piece, based on PIECES global
     Im_path = string path to image, based on type
     '''
-    def __init__(self, num, side, im_path):
-        self.side = side #T-->WHITE, F-->BLACK (Bool)
+    def __init__(self, num, side):
+        self.side = side #0-->WHITE, 1-->BLACK (Bool)
         self.id = num #ID/KEY of PIECES global (Int)
         self.type = PIECES[self.id] #from enum, use type number (String)
         self.im_path = im_path # string path to piece image (String)
 
-# BOARD = [[Piece(5, 1), Piece(2, 1), Piece(3, 1), Piece(9, 1), Piece(6, 1), Piece(3, 1), Piece(2, 1), Piece(5, 1)],
-#          [Piece(1, 1)]*8,
-#          [None]*8, [None]*8, [None]*8, [None]*8,
-#          [Piece(1, 0)]*8,
-#          [Piece(5, 0), Piece(2, 0), Piece(3, 0), Piece(9, 0), Piece(6, 0), Piece(3, 0), Piece(2, 0), Piece(5, 0)]]
+BOARD = [[Piece(5, 1), Piece(2, 1), Piece(3, 1), Piece(9, 1), Piece(6, 1), Piece(3, 1), Piece(2, 1), Piece(5, 1)],
+         [Piece(1, 1)]*8,
+         [None]*8, [None]*8, [None]*8, [None]*8,
+         [Piece(1, 0)]*8,
+         [Piece(5, 0), Piece(2, 0), Piece(3, 0), Piece(9, 0), Piece(6, 0), Piece(3, 0), Piece(2, 0), Piece(5, 0)]]
 
 side = SQ_SZ * NUM_BLOCKS
 size = (side, side)
@@ -76,7 +76,7 @@ def draw_board(valid_moves = None):
                 if valid_moves is not None and (j, i) in valid_moves:
                     pygame.draw.rect(screen, BLUEGREEN_shaded, (i * len, j * len, len - 1, len - 1))
                 else:
-                    pygame.draw.rect(screen, BLUEGREEN, (i*len, j*len , len-1, len-1))
+                    pygame.draw.rect(screen, BLUEGREEN, (i*len, j*len, len-1, len-1))
             else:
                 if valid_moves is not None and (j, i) in valid_moves:
                     pygame.draw.rect(screen, BLACK_shaded, (i * len, j * len, len - 1, len - 1))
@@ -290,7 +290,7 @@ if __name__ == '__main__':
                 last_loc = (r, c)
                 # coorLet = chr(c + 65)
                 # coorNum = 8-r
-                piece = PIECES[BOARD[r][c]];
+                piece = BOARD[r][c];
 
                 if piece == 'Empty':
                     break
