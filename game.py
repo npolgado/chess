@@ -27,20 +27,20 @@ PIECES = {
     9: 'Queen'
 }
 
-# TODO: make object that contains [piece, color, position] and maybe [alive/dead, path to image]
+# TODO: make object that contains [piece, color, path to image]
 
 BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
          [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
          [5, 2, 3, 9, 6, 3, 2, 5]]
 
-class Pieces:
-    def __init__(self, type):
-        self.id = type
-        self.type = PIECES.get(self.id) #from enum, use type number
-        self.points = 0 #fill in based on type
-        self.is_alive = True
-        self.poss_moves = []
-    
+class Piece:
+    def __init__(self, num, color):
+        # color: 0 or 1
+        self.id = num
+        self.type = PIECES[self.id] #from enum, use type number
+        self.color = color
+        self.image = 0 # which image is based on color and type. maybe have switch statement for this
+
     def is_valid_move(self, x, y):
         '''Returns T if new location x/y is valid, F otherwise'''
 
@@ -89,7 +89,6 @@ def draw_board(valid_moves = None):
     # tertsurface2 = mcfont.render('HI:    ' + str(hiScore), False, BLACK)  # 'HI:    '+ str(hiScore)
     # screen.blit(textsurface, (side - 100, 10))
     # screen.blit(textsurface2, (side - 100, 30))
-
 
 
 
