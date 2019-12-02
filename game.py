@@ -18,10 +18,14 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
-
 BLUEGREEN = (71,255,207)
-BLUEGREEN_shaded = (60, 174, 144)
 BLACK = (0, 0, 0)
+LIGHTBROWN = 200, 200, 150
+DARKBROWN = 155, 158, 71
+
+LIGHTBROWN_shaded = 156, 156, 123
+DARKBROWN_shaded = 125, 121, 56
+BLUEGREEN_shaded = (60, 174, 144)
 shd = 32
 BLACK_shaded = (shd, shd, shd)
 
@@ -36,8 +40,12 @@ BOARD = [[5, 2, 3, 9, 6, 3, 2, 5],
          [1]*8, [0]*8, [0]*8, [0,9,0,0,2,5,0,0], [0]*8, [1]*8,
          [5, 2, 3, 9, 6, 3, 2, 5]]
 
+# column for en passant in respective rows
+en_passant_2 = -1
+en_passant_5 = -1
+
 class Piece:
-    ''' 
+    '''
     Side = True means WHITE, False means BLACK
     Num = ID of piece, based on PIECES global
     Im_path = string path to image, based on type
@@ -80,7 +88,32 @@ size = (side, side)
 
 def is_check():
     '''Checks to see if the gamestate is in check/checkmate, and flags'''
-    pass
+    return False
+
+def is_game_over():
+
+    res = is_checkmate_or_stalemate()
+    if res == -1:
+        return -1
+
+    return res
+
+
+def is_checkmate_or_stalemate():
+    # after valid moves are generated for all pieces.
+    # if no moves,
+    #   if check    # win
+    #       return 1
+    #   else    # stalemate
+    #       return .5
+    return -1
+
+def is_3_repititions():
+    return False
+
+def is_insufficient_material():
+    return False
+
 
 def init():
     global screen
@@ -99,20 +132,26 @@ def draw_board(valid_moves = None):
             len = (side/a)
             if (i+j) % 2 == 0:
                 if valid_moves is not None and (j, i) in valid_moves:
-                    pygame.draw.rect(screen, BLUEGREEN_shaded, (i * len, j * len, len - 1, len - 1))
+                    # TODO: choose 1 of the following
+                    screen.fill(LIGHTBROWN_shaded, (i * len, j * len, len, len))
+                    # pygame.draw.rect(screen, LIGHTBROWN_shaded, (i * len, j * len, len, len))
                 else:
-                    pygame.draw.rect(screen, BLUEGREEN, (i*len, j*len, len-1, len-1))
+                    pygame.draw.rect(screen, LIGHTBROWN, (i*len, j*len, len, len))
             else:
                 if valid_moves is not None and (j, i) in valid_moves:
-                    pygame.draw.rect(screen, BLACK_shaded, (i * len, j * len, len - 1, len - 1))
+                    pygame.draw.rect(screen, DARKBROWN_shaded, (i * len, j * len, len, len))
                 else:
-                    pygame.draw.rect(screen, BLACK, (i*len, j*len , len-1, len-1))
+                    pygame.draw.rect(screen, DARKBROWN, (i*len, j*len , len, len))
 
             myfont = pygame.font.SysFont('Comic Sans MS', 50)
             ele = BOARD[j][i]
             if ele.side != -1:
-                image = pygame.image.load(ele.im_path).convert()
-                screen.blit(image, (i * len, j * len))
+                image = pygame.image.load(ele.im_path)
+                # rect_cent = image.get_rect ().center
+                # print ("CENTER=", rect_cent)
+                # screen.blit(image, (rect_cent[0], rect_cent[1]))
+                screen.blit(image, (i * len + SQ_SZ*2/4, j * len + SQ_SZ*2/4))
+
             # textsurface = myfont.render(BOARD[j][i].im_path, False, BLUE)
             # screen.blit(textsurface, (i*len, j*len))
 
@@ -126,7 +165,6 @@ def draw_board(valid_moves = None):
     # screen.blit(textsurface2, (side - 100, 30))
 
 
-
 def get_valid_moves (r, c):
 
     moves = []
@@ -137,17 +175,26 @@ def get_valid_moves (r, c):
         # two cases, one for white, one for black
         #       different for au queening, moving 2 at start, and au passant
 
+        # WHITE
         if p.side == 0:
             # diagonal attacks
             if (r-1 >= 0) and (c-1 >= 0):
                 if BOARD[r-1][c-1].id != 0:
                     if BOARD[r-1][c-1].side != p.side:
                         moves.append((r-1, c-1))
+                if r-1 == 2:    # en passant
+                    print ("reached 1", c-1, en_passant_2)
+                    if c-1 == en_passant_2:
+                        print("en passant added 1")
+                        moves.append((r-1, c-1))
             if (r-1 >= 0) and (c+1 < 8):
                 if BOARD[r-1][c+1].id != 0:
                     if BOARD[r-1][c+1].side != p.side:
                         moves.append((r-1, c+1))
-
+                if r-1 == 2:    # en passant
+                    if c+1 == en_passant_2:
+                        print("en passant added 2")
+                        moves.append(r-1, c+1)
             #forward
             if r-1 >= 0:
                 if BOARD[r-1][c].id == 0:
@@ -156,15 +203,22 @@ def get_valid_moves (r, c):
                         if BOARD[r-2][c].id == 0:
                             moves.append((r-2, c))
 
+        # BLACK
         if p.side == 1:
             # diagonal attacks
             if (r+1 < 8) and (c-1 >= 0):
                 if BOARD[r+1][c-1].id != 0:
                     if BOARD[r+1][c-1].side != p.side:
                         moves.append((r+1, c-1))
+                if r+1 == 5:    # en passant
+                    if c-1 == en_passant_5:
+                        moves.append((r+1, c-1))
             if (r+1 < 8) and (c+1 < 8):
                 if BOARD[r+1][c+1].id != 0:
                     if BOARD[r+1][c+1].side != p.side:
+                        moves.append((r+1, c+1))
+                if r+1 == 5:  # en passant
+                    if c+1 == en_passant_5:
                         moves.append((r+1, c+1))
 
             # forward
@@ -274,10 +328,9 @@ def get_valid_moves (r, c):
     if p.type == "King":
         a = [-1, 0, 1, -1, 1, -1, 0, 1]  # r vectors
         b = [-1, -1, -1, 0, 0, 1, 1, 1]  # c vectors
-        print ("reached", r+a[0])
         for i in range(0, len(a)):
-            if (r + a[i] < 8 and r + a[i] >= 0):
-                if (c + b[i] < 8 and c + b[i] >= 0):
+            if 0 <= r + a[i] < 8:
+                if 0 <= c + b[i] < 8:
                     # a piece is here
                     # if not same team, add as valid move
                     if BOARD[r + a[i]][c + b[i]].side != p.side:
@@ -299,6 +352,117 @@ def get_valid_moves (r, c):
 
     '''Given a piece and location (er: rook (4, 5), return a list of valid moves'''
     return moves
+
+def is_king_safe (team, loc1 = None, loc2 = None):
+    # return if King is safe in current position.
+    # team: 0 white, 1 black
+    # loc1/2:  move loc1 -> loc2  before checking (optional used for checking if a potential valid move is valid)
+
+    pseudo_board = BOARD        # use a fake version of the board for potential moves
+    if loc1 is not None and loc2 is not None:
+        r1 = loc1[0]
+        c1 = loc1[1]
+        r2 = loc2[0]
+        c2 = loc2[1]
+        pseudo_board[r2][c2] = pseudo_board[r1][c1]
+        pseudo_board[r1][c1] = Piece(0)
+
+    # pseudo board represents the board state (after a potential valid move has been made or not)
+    k = get_king_location(team)
+    rk = k[0]
+    ck = k[1]
+    # king = BOARD[rk][ck]
+
+    # KNIGHT?
+    a = [-2, -2, -1, -1, 1, 1, 2, 2]  # r vectors
+    b = [-1, 1, -2, 2, -2, 2, -1, 1]  # c vectors
+    for i in range(0, len(a)):
+        r_pos = rk + a[i]
+        c_pos = ck + b[i]
+        if 0 <= r_pos < 8:
+            if 0 <= c_pos < 8:
+                if BOARD[r_pos][c_pos].side != team and BOARD[r_pos][c_pos].type == 'Knight':
+                    return False
+
+    # BISHOP/ QUEEN?
+    v1 = (-1, -1)  # top-left
+    v2 = (-1, 1)  # top-right
+    v3 = (1, 1)  # bot-right
+    v4 = (1, -1)  # bot-left
+    vectors = [v1, v2, v3, v4]
+    for i in range(0, 4):
+        locX = rk
+        locY = ck
+        while True:
+            v = vectors[i]
+            locX += v[0]
+            locY += v[1]
+            if locX > 7 or locX < 0 or locY > 7 or locY < 0:
+                break
+
+            p = BOARD[locX][locY]
+            if p.id != 0:
+                if p.side == team:  # friendly piece
+                    break
+                else:       # enemy piece
+                    if p.type == 'Bishop' or p.type == 'Queen':
+                        return False
+                    break
+
+
+    # ROOK/ QUEEN
+
+    v1 = (-1, 0)  # top
+    v2 = (0, 1)  # right
+    v3 = (0, -1)  # bot
+    v4 = (1, 0)  # left
+    vectors = [v1, v2, v3, v4]
+
+    for i in range(0, 4):
+        locX = rk
+        locY = ck
+        while True:
+            v = vectors[i]
+            locX += v[0]
+            locY += v[1]
+            if locX > 7 or locX < 0 or locY > 7 or locY < 0:
+                break
+
+            p = BOARD[locX][locY]
+            if p.id != 0:
+                if p.side == team:  # friendly piece
+                    break
+                else:  # enemy piece
+                    if p.type == 'Rook' or p.type == 'Queen':
+                        return False
+                    break
+
+    # PAWN?
+    n = 1   # pawns can attack (row) in negative direction for white, positive for black
+    if team == 0:
+        n = -1
+
+    if 0 <= rk + n < 8:
+        if 0 <= ck - 1 < 8:
+            p = BOARD[rk + n][ck - 1]
+            if p.side != team and p.type == 'Pawn':
+                return False
+        if 0 <= ck + 1 < 8:
+            p = BOARD[rk + n][ck + 1]
+            if p.side != team and p.type == 'Pawn':
+                return False
+    return True
+
+
+def get_king_location (team):
+    # team: 0 White 1 Black
+    for i in range(0, 8):
+        for j in range (0, 8):
+            p = BOARD[i][j]
+            if p.type == 'Empty':
+                continue
+            if p.side == team and p.type == 'King':
+                return (i, j)
 
 
 
@@ -325,24 +489,32 @@ if __name__ == '__main__':
                 r = int(pos[1] / (side/8))
 
                 if clicked:
-                    print ("SECOND CLICK")
+                    print ("SECOND CLICK")  # placing pieces
 
                     if (r, c) in valids:
-                        print ("reached {}".format(last_loc))
+                        # move piece logic
                         BOARD[r][c] = BOARD[last_loc[0]][last_loc[1]]
                         BOARD[last_loc[0]][last_loc[1]] = Piece(0)
-                        clicked = False
-                        turn = 1 - turn
 
-                        print ("p =", p.type)
-                        print ("moved =", p.moved)
-                        # special case for castling
+                        # en passant logic
+                        if p.type == 'Pawn':
+                            dist = r - last_loc[0]
+                            if abs(dist) == 2:
+                                if dist < 0:
+                                    en_passant_5 = c
+                                else:
+                                    en_passant_2 = c
+                            if (r, c) == (2, en_passant_2):
+                                BOARD[r+1][c] = Piece(0)
+                            if (r, c) == (5, en_passant_5):
+                                BOARD[r-1][c] = Piece(0)
+
+                        # castling logic
                         if p.type == 'Rook':
                             p.moved = True
                         if p.type == 'King':
                             p.moved = True
                             # short castle!
-                            print ("Dist = ", c - last_loc[1])
                             if c - last_loc[1] == 2:
                                 print ("Short Castle")
                                 # move rook (king already moved)
@@ -355,6 +527,20 @@ if __name__ == '__main__':
                                 BOARD[r][last_loc[1] - 1] = BOARD[r][last_loc[1] - 4]
                                 BOARD[r][last_loc[1] - 4] = Piece(0)
                         draw_board()
+
+                        print ("King Safe ({})?  {}".format(turn, is_king_safe(turn)))
+
+                        clicked = False
+                        # NEW TURN
+                        turn = 1 - turn
+
+                        # reset en passant arrays
+                        if turn == 0:
+                            en_passant_5 = -1
+                        else:
+
+                            en_passant_2 = -1
+
                         break
                     else:
                         clicked = False
@@ -363,27 +549,27 @@ if __name__ == '__main__':
                             break
 
                 last_loc = (r, c)
-
-                print ("FIRST CLICK")
-
                 p = BOARD[r][c]
                 piece = p.type
+
+                print ("FIRST CLICK \t ({}, {})   = {}".format(r, c, piece))       # piece has been selected
+
+
 
                 if p.side != turn:
                     break
                 if piece == 'Empty':
                     break
-                print ("Loc: ({}, {})   = {}".format(r, c, piece))
 
                 # Click a piece, and it shows valid moves
                 # Working:
                 # In progress:   knight
                 valids = get_valid_moves (r, c)
                 draw_board(valids)
-                print ("Valid Moves: ", end = " ")
-                for i in range (0, len(valids)):
-                    print (valids[i], end = ", ")
-                print()
+                # print ("Valid Moves: ", end = " ")
+                # for i in range (0, len(valids)):
+                #     print (valids[i], end = ", ")
+                # print()
 
                 clicked = True
 
