@@ -122,6 +122,13 @@ def init():
     pygame.display.set_caption('Chess')
     screen.fill(WHITE)
 
+def print_board(arr):
+    print("-----")
+    for i in range(8):
+        for j in range(8):
+            print (arr[i][j].id, end =" ")
+        print ()
+
 def draw_board(valid_moves = None):
     global BOARD, screen
     pygame.font.init()  # you have to call this at the start,
@@ -181,27 +188,30 @@ def get_valid_moves (r, c):
             if (r-1 >= 0) and (c-1 >= 0):
                 if BOARD[r-1][c-1].id != 0:
                     if BOARD[r-1][c-1].side != p.side:
-                        moves.append((r-1, c-1))
+                        if is_king_safe(p.side, (r, c), (r-1, c-1)):
+                            moves.append((r-1, c-1))
                 if r-1 == 2:    # en passant
-                    print ("reached 1", c-1, en_passant_2)
                     if c-1 == en_passant_2:
-                        print("en passant added 1")
-                        moves.append((r-1, c-1))
+                        if is_king_safe(p.side, (r, c), (r-1, c-1)):
+                            moves.append((r-1, c-1))
             if (r-1 >= 0) and (c+1 < 8):
                 if BOARD[r-1][c+1].id != 0:
                     if BOARD[r-1][c+1].side != p.side:
-                        moves.append((r-1, c+1))
+                        if is_king_safe(p.side, (r, c), (r-1, c+1)):
+                            moves.append((r-1, c+1))
                 if r-1 == 2:    # en passant
                     if c+1 == en_passant_2:
-                        print("en passant added 2")
-                        moves.append(r-1, c+1)
+                        if is_king_safe(p.side, (r, c), (r-1, c)):
+                            moves.append((r-1, c+1))
             #forward
             if r-1 >= 0:
                 if BOARD[r-1][c].id == 0:
-                    moves.append((r-1, c))
+                    if is_king_safe(p.side, (r, c), (r-1, c)):
+                        moves.append((r-1, c))
                     if r == 6:
                         if BOARD[r-2][c].id == 0:
-                            moves.append((r-2, c))
+                            if is_king_safe(p.side, (r, c), (r-2, c)):
+                                moves.append((r-2, c))
 
         # BLACK
         if p.side == 1:
@@ -209,25 +219,31 @@ def get_valid_moves (r, c):
             if (r+1 < 8) and (c-1 >= 0):
                 if BOARD[r+1][c-1].id != 0:
                     if BOARD[r+1][c-1].side != p.side:
-                        moves.append((r+1, c-1))
+                        if is_king_safe(p.side, (r, c), (r+1, c-1)):
+                            moves.append((r+1, c-1))
                 if r+1 == 5:    # en passant
                     if c-1 == en_passant_5:
-                        moves.append((r+1, c-1))
+                        if is_king_safe(p.side, (r, c), (r+1, c-1)):
+                            moves.append((r+1, c-1))
             if (r+1 < 8) and (c+1 < 8):
                 if BOARD[r+1][c+1].id != 0:
                     if BOARD[r+1][c+1].side != p.side:
-                        moves.append((r+1, c+1))
+                        if is_king_safe(p.side, (r, c), (r+1, c+1)):
+                            moves.append((r+1, c+1))
                 if r+1 == 5:  # en passant
                     if c+1 == en_passant_5:
-                        moves.append((r+1, c+1))
+                        if is_king_safe(p.side, (r, c), (r+1, c+1)):
+                            moves.append((r+1, c+1))
 
             # forward
             if r+1 < 8:
                 if BOARD[r+1][c].id == 0:
-                    moves.append((r+1, c))
+                    if is_king_safe(p.side, (r, c), (r+1, c)):
+                        moves.append((r+1, c))
                     if r == 1:
                         if BOARD[r+2][c].id == 0:
-                            moves.append((r+2, c))
+                            if is_king_safe(p.side, (r, c), (r+2, c)):
+                                moves.append((r+2, c))
 
     # KNIGHT
     if p.type == 'Knight':
@@ -239,7 +255,8 @@ def get_valid_moves (r, c):
                     # a piece is here
                     # if not same team, add as valid move
                     if BOARD[r+a[i]][c+b[i]].side != p.side:
-                        moves.append((r+a[i], c+b[i]))
+                        if is_king_safe(p.side, (r, c), (r+a[i], c+b[i])):
+                            moves.append((r+a[i], c+b[i]))
 
     # BISHOP
     if p.type == 'Bishop':
@@ -259,13 +276,15 @@ def get_valid_moves (r, c):
                 if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                     break
                 if BOARD[locX][locY].id == 0:
-                    moves.append((locX, locY))
+                    if is_king_safe(p.side, (r, c), (locX, locY)):
+                        moves.append((locX, locY))
 
                 else:
                     # a piece is here
                     # if not same team, add as valid move
                     if BOARD[locX][locY].side != p.side:
-                        moves.append((locX, locY))
+                        if is_king_safe(p.side, (r, c), (locX, locY)):
+                            moves.append((locX, locY))
                     break
 
     # ROOK
@@ -286,13 +305,15 @@ def get_valid_moves (r, c):
                 if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                     break
                 if BOARD[locX][locY].id == 0:
-                    moves.append((locX, locY))
+                    if is_king_safe(p.side, (r, c), (locX, locY)):
+                        moves.append((locX, locY))
 
                 else:
                     # a piece is here
                     # if not same team, add as valid move
                     if BOARD[locX][locY].side != p.side:
-                        moves.append((locX, locY))
+                        if is_king_safe(p.side, (r, c), (locX, locY)):
+                            moves.append((locX, locY))
                     break
 
     # QUEEN
@@ -317,12 +338,14 @@ def get_valid_moves (r, c):
                 if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                     break
                 if BOARD[locX][locY].id == 0:
-                    moves.append((locX, locY))
+                    if is_king_safe(p.side, (r, c), (locX, locY)):
+                        moves.append((locX, locY))
                 else:
                     # a piece is here
                     # if not same team, add as valid move
                     if BOARD[locX][locY].side != p.side:
-                        moves.append((locX, locY))
+                        if is_king_safe(p.side, (r, c), (locX, locY)):
+                            moves.append((locX, locY))
                     break
 
     if p.type == "King":
@@ -334,7 +357,8 @@ def get_valid_moves (r, c):
                     # a piece is here
                     # if not same team, add as valid move
                     if BOARD[r + a[i]][c + b[i]].side != p.side:
-                        moves.append((r + a[i], c + b[i]))
+                        if is_king_safe(p.side, (r,c), (r+a[i], c+b[i])):
+                            moves.append((r + a[i], c + b[i]))
         # castling rules: kings and rooks have extra variable, moved, which is False only when the piece hasn't moved
         if not p.moved:  # king hasnt moved
             # Short Castle
@@ -358,7 +382,7 @@ def is_king_safe (team, loc1 = None, loc2 = None):
     # team: 0 white, 1 black
     # loc1/2:  move loc1 -> loc2  before checking (optional used for checking if a potential valid move is valid)
 
-    pseudo_board = BOARD        # use a fake version of the board for potential moves
+    pseudo_board = [row[:] for row in BOARD]       # use a fake version of the board for potential moves
     if loc1 is not None and loc2 is not None:
         r1 = loc1[0]
         c1 = loc1[1]
@@ -367,13 +391,15 @@ def is_king_safe (team, loc1 = None, loc2 = None):
         pseudo_board[r2][c2] = pseudo_board[r1][c1]
         pseudo_board[r1][c1] = Piece(0)
 
+    # print_board(pseudo_board)
+
     # pseudo board represents the board state (after a potential valid move has been made or not)
-    k = get_king_location(team)
+    k = get_king_location(team, pseudo_board)
     rk = k[0]
     ck = k[1]
-    # king = BOARD[rk][ck]
+    # king = pseudo_board[rk][ck]
 
-    # KNIGHT?
+    # King <- KNIGHT?
     a = [-2, -2, -1, -1, 1, 1, 2, 2]  # r vectors
     b = [-1, 1, -2, 2, -2, 2, -1, 1]  # c vectors
     for i in range(0, len(a)):
@@ -381,10 +407,10 @@ def is_king_safe (team, loc1 = None, loc2 = None):
         c_pos = ck + b[i]
         if 0 <= r_pos < 8:
             if 0 <= c_pos < 8:
-                if BOARD[r_pos][c_pos].side != team and BOARD[r_pos][c_pos].type == 'Knight':
+                if pseudo_board[r_pos][c_pos].side != team and pseudo_board[r_pos][c_pos].type == 'Knight':
                     return False
 
-    # BISHOP/ QUEEN?
+    # King <- BISHOP/ QUEEN?
     v1 = (-1, -1)  # top-left
     v2 = (-1, 1)  # top-right
     v3 = (1, 1)  # bot-right
@@ -400,7 +426,7 @@ def is_king_safe (team, loc1 = None, loc2 = None):
             if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                 break
 
-            p = BOARD[locX][locY]
+            p = pseudo_board[locX][locY]
             if p.id != 0:
                 if p.side == team:  # friendly piece
                     break
@@ -410,8 +436,7 @@ def is_king_safe (team, loc1 = None, loc2 = None):
                     break
 
 
-    # ROOK/ QUEEN
-
+    # King <- ROOK/ QUEEN?
     v1 = (-1, 0)  # top
     v2 = (0, 1)  # right
     v3 = (0, -1)  # bot
@@ -428,7 +453,7 @@ def is_king_safe (team, loc1 = None, loc2 = None):
             if locX > 7 or locX < 0 or locY > 7 or locY < 0:
                 break
 
-            p = BOARD[locX][locY]
+            p = pseudo_board[locX][locY]
             if p.id != 0:
                 if p.side == team:  # friendly piece
                     break
@@ -437,32 +462,35 @@ def is_king_safe (team, loc1 = None, loc2 = None):
                         return False
                     break
 
-    # PAWN?
+    # King <- PAWN?
     n = 1   # pawns can attack (row) in negative direction for white, positive for black
     if team == 0:
         n = -1
 
     if 0 <= rk + n < 8:
         if 0 <= ck - 1 < 8:
-            p = BOARD[rk + n][ck - 1]
+            p = pseudo_board[rk + n][ck - 1]
             if p.side != team and p.type == 'Pawn':
                 return False
         if 0 <= ck + 1 < 8:
-            p = BOARD[rk + n][ck + 1]
+            p = pseudo_board[rk + n][ck + 1]
             if p.side != team and p.type == 'Pawn':
                 return False
     return True
 
 
-def get_king_location (team):
+def get_king_location (team, arr):
     # team: 0 White 1 Black
     for i in range(0, 8):
         for j in range (0, 8):
-            p = BOARD[i][j]
+            p = arr[i][j]
             if p.type == 'Empty':
                 continue
             if p.side == team and p.type == 'King':
                 return (i, j)
+
+
+
 
 
 
@@ -566,10 +594,10 @@ if __name__ == '__main__':
                 # In progress:   knight
                 valids = get_valid_moves (r, c)
                 draw_board(valids)
-                # print ("Valid Moves: ", end = " ")
-                # for i in range (0, len(valids)):
-                #     print (valids[i], end = ", ")
-                # print()
+                print ("Valid Moves: ", end = " ")
+                for i in range (0, len(valids)):
+                    print (valids[i], end = ", ")
+                print()
 
                 clicked = True
 
