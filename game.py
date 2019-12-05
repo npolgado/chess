@@ -197,7 +197,6 @@ def draw_board(valid_moves=None, clicked=None): #, locs=None):
 
     a = 8
 
-    print ("last =", BOARD.prev_moves)
     for i in range(a):
         for j in range(a):
             len = (side / a)
@@ -681,7 +680,7 @@ if __name__ == '__main__':
                         draw_board()
 
                         if BOARD.state != 0:
-                            print ("State:", state)
+                            print ("State:", BOARD.state)
                         if BOARD.state == 1:  # checkmate
                             running = False
                             break
@@ -736,4 +735,4 @@ if __name__ == '__main__':
         #Repeat ^^
 
 
-print ("GAME OVER WITH STATE", state)
+print ("GAME OVER WITH STATE", BOARD.state)
