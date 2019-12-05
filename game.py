@@ -1,6 +1,8 @@
 import pygame, os
 import numpy as np
 
+FILE_DIR = os.path.dirname(__file__)
+
 #game constants
 IM_BLACK = 'images/Black/'
 IM_WHITE = 'images/White/'
@@ -156,7 +158,7 @@ class Piece:
             s += 'Black/'
         s += str(self.type)
         s += '.png'
-        self.im_path = s    # string path to piece image (String)
+        self.im_path = os.path.join(FILE_DIR, s)    # string path to piece image (String)
 
     def __str__(self):
         s = ""
