@@ -112,6 +112,7 @@ class Tree:
             pseudo_game = copy.deepcopy(cur_game)
             a = poss_moves[i]
             pseudo_game.move(a[0], a[1])
+            pseudo_game.new_turn()
 
             # evaluation of position (currently just material difference)
             dif = pseudo_game.__get_game_state_and_points__()

@@ -198,12 +198,12 @@ class Game:
             dist = r1 - r2
             if abs(dist) == 2:
                 if self.turn == 0:
-                    self.en_passant_5 = c
+                    self.en_passant_5 = c1
                 else:
-                    self.en_passant_2 = c
+                    self.en_passant_2 = c1
 
             if (r2, c2) == (2, self.en_passant_2):
-                removed_piece = self.board[r + 1][c]
+                removed_piece = self.board[r2 + 1][c2]
                 self.board[r2 + 1][c2] = Piece(0)
                 # ERROR CHECK: # print ("p =", p, "...", self.__get_r_c_from_piece__(p))
                 print("removed piece=", removed_piece, "..", self.__get_r_c_from_piece__(removed_piece))
@@ -212,7 +212,7 @@ class Game:
                 print(self.pieces_arr[removed_piece.side])
                 self.pieces_arr[removed_piece.side].remove(removed_piece)
             if (r1, c1) == (5, self.en_passant_5):
-                removed_piece = self.board[r - 1][c]
+                removed_piece = self.board[r2 - 1][c2]
                 self.board[r2 - 1][c2] = Piece(0)
                 self.pieces_arr[removed_piece.side].remove(removed_piece)
 
