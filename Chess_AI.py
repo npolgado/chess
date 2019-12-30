@@ -2,11 +2,11 @@ import random
 import copy
 import math
 # Agent that plays chess
+
 class AI :
     def __init__(self, game, col):
         self.game = game    # game object to get information about the game
         self.color = col    # color the ai is playing (0 white, 1 black)
-
 
     def get_move_random(self):
         pieces = self.game.get_teams_pieces(self.color)
@@ -17,23 +17,15 @@ class AI :
             for i in range (len(val_moves)):
                 poss_moves.append((p, val_moves[i]))
 
-        # print ("(", len(poss_moves), end =")")
-        # for i in range (len(poss_moves)):
-        #     print (poss_moves[i][0].type, "/", poss_moves[i][1], end = ". ")
-        # print ()
-
         # poss moves is an array of tuples: (piece, valid moves of that piece)
         return random.choice(poss_moves)
 
     def get_move(self):
-
         # create tree and set root value to current mat diff
         self.tree = Tree(self.game.get_mat_diff())
 
         # layer 1
         self.tree.add_children(self.tree.root, self.game)
-
-        # self.tree.print_tree()
 
         # layer 2
         for ch in self.tree.root.children:
@@ -42,33 +34,46 @@ class AI :
             for i in range (len(ch.path)):
                 p_game.move(ch.path[i][0], ch.path[i][1])
                 p_game.new_turn()
+
             self.tree.add_children(ch, p_game)
 
+        # minimax
+        for i in range(1, -1, -1):
+            layer_arr = self.tree.get_nodes_at_layer(i)
+            n = (i + self.color) % 2
+            nud = None
+            for el in layer_arr:
+                if n == 0:  # maximize
+                    nud = None
+                    for ch in el.children:
+                        if nud is None:
+                            nud = [ch]
+                        else:
+                            if ch.value > nud[0].value:
+                                nud = [ch]
+                            elif ch.value == nud[0].value:
+                                nud.append(ch)
+
+                elif n == 1:  # minimize
+                    nud = None
+                    for ch in el.children:
+                        if nud is None:
+                            nud = [ch]
+                        else:
+                            if ch.value < nud[0].value:
+                                nud = [ch]
+                            elif ch.value == nud[0].value:
+                                nud.append(ch)
+                if nud is None:
+                    print ("par=", el.value, el.path)
+                else:
+                    el.value = nud[0].value
+
         self.tree.print_tree()
-        self.tree.print_all_leaves()
-
-        # find minimum value'd node (replace with minimax once more depth is added)
-        l = self.tree.root.children
-        min_ind = 0
-        min_node = l[0]
-        node_inds = [min_ind]
-        for i in range(len(l)):
-            n = l[i]
-            if n.value < min_node.value:
-                min_node = n
-                min_ind = i
-                node_inds = [i]
-
-            elif n.value == min_node.value:
-                node_inds.append(i)
-
-        ind = random.choice(node_inds)
-
-        return self.tree.root.children[ind].path[0]
-
-        # above is working, but how can we do it for depth d.
-        # after getting an entire layer, call this on each child
-
+        # for a in nud:
+        #     print (a.value, end=", ")
+        # print()
+        return random.choice(nud).path[0]
 
 class Tree:
     def __init__(self, v):
@@ -88,11 +93,24 @@ class Tree:
         self.__print_leaf_helper__(self.root)
 
     def __print_leaf_helper__(self, n):
-        if n.children == []:
+        if n.children is []:
             print(n.value, n.path)
         else:
             for ch in n.children:
                 self.__print_leaf_helper__(ch)
+
+    def get_nodes_at_layer(self, d):
+        a = [self.root]
+        while d > 0:
+            b = []
+            for el in a:
+                for ch in el.children:
+                    b.append(ch)
+            a = b
+
+            d -= 1
+
+        return a
 
     def add_children(self, parent, cur_game):
         # copy current game state, to follow different lines
@@ -115,11 +133,17 @@ class Tree:
             pseudo_game.new_turn()
 
             # evaluation of position (currently just material difference)
-            dif = pseudo_game.__get_game_state_and_points__()
-            diff = dif[1]
-            # pseudo_game.print_board()
-            # print ("   dif =", diff)
-            n = self.Node(diff, parent, a)
+            dif = pseudo_game.get_mat_diff()
+            st = pseudo_game.get_state()
+            trn = pseudo_game.turn
+            if st == 1 or st == 2:
+                if trn==0:
+                    l = -1
+                elif trn==1:
+                    l = 1
+                n = self.Node(l*1000, parent, a)
+            else:
+                n = self.Node(dif, parent, a)
             parent.children.append(n)
 
     class Node:
@@ -127,7 +151,7 @@ class Tree:
             self.value = val
 
             # parents path plus last move
-            if par is None: # root
+            if par is None:     # root
                 self.parent = None
                 self.path = []
             else:

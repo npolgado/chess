@@ -205,11 +205,6 @@ class Game:
             if (r2, c2) == (2, self.en_passant_2):
                 removed_piece = self.board[r2 + 1][c2]
                 self.board[r2 + 1][c2] = Piece(0)
-                # ERROR CHECK: # print ("p =", p, "...", self.__get_r_c_from_piece__(p))
-                print("removed piece=", removed_piece, "..", self.__get_r_c_from_piece__(removed_piece))
-                print("en_pas=", self.en_passant_2)
-
-                print(self.pieces_arr[removed_piece.side])
                 self.pieces_arr[removed_piece.side].remove(removed_piece)
             if (r1, c1) == (5, self.en_passant_5):
                 removed_piece = self.board[r2 - 1][c2]
@@ -728,6 +723,7 @@ if __name__ == '__main__':
     GAME = Game()
 
     chess_ai = ai.AI(GAME, 1)
+    chess_ai2 = ai.AI(GAME, 0)
 
     # game state globals (not constant)
 
@@ -745,65 +741,72 @@ if __name__ == '__main__':
     first_click_loc = None
 
     while running:
+        # if GAME.turn == 0:
+        # # if True:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.MOUSEBUTTONUP:
+        #             if event.button == 3:   #   right click
+        #                 clicked = False
+        #                 GAME.draw_board()
+        #                 break
+        #             pos = pygame.mouse.get_pos()
+        #             c = int(pos[0] / (side/8))
+        #             r = int(pos[1] / (side/8))
+        #
+        #             # SECOND Click
+        #             if clicked:
+        #                 if (r, c) in valids:
+        #                     GAME.move(first_click_loc, (r,c))
+        #
+        #                     clicked = False
+        #
+        #                     GAME.new_turn()
+        #
+        #                     GAME.draw_board()
+        #
+        #                     st = GAME.get_state()
+        #                     if st != 0:
+        #                         print ("State:", st)
+        #                     if st == 1:  # checkmate
+        #                         running = False
+        #                         break
+        #                     elif st == 2:    # stalemate
+        #                         running = False
+        #                         break
+        #                     break
+        #                 else:
+        #                     clicked = False
+        #                     GAME.draw_board()
+        #                     if GAME.board[r][c].id == 0:
+        #                         break
+        #
+        #             # FIRST CLICK
+        #             p = GAME.board[r][c]
+        #             piece = p.type
+        #
+        #             if p.side != GAME.turn:
+        #                 break
+        #             if piece == 'Empty':
+        #                 break
+        #
+        #             first_click_loc = (r, c)
+        #
+        #             valids = GAME.get_valid_moves (p)
+        #             GAME.draw_board(valids, (r, c))
+        #
+        #             clicked = True
+        #
+        #         if event.type == pygame.QUIT:
+        #             running = False
+
         if GAME.turn == 0:
-        # if True:
-            for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if event.button == 3:   #   right click
-                        clicked = False
-                        GAME.draw_board()
-                        break
-                    pos = pygame.mouse.get_pos()
-                    c = int(pos[0] / (side/8))
-                    r = int(pos[1] / (side/8))
-
-                    # SECOND Click
-                    if clicked:
-                        if (r, c) in valids:
-                            GAME.move(first_click_loc, (r,c))
-
-                            clicked = False
-
-                            GAME.new_turn()
-
-                            GAME.draw_board()
-
-                            st = GAME.get_state()
-                            if st != 0:
-                                print ("State:", st)
-                            if st == 1:  # checkmate
-                                running = False
-                                break
-                            elif st == 2:    # stalemate
-                                running = False
-                                break
-                            break
-                        else:
-                            clicked = False
-                            GAME.draw_board()
-                            if GAME.board[r][c].id == 0:
-                                break
-
-                    # FIRST CLICK
-                    p = GAME.board[r][c]
-                    piece = p.type
-
-                    if p.side != GAME.turn:
-                        break
-                    if piece == 'Empty':
-                        break
-
-                    first_click_loc = (r, c)
-
-                    valids = GAME.get_valid_moves (p)
-                    GAME.draw_board(valids, (r, c))
-
-                    clicked = True
-
-                if event.type == pygame.QUIT:
-                    running = False
+            a = chess_ai2.get_move()
+            GAME.move(a[0], a[1])
+            GAME.new_turn()
+            GAME.draw_board()
         else:
             a = chess_ai.get_move()
+            # print("a=", a)
             GAME.move(a[0], a[1])
             GAME.new_turn()
             GAME.draw_board()
