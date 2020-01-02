@@ -36,6 +36,7 @@ class AI :
                 p_game.new_turn()
 
             self.tree.add_children(ch, p_game)
+        # layer 3
 
         # minimax
         for i in range(1, -1, -1):
