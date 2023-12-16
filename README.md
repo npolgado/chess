@@ -7,17 +7,17 @@ Game.py holds all the logic for the chess game. Run this file
 
 # GOALS
 - Cleanup
-    - [ ] identify changes in the code
+    - [] identify changes in the code
 
 - Multiplayer online
-    - [ ] dropdown for engine choice
-    - [ ] identify multiplayer
+    - [] dropdown for engine choice
+    - [] identify multiplayer
 
 - Custom game time
 - 1v1 online using custom AI assistance
-    - [ ] final integration and testing
+    - [] final integration and testing
 
 # ISSUES TO FIX
-- [ ] AI vs. AI king can take king
-- [ ] AI's crash
-- [ ] AI's speed up at end game
+- [] AI vs. AI king can take king
+- [] AI's crash
+- [] AI's speed up at end game
