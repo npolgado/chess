@@ -26,6 +26,8 @@ move: str
 
 '''
 
+#merge test
+
 # Board State should be a string representing the current position of pieces on the board
 board_state = np.array((8,8))
 board_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
