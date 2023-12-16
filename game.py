@@ -712,10 +712,10 @@ def init():
 
     pygame.display.flip()
 
-def is_3_repititions():
+def is_3_repititions(): # TODO
     return False
 
-def is_insufficient_material():
+def is_insufficient_material(): # TODO
     return False
 
 if __name__ == '__main__':
@@ -798,11 +798,11 @@ if __name__ == '__main__':
                 if event.type == pygame.QUIT:
                     running = False
 
-        # if GAME.turn == 0:
-        #     a = chess_ai2.get_move()
-        #     GAME.move(a[0], a[1])
-        #     GAME.new_turn()
-        #     GAME.draw_board()
+        if GAME.turn == 0:
+            a = chess_ai2.get_move()
+            GAME.move(a[0], a[1])
+            GAME.new_turn()
+            GAME.draw_board()
         else:
             a = chess_ai.get_move()
             # print("a=", a)
