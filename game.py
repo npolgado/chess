@@ -1,7 +1,8 @@
 import pygame, os
 import math
 import numpy as np
-import Chess_AI as ai
+import eric_AI as eai
+import nick_AI as nai
 
 FILE_DIR = os.path.dirname(__file__)
 
@@ -722,8 +723,8 @@ if __name__ == '__main__':
 
     GAME = Game()
 
-    chess_ai = ai.AI(GAME, 1)
-    chess_ai2 = ai.AI(GAME, 0)
+    chess_ai = eai.AI(GAME, 1)
+    chess_ai2 = nai.AI(GAME, 0)
 
     # game state globals (not constant)
 
