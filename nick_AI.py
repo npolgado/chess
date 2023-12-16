@@ -1,27 +1,21 @@
 import random
 import copy
 import math
-# Agent that plays chess
+import numpy as np
+import time
 
 class AI :
     def __init__(self, game, col):
         self.game = game    # game object to get information about the game
         self.color = col    # color the ai is playing (0 white, 1 black)
 
-    def get_move_random(self):
-        pieces = self.game.get_teams_pieces(self.color)
-        poss_moves = []
-        for i in range (len(pieces)):
-            p = pieces[i]
-            val_moves = self.game.get_valid_moves(p)
-            for i in range (len(val_moves)):
-                poss_moves.append((p, val_moves[i]))
-
-        # poss moves is an array of tuples: (piece, valid moves of that piece)
-        return random.choice(poss_moves)
+    def recieve_opponent_move(move: str):
+        pass
 
     def get_move(self) -> tuple:
-        # create tree and set root value to current mat diff
+        pass
+
+        """# create tree and set root value to current mat diff
         self.tree = Tree(self.game.get_mat_diff())
 
         # layer 1
@@ -74,9 +68,9 @@ class AI :
         # for a in nud:
         #     print (a.value, end=", ")
         # print()
-        return random.choice(nud).path[0]
+        return random.choice(nud).path[0]"""
 
-class Tree:
+"""class Tree:
     def __init__(self, v):
         self.root = self.Node(v)
         self.depth = 0
@@ -163,3 +157,4 @@ class Tree:
 
         def __str__(self):
             return str(self.value)
+"""
