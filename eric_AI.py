@@ -20,7 +20,7 @@ class AI :
         # poss moves is an array of tuples: (piece, valid moves of that piece)
         return random.choice(poss_moves)
 
-    def get_move(self):
+    def get_move(self) -> tuple:
         # create tree and set root value to current mat diff
         self.tree = Tree(self.game.get_mat_diff())
 
@@ -70,7 +70,7 @@ class AI :
                 else:
                     el.value = nud[0].value
 
-        self.tree.print_tree()
+        # self.tree.print_tree()
         # for a in nud:
         #     print (a.value, end=", ")
         # print()
