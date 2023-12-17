@@ -74,6 +74,10 @@ class AI :
         # for a in nud:
         #     print (a.value, end=", ")
         # print()
+                    
+        if nud is None:
+            import time
+            time.sleep(10000)
         return random.choice(nud).path[0]
 
 class Tree:
