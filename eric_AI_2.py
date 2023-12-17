@@ -3,28 +3,22 @@ import copy
 import math
 # Agent that plays chess
 
-
 # TODO: variable that keeps track of current board state
-
 # TODO: function that transforms board state by one move
-
 # TODO: create tree where each valid move is a new node, and the board state is transformed one move, and that Node is analyzed for a score, and pruned if its much lower than the original
+
 
 class AI :
     
     def __init__(self, board_state):
         self.current_board_state = board_state
 
-
         for el in board_state:
             print(el)
-        # delete
 
-        n = self.Node(board_state)
+        self.root = self.Node(board_state)  
 
-        print("Score:", n.calculate_score())
-
-
+        print("Score:", self.root.calculate_score())
 
 
     def get_move(self) -> tuple:
@@ -36,18 +30,20 @@ class AI :
         pass    # TODO
     
     class Node:
-        def __init__(self, board_state):
+        def __init__(self, board_state, children=[]):
 
             self.board_state = board_state
             score = self.calculate_score()
 
+            # TODO: add logic for children (PREREQ: game_state class, update_game(move))
 
         def calculate_score(self):
 
             # is_game_over, mat_diff, king_safety, piece_activity, pawn_structure, center_control = self.analyze_board()
             mat_diff = self.analyze_board()
 
-            return mat_diff
+            overall_score = mat_diff    # TODO: this will comebine metrics to create an ultimate score
+            return overall_score
 
 
         def analyze_board(self):

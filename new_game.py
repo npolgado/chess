@@ -134,8 +134,39 @@ def pos_to_row_col(notation: str) -> (int, int):
     return (row, col)
 
 def get_pawn_moves(board_state, row, col, player_turn):
-    pass
+    if player_turn == 0:
+        direc = 1
+        starting_row = 1
+    else:
+        direc = -1
+        starting_row = 7
 
+    moves = []
+
+    # advances
+    if board_state[row + direc][col] == "-":
+        moves.append((row + direc, col))
+        if board_state[row + 2*direc][col] == "-":
+            moves.append((row + 2*direc, col))
+    
+    # captures
+    if col + 1 < 8:
+        # right captures
+        if board_state[row + direc][col + 1] != "-":
+            moves.append((row, col + 1))
+        # en passant
+        if (row, col+1) == en_passant:
+            moves.append((row, col+1))
+
+    if col - 1 >= 0:
+        # left captures
+        if board_state[row + direc][col - 1] != "-":
+            moves.append((row, col - 1))
+        # en passant
+        if (row, col-1) == en_passant:
+            moves.append((row, col - 1))
+        
+    return moves
 def get_piece_moves(board_state, row, col, player_turn, piece_str):
     piece_str = piece_str.lower()
     if piece_str == "r":
@@ -312,6 +343,8 @@ def update_board(move):
     # TODO: update board based on move
     # TODO: promotion logic
     # TODO: reset/update EN PASSANT
+        # set en passant to None
+        # if the last move was a pawn and it moved 2 spaces, set en passant to space in between
     pass
 
 def draw_board():
