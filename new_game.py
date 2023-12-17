@@ -6,7 +6,10 @@ import os
 import numpy as np
 from pprint import pprint
 
-# TODO: have we outlined everything?
+# BLACK = 1 = UPPER
+# WHITE = 0 = LOWER
+
+# TODO: make 'game_state' class that tracks board_state, turn_num, player_turn, en passant logic, move_archives, 
 
 # TODO: should everything be global? If so, how do we handle graphics. If not, where is the line between in and out of class?
 
@@ -27,7 +30,7 @@ move: str
 '''
 
 # Board State should be a string representing the current position of pieces on the board
-board_state = np.array((8,8))
+board_state = []
 board_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 
 # Board History is used to keep track of the moves played
@@ -132,20 +135,25 @@ def get_pawn_moves(board_state, row, col, player_turn):
     pass
 
 def get_piece_moves(board_state, row, col, player_turn, piece_str):
-    if piece_str == "bishop":
+    piece_str = piece_str.lower()
+    if piece_str == "r":
         directions = [(1,0), (0,1), (-1, 0), (0, -1)]   # down, up, left, right
         depth = 8
-    elif piece_str == "rook":
+    elif piece_str == "b":
         directions = [(1,1), (-1,1), (-1, 1), (-1, -1)]   # down, up, left, right
         depth = 8
-    elif piece_str == "knight":
+    elif piece_str == "n":
         directions = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]   # topleft, 
         depth = 1
-    elif piece_str == "queen" or piece_str == "king":
+    elif piece_str == "q" or piece_str == "k":
         directions =  [(1, 1), (-1, 1), (-1, 1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
         depth = 8 if piece_str == "queen" else 1
-    elif piece_str == "pawn":
+    elif piece_str == "p":
         return get_pawn_moves(board_state, row, col, player_turn)
+
+    else:
+        print("error. piece str = ", piece_str)
+        return []
 
     valid_moves = []
 
@@ -172,14 +180,19 @@ def get_piece_moves(board_state, row, col, player_turn, piece_str):
 
     return valid_moves
 
+def get_king_position(current_player_turn):
+    target_king = 'k' if current_player_turn == 0 else 'K'
+    for r in range(8):
+        for c in range(8):
+            if board_state[r][c] == target_king:
+                return r, c
+    return None
+
 ###############################################################
 # ENDGAME CONDITIONS
 ###############################################################
 
 def is_checked(board_state, king_row, king_col, player_turn):
-    pass
-
-def is_checkmate():
     pass
 
 def is_insufficient_material():
@@ -200,9 +213,9 @@ def is_insufficient_material():
 def is_fifty_move_rule():
     pass
 
-def end_game(status_string, player_turn):
+def end_game(status_string, winner_player=-1):
 
-    print(f"Game Ended in {status_string}. Player {player_turn} wins!")     # TODO: player_turn doesnt matter if stalemate
+    print(f"Game Ended in {status_string}. Player {winner_player} wins!")     # TODO: player_turn doesnt matter if stalemate
 
     time.wait(1000)
 
@@ -234,30 +247,34 @@ def convert_update_and_evaluate_archive(board_state):
     return False
 
 def get_valid_moves(board_state, current_player_turn):
-    # TODO: hard part: evaluate all valid moves
-        # en passant
-        # pawns direction (and if capture - diagonal)
-        # move cant put king in check 
-            # loop thru king as every other piece and see if it can capture opponent of that type
-            # evaluated after potential move is made, which is awkward?
-            # pins
-        # castling - cant move thru check
-    pass
+    current_player_turn
+    valid_moves_arr = []
+    for r in range(8):
+        for c in range(8):
+            piece = board_state[r][c]
+            if piece == "-":
+                continue
+            if piece.isupper() == current_player_turn:  # is piece white == is turn white
+                a = get_piece_moves(board_state, r, c, current_player_turn, piece)
+                valid_moves_arr.append( a )
+                print(piece, ":", a)
 
-# TODO: need logic for whose turn it is
+    # print(valid_moves_arr)
+
+# TODO: states
 def get_moves_and_verify(board_state, current_player_turn):
 
     valid_moves_arr = get_valid_moves(board_state, current_player_turn)
 
     # checkmates and stalemates
     if valid_moves_arr == []:
-
-        if is_checkmate(board_state):
-            
+        king_row, king_col = get_king_position(current_player_turn)
+        
+        if is_checked(board_state, king_row, king_col, current_player_turn):
             end_game("checkmate", not current_player_turn)
         
         else:
-            # end_game("stalemate")
+            end_game("stalemate")
         
             is_three_fold_repetition = convert_update_and_evaluate_archive(board_state)
 
@@ -277,22 +294,22 @@ def get_moves_and_verify(board_state, current_player_turn):
 ###############################################################
 
 def init_empty_board():
-    # use board_state to initialize board
-    global board_state
-    board_state = np.array([
+    init_array = [
         ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-        ['p', 'p',  'p', 'p', 'p', 'p', 'p', 'p'],
-        ['-', '-',  '-', '-', '-', '-', '-', '-'], 
-        ['-', '-',  '-', '-', '-', '-', '-', '-'],
-        ['-', '-',  '-', '-', '-', '-', '-', '-'], 
-        ['-', '-',  '-', '-', '-', '-', '-', '-'], 
-        ['P', 'P',  'P', 'P', 'P', 'P', 'P', 'P'], 
-        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-    ])
+        ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+        ['-', '-', '-', '-', '-', '-', '-', '-'],
+        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'], 
+        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
+    ]
+    return init_array
 
 def update_board(move):
     # TODO: update board based on move
     # TODO: promotion logic
+    # TODO: reset/update EN PASSANT
     pass
 
 def draw_board():
@@ -303,6 +320,16 @@ def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board()
     turn = 0
+
+    get_valid_moves(board_state, 0)
+
+    
+    # remove this
+    import eric_AI_2 as dummyai
+    dummy_ai = dummyai.AI(board_state)
+    exit()
+    # end remove
+
 
     # Check and verify initial board state
     valid_moves, endgame_status = get_moves_and_verify()
@@ -336,8 +363,5 @@ def run():
         # Update turn counter
         turn += 1
 
-def main():
-    run()
-
 if __name__ == "__main__":
-    main()
+    run()

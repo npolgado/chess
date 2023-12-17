@@ -12,18 +12,28 @@ import math
 
 class AI :
     
-    def __init__(self):
-        self.current_board_state = None
+    def __init__(self, board_state):
+        self.current_board_state = board_state
+
+
+        for el in board_state:
+            print(el)
+        # delete
+
+        n = self.Node(board_state)
+
+        print("Score:", n.calculate_score())
+
+
 
 
     def get_move(self) -> tuple:
         move = ("a1", "b1")
 
-        
-
-
         return move
 
+    def receive_move(self):
+        pass    # TODO
     
     class Node:
         def __init__(self, board_state):
@@ -37,10 +47,12 @@ class AI :
             # is_game_over, mat_diff, king_safety, piece_activity, pawn_structure, center_control = self.analyze_board()
             mat_diff = self.analyze_board()
 
+            return mat_diff
+
 
         def analyze_board(self):
             
-            piece_points_dict = {'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9}
+            piece_points_dict = {'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 10}
 
             mat_diff = 0
 
@@ -48,11 +60,15 @@ class AI :
                 for col in range(8):
                     # material difference
                     piece_char = self.board_state[row][col]
-                    piece_point = piece_points_dict[piece_char.tolower()]
-                    if piece_char.isLower():
+                    if piece_char == "-":
+                        continue
+                    piece_point = piece_points_dict[piece_char.lower()]
+                    if piece_char.isupper():
                         piece_point *= -1
                     mat_diff += piece_point
+
+            return mat_diff
             
-            
+
 
 

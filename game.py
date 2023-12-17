@@ -4,6 +4,7 @@ import numpy as np
 import eric_AI as eai
 import nick_AI as nai
 
+
 FILE_DIR = os.path.dirname(__file__)
 
 #game constants
@@ -722,9 +723,9 @@ def is_insufficient_material(): # TODO
 if __name__ == '__main__':
 
     GAME = Game()
-
+    
     chess_ai = eai.AI(GAME, 1)
-    chess_ai2 = nai.AI(GAME, 0)
+    chess_ai2 = eai.AI(GAME, 0)
 
     # game state globals (not constant)
 
@@ -812,6 +813,8 @@ if __name__ == '__main__':
             GAME.draw_board()
 
 print ("GAME OVER WITH STATE", GAME.get_state())
+
+pygame.time.wait(30000)
 
 if GAME.state == 1:
     print ("CHECKMATE")
