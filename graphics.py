@@ -1,3 +1,5 @@
+import time
+import datetime
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
@@ -21,8 +23,12 @@ BLACK = (0, 0, 0)
 BOARD_LIGHT_COLOR = (255, 206, 158)
 BOARD_DARK_COLOR = (209, 139, 71)
 
+
+HIGHLIGHT_COLOR = (255, 255, 0)
+
+
 class Graphics:
-    def __init__(self, board = None, game = None, display_index=0) -> None:
+    def __init__(self, board=None, game=None, display_index=0) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
         self.board_size = 8
@@ -32,12 +38,18 @@ class Graphics:
 
         self.framerate = 30
 
+        self.clicked = False
+        self.click_pos = (0,0)
+
         self.display = pygame.display.set_mode(
             size=(self.display_size, self.display_size),
             flags=pygame.RESIZABLE|pygame.SCALED,
             display=display_index
         )
-        self.clock = pygame.time.Clock()
+
+        self.game_timer = pygame.font.SysFont('Arial', 30)
+        self.start_time = time.monotonic()
+        self.game_time = 0
 
         self.board = board
         self.game = game
@@ -47,7 +59,7 @@ class Graphics:
 
         self.load_images()
         self.init_board()
-        pygame.display.update()
+        self.draw(self.board, self.game)
 
     def load_images(self):
         # TODO: load images for pieces
@@ -62,19 +74,34 @@ class Graphics:
         # draw board grid (TODO: add row column labels)
         self.draw_grid()
         
-        # initialize game timer drawing
-        self.game_timer = pygame.font.SysFont('Arial', 30)
-        self.display.blit(self.game_timer.render('00:00', True, WHITE), (self.border_size, self.border_size/2))
+        # get formatted string of self.game_time as XX:XX:XX of minutes and seconds and miliseconds elapsed
+        time_str = time.strftime("%H:%M:%S", time.gmtime(self.game_time))
 
-    def draw(self, board, gs):
+        # initialize game timer drawing
+        self.display.blit(self.game_timer.render(time_str, True, WHITE), (self.border_size, self.border_size/2))
+
+    def draw_time(self, update=True):
+        # TODO: draw time: update self.game_timer
+        # get current game time
+        curr_time = time.monotonic()
+        new_time = float(curr_time - self.start_time)
+        time_str = time.strftime("%H:%M:%S", time.gmtime(new_time))
+        
+        if update:
+            # remove old time from display
+            self.display.fill(BLACK, (self.border_size, self.border_size/2, self.border_size*2, self.border_size/2))
+            # draw new time
+            self.display.blit(self.game_timer.render(time_str, True, WHITE), (self.border_size, self.border_size/2))
+
+    def draw(self, board, game):
         # handle pygame events like quitting or aftergame controls
         self.handle_game_events()
 
+        # TODO: drawing???
+        self.draw_time()
+
         # update screen
         pygame.display.flip()
-
-        # Ensure program maintains a rate of 30 frames per second
-        self.clock.tick(self.framerate)
 
     def draw_grid(self):
         # board size is display size - 2*border size
@@ -103,18 +130,56 @@ class Graphics:
     def handle_game_events(self):
         # Look at every event in the queue
         for event in pygame.event.get():
-            # Did the user hit a key?
+
+            # Key Press
             if event.type == KEYDOWN:
-                # Was it the Escape key? If so, stop the loop.
+                # TODO: add key press events after game to review game
+
+                # Q for Quit, or Esc i guess.. 
                 if event.key == K_ESCAPE or event.key == ord('q'):
                     self.running = False
 
-            # Did the user click the window close button? If so, stop the loop.
+            # Mouse Click
+            if event.type == pygame.MOUSEBUTTONUP:
+                self.click_pos = pygame.mouse.get_pos()
+
+                # TODO: Right click (cancel if clicked on square)
+                if event.button == 3:
+                    self.clicked = False
+                    # unhighlight
+                    # break # TODO: ?
+
+                # TODO: Left Click (select square OR move piece if your turn)
+                else:
+                    self.clicked = True
+                    self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+
+                    # case: second click (move piece)
+                    if self.clicked:
+                        pass
+                    # case: first click (select piece)
+                    else: 
+                        pass
+
+            # Quit
             elif event.type == QUIT:
                 self.running = False
 
+    def get_square_from_mouse_pos(self, mouse_pos: tuple) -> tuple: # TODO: this
+        pass
+
 if __name__ == '__main__':
+    from new_game import init_empty_board
+    from game_state import GameState
+
+    b = init_empty_board()
+    gs = GameState()
     g = Graphics()
+    
+    g.draw(b, None)
+    # TODO: make move
+    # g.draw(b, None)
+    
     while g.running:
-        g.draw(None, None)
+        g.draw(b, None)
     pygame.quit()

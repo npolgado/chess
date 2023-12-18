@@ -322,12 +322,12 @@ def update_board(board_state, move, gs):
     # TODO: promotion logic
     # TODO: reset/update EN PASSAN
     # TODO: update castling rights
+    # TODO: return new board state
 
     # get new board
 
     gs.update(board_state, en_passant=None)
-    return new_board_state
-
+    
 def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
@@ -338,7 +338,8 @@ def run():
     valid_moves = get_valid_moves(board_state, gs.get_player_turn())
 
     p1 = eric_bot.AI()
-    p2 = nick_bot.AI()
+    p2 = eric_bot.AI()
+    # p2 = nick_bot.AI() #TODO: DECOMMISIONED ATM
 
     players = (p1, p2)
 
