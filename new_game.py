@@ -2,21 +2,18 @@ import eric_AI as eric_bot
 import nick_AI as nick_bot
 import time
 import sys
-import os
 import numpy as np
 from pprint import pprint
 from game_state import GameState
+from graphics import Graphics
 
 # BLACK = 1 = UPPER
 # WHITE = 0 = LOWER
 
-# TODO: make 'game_state' class that tracks board_state, turn_num, player_turn, en passant logic, move_archives, 
-
-# TODO: should everything be global? If so, how do we handle graphics. If not, where is the line between in and out of class?
-
 # TODO: Check if move is valid should be done by calling get_piece_moves() and checking if the move is in the list
 # TODO: Make get_valid_moves() return a dictionary with keys based on the pieces on the board
 # TODO: change endgame logic for dictionary
+# TODO: fix the helper functions to not use the old global variables
 
 ''' 
 0 is white (lowercase), 1 is black (uppercase)
@@ -33,8 +30,6 @@ move: str
     <From Pos><To Pos> for example C3C5
 
 '''
-
-#merge test
 
 # Board State should be a string representing the current position of pieces on the board
 board_state = []
@@ -114,25 +109,30 @@ def string_to_board():
 def print_board(board=None):
     pprint(board)
 
-def row_col_to_pos(row: int, col: int) -> str:
+def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: int) -> str:
     ''' Converts row and col to chess position 
         example: row 0, col 0 -> A1
                 row 7, col 7 -> H8
     '''
     ans = ""
-    ans += chr(col + 65)
-    ans += str(row + 1)
+    ans += chr(start_row + 65)
+    ans += str(start_row + 1)
+    ans += chr(end_row + 65)
+    ans += str(end_col + 1)
     return ans
 
-def pos_to_row_col(notation: str) -> (int, int):
+def translate_move_s2t(notation: str) -> (int, int):
     ''' Converts string into a tuple of row and col
         example: A1 -> (0, 0)
                 H8 -> (7, 7)
     '''
-    col = ord(notation[0]) - 65
-    row = int(notation[1]) - 1
+    start_col = ord(notation[0]) - 65
+    start_row = int(notation[1]) - 1
 
-    return (row, col)
+    start_col = ord(notation[2]) - 65
+    start_row = int(notation[3]) - 1
+
+    return (start_row, start_col), (start_row, start_col)
 
 def get_pawn_moves(board_state, row, col, player_turn):
     pass
@@ -229,27 +229,6 @@ def end_game(status_string, winner_player=-1):
 # BOARD STATE FUNCTIONS
 ###############################################################
 
-def convert_update_and_evaluate_archive(board_state):
-
-    # get current board as a string
-    board_str = board_to_string(board_state)
-
-    # update history
-    board_history.append(board_str)
-
-    # evaluate history for three fold repetition
-    if board_state_dict[board_str] in board_state_dict.keys():
-        
-        board_state_dict[board_str] += 1
-        
-        if board_state_dict[board_str] >= 3:
-            return True
-    
-    else:
-        board_state_dict[board_str] = 1
-
-    return False
-
 def get_valid_moves(board_state, current_player_turn, en_passant_square=None):
     current_player_turn
     valid_moves_arr = []
@@ -318,14 +297,11 @@ def update_board(board_state, move, gs):
     gs.update(board_state, en_passant=None)
     return new_board_state
 
-def draw_board():
-    # TODO: interact with pygame (part of decision with code layout)
-    pass
-
 def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
+    graphics = Graphics()
 
     # Check and verify initial board state
     valid_moves = get_valid_moves(board_state, gs.get_player_turn())
@@ -340,11 +316,13 @@ def run():
         move = players[gs.get_player_turn()].get_move()
 
         # Check if move is valid
-        if move in valid_moves: # TODO: fix
-        # if pos_to_row_col(move.end) in get_piece_moves(board_state, pos_to_row_col(move.start), col, player_turn, 'N'):
-            
+        # TODO: fix
+        # if translate_move(move.end) in get_piece_moves(board_state, translate_move(move.start), col, player_turn, 'N'):
+        if move in valid_moves: 
+        
             # Update game board state
             board_state = update_board(move, gs)
+            graphics.draw(board_state)
             
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.enpassant_square)
