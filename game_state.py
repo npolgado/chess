@@ -1,20 +1,5 @@
-import os
-import sys
 import numpy as np
 from new_game import *
-
-class Move:
-    def __init__(self, start, end) -> None:
-        self.start = pos_to_row_col(start)
-        self.end = pos_to_row_col(end)
-
-    def __init__(self, notation) -> None:
-        # assert notation is a string of length 4
-        assert type(notation) == str
-        assert len(notation) == 4
-
-        self.start = pos_to_row_col(notation[:2])
-        self.end = pos_to_row_col(notation[2:])
 
 class GameState:
     def __init__(self, turn: int=1) -> None:
@@ -26,12 +11,20 @@ class GameState:
         self.board_history = []
         self.board_dict = {}
         self.is_three_fold_repetition = False
+        self.castling_rights = {
+            "w_Q": True,
+            "w_K": True,
+            "b_Q": True,
+            "b_K": True
+        }
 
-    def get_board(self):
-        return self.board
+    def update_castling_rights(self, board) -> None:
+        '''
+        look at the current board to determine if there are castling rights
 
-    def get_turn(self):
-        return self.turn
+        check if king and rooks are on starting sqaures, set to true, else false
+        '''
+        pass
 
     def get_player_turn(self):
         return self.bool_turn
@@ -53,10 +46,9 @@ class GameState:
         else:
             self.board_dict[board_str] = 1
 
-    def update(self, board, en_passant=None):        
+    def update(self, board, en_passant=None):
         self.enpassant_square = en_passant
-        
+        self.update_castling_rights(board)
         self.archive(board)
-        
         self.turn += 1
         self.bool_turn = not self.bool_turn
