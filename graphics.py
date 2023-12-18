@@ -1,3 +1,6 @@
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 import pygame
 
 # Import pygame.locals for easier access to key coordinates
@@ -63,7 +66,6 @@ class Graphics:
         self.game_timer = pygame.font.SysFont('Arial', 30)
         self.display.blit(self.game_timer.render('00:00', True, WHITE), (self.border_size, self.border_size/2))
 
-
     def draw(self, board, gs):
         # handle pygame events like quitting or aftergame controls
         self.handle_game_events()
@@ -104,7 +106,7 @@ class Graphics:
             # Did the user hit a key?
             if event.type == KEYDOWN:
                 # Was it the Escape key? If so, stop the loop.
-                if event.key == K_ESCAPE:
+                if event.key == K_ESCAPE or event.key == ord('q'):
                     self.running = False
 
             # Did the user click the window close button? If so, stop the loop.
@@ -115,3 +117,4 @@ if __name__ == '__main__':
     g = Graphics()
     while g.running:
         g.draw(None, None)
+    pygame.quit()
