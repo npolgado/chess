@@ -9,28 +9,35 @@ Game.py holds all the logic for the chess game. Run this file
 
 # TODO:
 
-- Tests outline (Nick)
-
-- Graphics (Nick)
-
-- Update_Board function (Eric)
+- Update_Board function (Eric) 
 
 - TODO 1 (Eric)
-	- checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
-	- make the valid moves array a dictionary
-	- change end_game() logic
+	- [ ] checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
+	- [ ] make the valid moves array a dictionary
+	- [ ] change end_game() logic
 
+- Tests outline (Nick)
+    - [x] helpers testing
+    - [ ] valid move testing
+    - [ ] endgame testing
+    - [ ] castling testing
+    - [ ] en passant testing
+    - [ ] turn logic testing
 
-
-
-
-
-
-
+- Graphics (Nick)
+    - [x] initial display and board
+    - [ ] draw pieces
+    - [ ] possible issue!!: redrawing properly (blit vs. flip)
+    
+    - [ ] [NICE TO HAVE] turn counter
+    - [x] [NICE TO HAVE] timer with real time
+    - [ ] [NICE TO HAVE] move history
+    - [ ] [NICE TO HAVE] move highlighting (current / past)
 
 # GOALS
+
 - Cleanup
-    - [ ] identify changes in the code
+    - [x] identify changes in the code
 
 - Multiplayer online
     - [ ] dropdown for engine choice
