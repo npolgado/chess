@@ -5,6 +5,29 @@ Goal: to create our own application for chess. the idea was just for fun. Over t
 
 Game.py holds all the logic for the chess game. Run this file
 
+
+
+# TODO:
+
+- Tests outline (Nick)
+
+- Graphics (Nick)
+
+- Update_Board function (Eric)
+
+- TODO 1 (Eric)
+	- checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
+	- make the valid moves array a dictionary
+	- change end_game() logic
+
+
+
+
+
+
+
+
+
 # GOALS
 - Cleanup
     - [ ] identify changes in the code
