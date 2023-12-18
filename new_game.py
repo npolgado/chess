@@ -5,6 +5,7 @@ import sys
 import os
 import numpy as np
 from pprint import pprint
+from game_state import GameState
 
 # BLACK = 1 = UPPER
 # WHITE = 0 = LOWER
@@ -12,6 +13,10 @@ from pprint import pprint
 # TODO: make 'game_state' class that tracks board_state, turn_num, player_turn, en passant logic, move_archives, 
 
 # TODO: should everything be global? If so, how do we handle graphics. If not, where is the line between in and out of class?
+
+# TODO: Check if move is valid should be done by calling get_piece_moves() and checking if the move is in the list
+# TODO: Make get_valid_moves() return a dictionary with keys based on the pieces on the board
+# TODO: change endgame logic for dictionary
 
 ''' 
 0 is white (lowercase), 1 is black (uppercase)
@@ -76,7 +81,7 @@ def board_to_string() -> str:
 
     return string
 
-def string_to_board() -> np.array:
+def string_to_board():
     arr = np.empty([8,8], dtype=object)
 
     # split string into "/"
@@ -106,12 +111,8 @@ def string_to_board() -> np.array:
 
     return arr
 
-def print_board(board: np.array=None):
-    if board is None:
-        global board_state
-        pprint(board_state)
-    else:
-        pprint(board)
+def print_board(board=None):
+    pprint(board)
 
 def row_col_to_pos(row: int, col: int) -> str:
     ''' Converts row and col to chess position 
@@ -226,7 +227,8 @@ def get_king_position(current_player_turn):
 ###############################################################
 
 def is_checked(board_state, king_row, king_col, player_turn):
-    pass
+    if king_col == None or king_row == None:
+        return False
 
 def is_insufficient_material():
     ''' The insufficient mating material rule says that the game is
@@ -250,7 +252,7 @@ def end_game(status_string, winner_player=-1):
 
     print(f"Game Ended in {status_string}. Player {winner_player} wins!")     # TODO: player_turn doesnt matter if stalemate
 
-    time.wait(1000)
+    time.sleep(1000)
 
     sys.exit()
 
@@ -279,7 +281,7 @@ def convert_update_and_evaluate_archive(board_state):
 
     return False
 
-def get_valid_moves(board_state, current_player_turn):
+def get_valid_moves(board_state, current_player_turn, en_passant_square=None):
     current_player_turn
     valid_moves_arr = []
     for r in range(8):
@@ -293,34 +295,31 @@ def get_valid_moves(board_state, current_player_turn):
                 print(piece, ":", a)
 
     # print(valid_moves_arr)
+    return valid_moves_arr
 
-# TODO: states
-def get_moves_and_verify(board_state, current_player_turn):
-
-    valid_moves_arr = get_valid_moves(board_state, current_player_turn)
-
-    # checkmates and stalemates
-    if valid_moves_arr == []:
+def handle_end_game(board_state, gs, valid_moves, current_player_turn):
+    # if there are no valid moves, it's either checkmate and stalemate
+    if valid_moves == []:
         king_row, king_col = get_king_position(current_player_turn)
         
         if is_checked(board_state, king_row, king_col, current_player_turn):
             end_game("checkmate", not current_player_turn)
         
         else:
-            end_game("stalemate")
-        
-            is_three_fold_repetition = convert_update_and_evaluate_archive(board_state)
+            end_game("stalemate") #TODO: remove this? it would exit file before checking three fold or other endgame conditions
 
-            if is_three_fold_repetition:
-                end_game("stalemate")
-            
-            if is_insufficient_material():
-                end_game("stalemate")
-            
-            if is_fifty_move_rule():
-                end_game("stalemate")
+    # if there are valid moves, check for other enforced endgame conditions
+    # is_three_fold_repetition = convert_update_and_evaluate_archive(board_state)
+    is_three_fold_repetition = gs.get_three_fold_repetition()
+
+    if is_three_fold_repetition:
+        end_game("stalemate")
     
-    return valid_moves_arr
+    if is_insufficient_material():
+        end_game("stalemate")
+    
+    if is_fifty_move_rule():
+        end_game("stalemate")
 
 ###############################################################
 # GAME FUNCTIONS
@@ -339,13 +338,16 @@ def init_empty_board():
     ]
     return init_array
 
-def update_board(move):
+def update_board(board_state, move, gs):
     # TODO: update board based on move
     # TODO: promotion logic
-    # TODO: reset/update EN PASSANT
-        # set en passant to None
-        # if the last move was a pawn and it moved 2 spaces, set en passant to space in between
-    pass
+    # TODO: reset/update EN PASSAN
+    # TODO: update castling rights
+
+    # get new board
+
+    gs.update(board_state, en_passant=None)
+    return new_board_state
 
 def draw_board():
     # TODO: interact with pygame (part of decision with code layout)
@@ -353,21 +355,11 @@ def draw_board():
 
 def run():
     # Initialize board state and turn counter 
-    board_state = init_empty_board()
-    turn = 0
-
-    get_valid_moves(board_state, 0)
-
-    
-    # remove this
-    import eric_AI_2 as dummyai
-    dummy_ai = dummyai.AI(board_state)
-    exit()
-    # end remove
-
+    board_state = init_empty_board() 
+    gs = GameState()
 
     # Check and verify initial board state
-    valid_moves, endgame_status = get_moves_and_verify()
+    valid_moves = get_valid_moves(board_state, gs.get_player_turn())
 
     p1 = eric_bot.AI()
     p2 = nick_bot.AI()
@@ -375,28 +367,24 @@ def run():
     players = (p1, p2)
 
     while True:
-        
-        # Determine whose color it is
-        current_player_turn = turn % 2
-
         # Get move from player ai
-        move = players[current_player_turn].get_move()
+        move = players[gs.get_player_turn()].get_move()
 
         # Check if move is valid
-        if move in valid_moves:
+        if move in valid_moves: # TODO: fix
+        # if pos_to_row_col(move.end) in get_piece_moves(board_state, pos_to_row_col(move.start), col, player_turn, 'N'):
             
             # Update game board state
-            board_state = update_board(move)
+            board_state = update_board(move, gs)
             
             # Checks new board state for valid moves
-            # Also verifies game status for an endgame condition
-            valid_moves, endgame_status = get_moves_and_verify(board_state, current_player_turn)
+            valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.enpassant_square)
+
+            # Check for endgame conditions
+            handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
 
             # Send updated move to the other player ai
-            players[not current_player_turn].recieve_opponent_move(move)
-
-        # Update turn counter
-        turn += 1
+            players[not gs.get_player_turn()].recieve_opponent_move(move)
 
 if __name__ == "__main__":
     run()
