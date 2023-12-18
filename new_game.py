@@ -353,7 +353,7 @@ def run():
         
             # Update game board state
             board_state = update_board(move, gs)
-            graphics.draw(board_state)
+            graphics.draw(board_state, gs)
             
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.enpassant_square)
