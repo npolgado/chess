@@ -253,15 +253,34 @@ if __name__ == '__main__':
     gs = GameState()
     g = Graphics(display_index=1)
     
-    # g.draw(b, gs)
-    # TODO: make move
-    # g.draw(b, gs)
     s = time.monotonic()
     while g.running:
         g.draw(b, gs.time)
         gs.time = (float(time.monotonic()-s),float(time.monotonic()-s)) #TODO: time is using time.gmtime() so it is not accurate
 
-        if gs.time[0] > 3:
-            g.running = False
+        if gs.time[0] > 3 and gs.time[1] > 3.02:
+            b = [
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                ['p', 'p', 'p', 'p', '-', 'p', 'p', 'p'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', 'p', '-', '-', '-'],
+                ['-', '-', '-', 'P', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['P', 'P', 'P', '-', 'P', 'P', 'P', 'P'],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            ]
+
+
+        if gs.time[0] > 6 and gs.time[1] > 6.02:
+            b = [
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                ['p', 'p', 'p', 'p', '-', 'p', 'p', 'p'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', 'p', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['P', 'P', 'P', '-', 'P', 'P', 'P', 'P'],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            ]
 
     pygame.quit()
