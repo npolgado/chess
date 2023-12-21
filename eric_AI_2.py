@@ -30,11 +30,14 @@ class AI :
         
         random_index = random.choice(range(count))
 
+        
         for key in valid_moves:
             for value in valid_moves[key]:
-                random_index -= 1
+                print(random_index, key, value)
                 if random_index == 0:
                     random_move = (key, value)
+                random_index -= 1
+
         
         move = translate_move_t2s(random_move[0][0], random_move[0][1], random_move[1][0], random_move[1][1])
 
