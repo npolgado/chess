@@ -253,7 +253,7 @@ def run():
 
         # If the players move is None, we have not recieved a new move, so just draw
         if move == None:  # TODO: this needs to check if the move is the same as the last? 
-            graphics.draw(board_state, gs)
+            graphics.draw(board_state, gs.time)
             continue
 
         # Check if move is valid
@@ -262,7 +262,7 @@ def run():
         if move in valid_moves: 
         
             # Update game board state
-            board_state = update_board(move, gs)
+            board_state = update_board(move, gs.time)
             graphics.draw(board_state, gs)
             
             # Checks new board state for valid moves

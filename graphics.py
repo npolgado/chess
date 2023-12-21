@@ -27,9 +27,9 @@ HIGHLIGHT_COLOR = (255, 255, 0)
 IMAGE_ROOT = 'images/'
 
 class Piece(pygame.sprite.Sprite):
-    def __init__(self, color, im, size):
-       pygame.sprite.Sprite.__init__(self)
-       # TODO: resize image to size
+    def __init__(self, piece, im, size):
+        pygame.sprite.Sprite.__init__(self)
+        # TODO: resize image to size
 
 class Square(pygame.sprite.Sprite):
     def __init__(self, color, size):
@@ -38,12 +38,10 @@ class Square(pygame.sprite.Sprite):
        self.image.fill(color)
        self.rect = self.image.get_rect()
 
-
 # Draws board and pieces
 # Displays time, material count
-
 class Graphics:
-    def __init__(self, board=None, game: GameState=None, display_index=0) -> None:
+    def __init__(self, board=None, game_time: tuple=None, display_index=0) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
         
@@ -60,16 +58,16 @@ class Graphics:
         )
 
         self.game_timer = pygame.font.SysFont('Arial', 30)
-        self.time = None
 
         self.board = board
-        self.game = game
         self.piece_images = {}
 
+        self.game_time = time.strftime("%H:%M:%S", time.gmtime(game_time))
+        
         self.running = True
         self.load_images()
-        self.draw_board()
-        self.draw(self.board, self.game)
+
+        self.draw(self.board, self.game_time)
 
 ## PYGAME ##
 
@@ -126,76 +124,56 @@ class Graphics:
                 self.running = False
 
 ## DRAWING ##
-    def draw_pieces(self):
-        # given the board, draw the pieces on the board
-
-        for i in range(self.board_size):
-            for j in range(self.board_size):
-                piece = self.board[i][j]
-                if piece is not None:
-                    x = self.border_size + (i * self.square_size)
-                    y = self.border_size + (j * self.square_size)
-                    p = Piece(piece.color, self.piece_images[piece], self.square_size)
-                    self.display.blit(p.image, (x, y))
+                
+    def draw(self, board, game_time):
+        # update state
+        self.game_time = time.strftime("%H:%M:%S", time.gmtime(game_time))
+        self.board = board
         
-        # if there is no piece in the position (i, j), then draw nothing
+        # TODO: player on player
+        self.handle_game_events()
 
-    def draw_grid(self):
-        # board size is display size - 2*border size
+        # Clear the entire screen
+        self.display.fill(BLACK)
+
+        # Draw Time
+        self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
+
+        # # board size is display size - 2*border size
         grid_len = self.display_size - self.border_size
-        
+
         counter = 0 
 
-        # start x at border on lfet side, and increment by total board size
-        for x in range(self.border_size, grid_len, self.square_size):
-            for y in range(self.border_size, grid_len, self.square_size):
+        # Draw Board
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+
+                # get square position
+                x = self.border_size + (i * self.square_size)
+                y = self.border_size + (j * self.square_size)
 
                 # if x is even, y is odd, or vice versa, then the square is light
-                if counter % 2 == 0:
-                    color = BOARD_LIGHT_COLOR
-                else:
-                    color = BOARD_DARK_COLOR
+                color = BOARD_LIGHT_COLOR if counter % 2 == 0 else BOARD_DARK_COLOR
+
+                # get piece notation from board_state
+                piece = self.board[i][j]
+
+                # draw piece
+                if piece is not None:
+                    p = Piece(piece, self.piece_images[piece], self.square_size)
+                    self.display.blit(p.image, (x, y))
                 
-                s = Square(color, self.square_size)
-                self.display.blit(s.image, (x, y))
+                # draw square
+                else:
+                    s = Square(color, self.square_size)
+                    self.display.blit(s.image, (x, y))
 
                 counter += 1
 
             counter += 1
 
-    def draw_board(self):
-        # Fill the background BLACK
-        self.display.fill((0, 0, 0))
-
-        # draw board grid (TODO: add row column labels)
-        self.draw_grid()
-
-        # initialize game timer drawing
-        self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
-
-    def draw_turn(self):
-        pass
-
-    def draw(self, board, game):
-        self.game = game
-        self.board = board
-
-        self.time = time.strftime("%H:%M:%S", time.gmtime(self.game.time))
-        
-        self.handle_game_events() # TODO: player on player
-
-        # TODO: redrawing?? clear here
-        self.draw_pieces() # TODO: this
-        self.draw_time()
-        self.draw_turn() # TODO: this
+        # update display
         pygame.display.flip()
-
-    def draw_time(self, update=True):        
-        if update:
-            # remove old time from display
-            self.display.fill(BLACK, (self.border_size, self.border_size/2, self.border_size*2, self.border_size/2))
-            # draw new time
-            self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
 
 ## HELPERS ##
 
