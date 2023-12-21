@@ -253,7 +253,7 @@ if __name__ == '__main__':
 
     b = init_empty_board()
     gs = GameState()
-    g = Graphics(display_index=1)
+    g = Graphics(display_index=0)
     
     s = time.monotonic()
     while g.running:

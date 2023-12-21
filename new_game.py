@@ -250,7 +250,7 @@ def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
-    graphics = Graphics()
+    graphics = Graphics(display_index=1)
 
     # Check and verify initial board state
     valid_moves = get_valid_moves(board_state, gs.get_player_turn())
@@ -292,12 +292,14 @@ def run():
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())
 
+            gs.update(board_state)
+
             # Check for endgame conditions
             handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
         
         for el in board_state:
             print(el)
-        time.sleep(.5) 
+        time.sleep(.2) 
 
 if __name__ == "__main__":
     run()

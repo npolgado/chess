@@ -41,7 +41,7 @@ class GameState:
         return self.enpassant_square
 
     def archive(self, board):
-        board_str = board_to_string(self.board)
+        board_str = board_to_string(board)
         self.board_history.append(board_str)
 
         if board_str in self.board_dict:
