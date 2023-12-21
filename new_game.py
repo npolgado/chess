@@ -287,12 +287,13 @@ def run():
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = update_board(board_state, move)
+            gs.update(board_state)
+
+            # Draw
             graphics.draw(board_state, gs.time)
             
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())
-
-            gs.update(board_state)
 
             # Check for endgame conditions
             handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
