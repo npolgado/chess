@@ -85,3 +85,4 @@ if __name__ == "__main__":
     test_string_to_board()
     test_translate_move_s2t()
     test_translate_move_t2s()
+    print("All tests passed!")

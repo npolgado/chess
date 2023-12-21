@@ -73,7 +73,7 @@ def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: in
     ans += chr(end_row + 65)
     ans += str(end_col + 1)
 
-    print(ans)
+    # print(ans)
     return ans
 
 def translate_move_s2t(notation: str) -> (int, int):
@@ -105,6 +105,58 @@ def init_empty_board():
     ]
     return init_array
 
+def evaluate_board(board):
+    # given the board and player's turn, return a score
+
+    vals = {
+        'p': 1,
+        'n': 3,
+        'b': 3,
+        'r': 5,
+        'q': 9,
+        'k': 0
+    }
+
+    ans = 0
+
+    for i in range(8):
+        for j in range(8):
+            piece = board[i][j]
+
+            if piece == '-':
+                continue
+
+            if piece.isupper():
+                key = piece.lower()
+                ans -= vals[key]
+            else:
+                ans += vals[piece]
+    
+    return ans
+
+def make_move(board, move):
+    # given a board array and move of notation "A1H8", make the move and return the new board
+    # NOTE: this accesses the board in col, row format
+    start, end = translate_move_s2t(move)
+    board[end[1]][end[0]] = board[start[1]][start[0]]
+    board[start[1]][start[0]] = '-'
+    return board
+
 if __name__ == "__main__":
+    import time
+
     b = init_empty_board()
+    print_board(b)    
+    print(evaluate_board(b))
+
+    b = make_move(b, "A2A3")
     print_board(b)
+    print(evaluate_board(b))
+    
+    b = make_move(b, "A1B1")
+    print_board(b)
+    print(evaluate_board(b))
+    
+    b = make_move(b, "B1C1")
+    print_board(b)
+    print(evaluate_board(b))

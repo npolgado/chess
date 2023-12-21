@@ -50,6 +50,8 @@ def get_pawn_moves(board_state, row, col, player_turn, en_passant):
     if player_turn == 0:
         direc = 1
         starting_row = 1
+        if row + direc > 7: # TODO: Handle promotion, possibly pass in the piece to promote to
+            direc = -1
     else:
         direc = -1
         starting_row = 7
@@ -262,6 +264,7 @@ def run():
     move = None
 
     while True:
+        # Update game time
         gs.tick()
 
         # Send updated move to the other player ai
@@ -281,14 +284,16 @@ def run():
         move_to = move_tuple[1]
 
         print(move)
-        for el in valid_moves:
-            print(el, valid_moves[el])
-        print(move_from, move_to)
+        # for el in valid_moves:
+        #     print(el, valid_moves[el])
+        # print(move_from, move_to)
         
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = update_board(board_state, move)
             gs.update(board_state)
+            
+            # print(evaluate_board(board_state))
 
             # Draw
             graphics.draw(board_state, gs.time)
@@ -299,7 +304,7 @@ def run():
             # Check for endgame conditions
             handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
         
-        print_board(board_state)
+        # print_board(board_state)
         time.sleep(.2) 
 
 if __name__ == "__main__":
