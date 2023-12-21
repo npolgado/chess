@@ -41,17 +41,6 @@ FULL_NAMES = {
     'k': 'King'
 }
 
-TEST_BOARD_3 = [
-    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-    ['p', 'p', 'p', '-', 'p', 'p', 'p', 'p'],
-    ['-', '-', '-', '-', '-', '-', '-', '-'], 
-    ['-', '-', '-', 'p', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', 'P', '-', '-', '-'], 
-    ['-', '-', '-', '-', '-', '-', '-', '-'], 
-    ['P', 'P', 'P', 'P', '-', 'P', 'P', 'P'],
-    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-]
-
 class White(pygame.sprite.Sprite):
     def __init__(self, piece, size):
         pygame.sprite.Sprite.__init__(self)
@@ -150,6 +139,7 @@ class Graphics:
                 # Q for Quit, or Esc i guess.. 
                 if event.key == K_ESCAPE or event.key == ord('q'):
                     self.running = False
+                    exit() # RAISE SIGTERM TO KILL ALL PROCESSES
 
             # Mouse Click
             if event.type == pygame.MOUSEBUTTONUP:
@@ -261,6 +251,8 @@ class Graphics:
 
 if __name__ == '__main__':
     from game_state import GameState
+    from tests.test_helpers import TEST_BOARD_3
+
 
     b = init_empty_board()
     gs = GameState()

@@ -81,7 +81,6 @@ def get_pawn_moves(board_state, row, col, player_turn, en_passant):
     
     return moves
 
-
 def get_piece_moves(board_state, row, col, player_turn, piece_str, en_passant):
     piece_str = piece_str.lower()
     if piece_str == "r":
@@ -263,6 +262,8 @@ def run():
     move = None
 
     while True:
+        gs.tick()
+
         # Send updated move to the other player ai
         players[not gs.get_player_turn()].recieve(move)
 
@@ -298,8 +299,7 @@ def run():
             # Check for endgame conditions
             handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
         
-        for el in board_state:
-            print(el)
+        print_board(board_state)
         time.sleep(.2) 
 
 if __name__ == "__main__":
