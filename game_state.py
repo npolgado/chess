@@ -18,7 +18,7 @@ class GameState:
             "b_K": True
         }
 
-        self.time = 0
+        self.time = (0,0)
 
     def update_castling_rights(self, board) -> None:
         '''

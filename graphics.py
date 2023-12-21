@@ -1,9 +1,7 @@
 import time
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
 import pygame
-
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
 from pygame.locals import (
@@ -15,6 +13,8 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
+from __init__ import *
+import numpy as np
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -26,52 +26,104 @@ HIGHLIGHT_COLOR = (255, 255, 0)
 
 IMAGE_ROOT = 'images/'
 
-class Piece(pygame.sprite.Sprite):
-    def __init__(self, color, im, size):
-       pygame.sprite.Sprite.__init__(self)
-       # TODO: resize image to size
+FULL_NAMES = {
+    'P': 'Pawn',
+    'N': 'Knight',
+    'B': 'Bishop',
+    'R': 'Rook',
+    'Q': 'Queen',
+    'K': 'King',
+    'p': 'Pawn',
+    'n': 'Knight',
+    'b': 'Bishop',
+    'r': 'Rook',
+    'q': 'Queen',
+    'k': 'King'
+}
+
+class White(pygame.sprite.Sprite):
+    def __init__(self, piece, size):
+        pygame.sprite.Sprite.__init__(self)
+
+        # get image filepath
+        im = os.path.join(IMAGE_ROOT, 'White', FULL_NAMES[piece] + '.png')
+
+        # Load image from file path im
+        self.image = pygame.image.load(im).convert_alpha()
+        self.image.set_colorkey(None)
+
+        # Scale image to size
+        self.image = pygame.transform.scale(self.image, (size, size))
+
+        # Set image background to transparent
+        self.rect = self.image.get_rect()
+
+class Black(pygame.sprite.Sprite):
+    def __init__(self, piece, size):
+        pygame.sprite.Sprite.__init__(self)
+
+        # get image filepath
+        im = os.path.join(IMAGE_ROOT, 'Black', FULL_NAMES[piece] + '.png')
+
+        # Load image from file path im
+        self.image = pygame.image.load(im).convert_alpha()
+        self.image.set_colorkey(None)
+
+        # Scale image to size
+        self.image = pygame.transform.scale(self.image, (size, size))
+
+        # Set image background to transparent
+        self.rect = self.image.get_rect()
 
 class Square(pygame.sprite.Sprite):
     def __init__(self, color, size):
        pygame.sprite.Sprite.__init__(self)
-       self.image = pygame.Surface([size, size])
-       self.image.fill(color)
-       self.rect = self.image.get_rect()
 
+       # Create a square image of the given size
+       self.image = pygame.Surface([size, size])
+       
+       # Fill the square with the given color
+       self.image.fill(color)
+       
+       # Set image background to transparent
+       self.rect = self.image.get_rect()
 
 # Draws board and pieces
 # Displays time, material count
-
 class Graphics:
-    def __init__(self) -> None:
+    def __init__(self, board=None, game_time: tuple=None, display_index=0) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
         
         self.board_size = 8
-        self.square_size = 100
+        self.square_size = 75
         self.border_size = 100
+        self.piece_padding = 10
+        self.pos_offset = self.piece_padding / 2
 
+        self.display = board
         self.display_size = self.board_size * self.square_size + (2*self.border_size)
 
+        # self.board = board
+        self.running = True
+
+        self.game_timer_white = pygame.font.SysFont('Arial', 30)
+        self.game_timer_black = pygame.font.SysFont('Arial', 30)
+
+        self.game_time_white = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[0])
+        self.game_time_black = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[1])
+
+        self.init(display_index)
+
+    def init(self, display_index):
         self.display = pygame.display.set_mode(
             size=(self.display_size, self.display_size),
-            flags=pygame.RESIZABLE|pygame.SCALED,
+            flags=pygame.RESIZABLE|pygame.SCALED|pygame.SRCALPHA,
             display=display_index
         )
-
-        self.game_timer = pygame.font.SysFont('Arial', 30)
-        self.time = None
-
-        self.board = board
-        self.game = game
-        self.piece_images = {}
-
-        self.running = True
-        self.load_images()
-        self.draw_board()
-        self.draw(self.board, self.game)
-
-## PYGAME ##
+        pygame.display.set_caption('Chess')
+        pygame.display.set_icon(pygame.image.load(os.path.join(IMAGE_ROOT, 'Black', 'King.png')))
+        pygame.display.flip()
 
     def handle_game_events(self):
         # Look at every event in the queue
@@ -85,126 +137,112 @@ class Graphics:
                 if event.key == K_ESCAPE or event.key == ord('q'):
                     self.running = False
 
-            # # Mouse Click
-            # if event.type == pygame.MOUSEBUTTONUP:
-            #     # self.click_pos = pygame.mouse.get_pos()
-            #     # self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+            # Mouse Click
+            if event.type == pygame.MOUSEBUTTONUP:
+                # self.click_pos = pygame.mouse.get_pos()
+                # self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
-            #     # TODO: Right click (cancel if clicked on square)
-            #     if event.button == 3:
-            #         self.clicked = False
-            #         self.clicked_square = None
-            #         # unhighlight
+                # TODO: Right click (cancel if clicked on square)
+                if event.button == 3:
+                    self.clicked = False
+                    self.clicked_square = None
+                    # unhighlight
 
-            #     # TODO: Left Click (select square OR move piece if your turn)
-            #     else:
-            #         # case: second click (move piece)
-            #         if self.clicked:
-            #             # save current click pos and clicked square
+                # TODO: Left Click (select square OR move piece if your turn)
+                else:
+                    # case: second click (move piece)
+                    if self.clicked:
+                        # save current click pos and clicked square
 
-            #             # update click state
-            #             self.clicked = True
-            #             self.click_pos = pygame.mouse.get_pos()
-            #             self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+                        # update click state
+                        self.clicked = True
+                        self.click_pos = pygame.mouse.get_pos()
+                        self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
-            #             # unhighlight
+                        # unhighlight
 
-            #         # case: first click (select piece)
-            #         else:
-            #             # save current click pos and clicked square
+                    # case: first click (select piece)
+                    else:
+                        # save current click pos and clicked square
                         
-            #             # update click state
-            #             self.clicked = True
-            #             self.click_pos = pygame.mouse.get_pos()
-            #             self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+                        # update click state
+                        self.clicked = True
+                        self.click_pos = pygame.mouse.get_pos()
+                        self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
-            #             # highlight
-            #             # highlight possible moves
+                        # highlight
+                        # highlight possible moves
 
             # Quit
             elif event.type == QUIT:
                 self.running = False
-
-## DRAWING ##
-    def draw_pieces(self):
-        # given the board, draw the pieces on the board
-
-        for i in range(self.board_size):
-            for j in range(self.board_size):
-                piece = self.board[i][j]
-                if piece is not None:
-                    x = self.border_size + (i * self.square_size)
-                    y = self.border_size + (j * self.square_size)
-                    p = Piece(piece.color, self.piece_images[piece], self.square_size)
-                    self.display.blit(p.image, (x, y))
+                
+    def draw(self, board, game_time):
+        # update state
+        self.game_time_white = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[0])
+        self.game_time_black = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[1])
+        self.board = np.flip(board, axis=0)
         
-        # if there is no piece in the position (i, j), then draw nothing
+        # TODO: player on player
+        self.handle_game_events()
 
-    def draw_grid(self):
-        # board size is display size - 2*border size
-        grid_len = self.display_size - self.border_size
-        
+        # Clear the entire screen
+        self.display.fill(BLACK)
+
+        # Draw white time
+        self.display.blit(self.game_timer_white.render(self.game_time_white, True, WHITE), (self.border_size, self.border_size/2))
+
+        # Draw black time
+        self.display.blit(self.game_timer_black.render(self.game_time_black, True, WHITE), (self.border_size, self.display_size - self.border_size))
+
         counter = 0 
 
-        # start x at border on lfet side, and increment by total board size
-        for x in range(self.border_size, grid_len, self.square_size):
-            for y in range(self.border_size, grid_len, self.square_size):
+        # Draw board
+        for i in range(self.board_size):
+            for j in range(self.board_size):
 
-                # if x is even, y is odd, or vice versa, then the square is light
-                if counter % 2 == 0:
-                    color = BOARD_LIGHT_COLOR
-                else:
-                    color = BOARD_DARK_COLOR
-                
+                # get square position
+                x = self.border_size + (i * self.square_size)
+                y = self.border_size + (j * self.square_size)
+
+                # alternate colors
+                color = BOARD_LIGHT_COLOR if counter % 2 == 0 else BOARD_DARK_COLOR
+
+                # get piece notation from board_state
+                piece = self.board[j][i]
+
+                # draw squares
                 s = Square(color, self.square_size)
                 self.display.blit(s.image, (x, y))
+
+                # draw piece
+                if piece is not None:
+                    if piece == '-':
+                        pass
+
+                    elif piece.isupper():
+                        p = Black(piece, self.square_size-self.piece_padding)
+                        self.display.blit(p.image, (x+self.pos_offset, y+self.pos_offset))
+
+                    else:
+                        p = White(piece, self.square_size-self.piece_padding)
+                        self.display.blit(p.image, (x+self.pos_offset, y+self.pos_offset))                    
 
                 counter += 1
 
             counter += 1
 
-    def draw_board(self):
-        # Fill the background BLACK
-        self.display.fill((0, 0, 0))
+        # Update display
+        if self.running: pygame.display.flip()
 
-        # draw board grid (TODO: add row column labels)
-        self.draw_grid()
-
-        # initialize game timer drawing
-        self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
-
-    def draw_turn(self):
-        pass
-
-    def draw(self, board, game):
-        self.game = game
-        self.board = board
-
-        self.time = time.strftime("%H:%M:%S", time.gmtime(self.game.time))
+    def format_elapsed_time(self, elapsed_time_seconds):
+        hours, remainder = divmod(elapsed_time_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        milliseconds = int((elapsed_time_seconds - int(elapsed_time_seconds)) * 1000)
         
-        self.handle_game_events() # TODO: player on player
-
-        # TODO: redrawing?? clear here
-        self.draw_pieces() # TODO: this
-        self.draw_time()
-        self.draw_turn() # TODO: this
-        pygame.display.flip()
-
-    def draw_time(self, update=True):        
-        if update:
-            # remove old time from display
-            self.display.fill(BLACK, (self.border_size, self.border_size/2, self.border_size*2, self.border_size/2))
-            # draw new time
-            self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
-
-## HELPERS ##
+        return "{:02d}:{:02d}:{:02d}.{:03d}".format(int(hours), int(minutes), int(seconds), milliseconds)
 
     def get_square_from_mouse_pos(self, mouse_pos: tuple) -> tuple: # TODO: this
-        pass
-
-    def load_images(self): # TODO: this
-        # TODO: load images for pieces
-        # TODO: create dictionary of piece images
         pass
 
 if __name__ == '__main__':
@@ -218,8 +256,12 @@ if __name__ == '__main__':
     # g.draw(b, gs)
     # TODO: make move
     # g.draw(b, gs)
-    
+    s = time.monotonic()
     while g.running:
-        g.draw(b, gs)
+        g.draw(b, gs.time)
+        gs.time = (float(time.monotonic()-s),float(time.monotonic()-s)) #TODO: time is using time.gmtime() so it is not accurate
+
+        if gs.time[0] > 3:
+            g.running = False
 
     pygame.quit()
