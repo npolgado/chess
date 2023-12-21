@@ -1,7 +1,7 @@
 # import new_game from outside test folder
 import sys
 sys.path.append("..")
-from new_game import *
+from __init__ import *
 
 TEST_BOARD_1 = [
     ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
@@ -34,9 +34,9 @@ TEST_BOARD_3 = [
     ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 ]
 
-TEST_BOARD_STR_1 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RBQKBNR"
+TEST_BOARD_STR_1 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 TEST_BOARD_STR_2 = "8/8/8/8/8/8/8/8"
-TEST_BOARD_STR_3 = "rnbqkbnr/pppppppp/8/3p4/4P3/8/PPPPPPPP/RBQKBNR"
+TEST_BOARD_STR_3 = "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR"
 
 TEST_MOVE_1 = "e2e4"
 TEST_MOVE_2 = "e7e5"

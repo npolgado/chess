@@ -1,7 +1,7 @@
 import numpy as np
 from pprint import pprint
 
-def board_to_string() -> str:
+def board_to_string(board_state) -> str:
     string = ""
 
     for row in range(8):
@@ -32,7 +32,7 @@ def board_to_string() -> str:
 
     return string
 
-def string_to_board():
+def string_to_board(board_string):
     arr = np.empty([8,8], dtype=object)
 
     # split string into "/"
@@ -91,14 +91,19 @@ def translate_move_s2t(notation: str) -> (int, int):
     return (start_row, start_col), (start_row, start_col)
 
 def init_empty_board():
+    # TODO: was this meant to be oriented as if you were white or black? right now it is black
     init_array = [
         ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
         ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
         ['-', '-', '-', '-', '-', '-', '-', '-'], 
         ['-', '-', '-', '-', '-', '-', '-', '-'],
         ['-', '-', '-', '-', '-', '-', '-', '-'], 
-        ['-', '-', '-', '-', '-', '-', '-', '-'], 
-        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'], 
-        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
+        ['-', '-', '-', '-', '-', '-', '-', '-'],
+        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], 
+        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
     ]
     return init_array
+
+if __name__ == "__main__":
+    b = init_empty_board()
+    print_board(b)
