@@ -71,10 +71,10 @@ def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: in
                 row 7, col 7 -> H8
     '''
     ans = ""
-    ans += chr(start_row + 65)
+    ans += chr(start_col + 65)
     ans += str(start_row + 1)
-    ans += chr(end_row + 65)
-    ans += str(end_col + 1)
+    ans += chr(end_col + 65)
+    ans += str(end_row + 1)
     return ans
 
 def translate_move_s2t(notation: str) -> (int, int):
@@ -85,10 +85,10 @@ def translate_move_s2t(notation: str) -> (int, int):
     start_col = ord(notation[0]) - 65
     start_row = int(notation[1]) - 1
 
-    start_col = ord(notation[2]) - 65
-    start_row = int(notation[3]) - 1
+    end_col = ord(notation[2]) - 65
+    end_row = int(notation[3]) - 1
 
-    return (start_row, start_col), (start_row, start_col)
+    return (start_row, start_col), (end_row, end_col)
 
 def init_empty_board():
     init_array = [

@@ -6,7 +6,7 @@ import numpy as np
 from pprint import pprint
 from game_state import GameState
 from graphics import Graphics
-from . import *
+from __init__ import *
 
 # BLACK = 1 = UPPER
 # WHITE = 0 = LOWER
@@ -46,7 +46,7 @@ board_state_dict = {"board_state_1": 3, "board_state_2":1}
 # HELPER FUNCTIONS
 ###############################################################
 
-def get_pawn_moves(board_state, row, col, player_turn):
+def get_pawn_moves(board_state, row, col, player_turn, en_passant):
     if player_turn == 0:
         direc = 1
         starting_row = 1
@@ -80,6 +80,8 @@ def get_pawn_moves(board_state, row, col, player_turn):
             moves.append((row, col - 1))
     
     return moves
+
+
 def get_piece_moves(board_state, row, col, player_turn, piece_str, en_passant):
     piece_str = piece_str.lower()
     if piece_str == "r":
@@ -174,7 +176,7 @@ def end_game(status_string, winner_player=-1):
 
 def get_valid_moves(board_state, current_player_turn, en_passant=None):
     current_player_turn
-    valid_moves_arr = []
+    valid_moves = {}
     for r in range(8):
         for c in range(8):
             piece = board_state[r][c]
@@ -182,11 +184,10 @@ def get_valid_moves(board_state, current_player_turn, en_passant=None):
                 continue
             if piece.isupper() == current_player_turn:  # is piece white == is turn white
                 a = get_piece_moves(board_state, r, c, current_player_turn, piece, en_passant)
-                valid_moves_arr.append( a )
-                print(piece, ":", a)
+                valid_moves[(r,c)] = a
 
     # print(valid_moves_arr)
-    return valid_moves_arr
+    return valid_moves
 
 def handle_end_game(board_state, gs, valid_moves, current_player_turn):
     # if there are no valid moves, it's either checkmate and stalemate
@@ -215,61 +216,86 @@ def handle_end_game(board_state, gs, valid_moves, current_player_turn):
 ###############################################################
 # GAME FUNCTIONS
 ###############################################################
-def update_board(board_state, move, gs):
-    
-    # TODO: update board based on move
+def update_board(board_state, move):
+
+    move_tuple = translate_move_s2t(move)
+    move_from = move_tuple[0]
+    move_from_row = move_from[0]
+    move_from_col = move_from[1]
+    move_to = move_tuple[1]
+    move_to_row = move_to[0]
+    move_to_col = move_to[1]
+
+    piece_removed = board_state[move_to_row][move_to_col]
+    moving_piece = board_state[move_from_row][move_from_col]
+    board_state[move_to_row][move_to_col] = moving_piece
+    board_state[move_from_row][move_to_col] = '-'
+
+    # TODO: pass en passant to game state
+    # game_state.en_passant = None
+    if moving_piece == 'p':
+        if abs(move_from_row - move_to_row) == 2:
+            middle_row = (move_from_row + move_to_row) // 2
+            # game_state.en_passant = (middle_row, move_from_col)
+            print("EN PASSANT AVAILABLE AT: ", middle_row, move_from_col)
+
     # TODO: promotion logic
     # TODO: reset/update EN PASSAN
     # TODO: update castling rights
     # TODO: return new board state
 
-    # get new board
-
-    gs.update(board_state, en_passant=None)
+    return board_state
     
 def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
-    graphics = Graphics()
+    # graphics = Graphics()
 
     # Check and verify initial board state
+    print(board_state)
     valid_moves = get_valid_moves(board_state, gs.get_player_turn())
 
     p1 = eric_bot.AI()
     p2 = eric_bot.AI()
-    # p2 = nick_bot.AI() #TODO: DECOMMISIONED ATM
 
     players = (p1, p2)
 
     move = None
 
+    print("start.")
     while True:
         # Send updated move to the other player ai
         players[not gs.get_player_turn()].recieve(move)
 
         # get potential move from player
-        move = players[gs.get_player_turn()].get_target_move()
+        move = players[gs.get_player_turn()].get_target_move(valid_moves)
 
         # If the players move is None, we have not recieved a new move, so just draw
         if move == None:  # TODO: this needs to check if the move is the same as the last? 
-            graphics.draw(board_state, gs)
+            # graphics.draw(board_state, gs)
             continue
 
-        # Check if move is valid
-        # TODO: fix
-        # if translate_move(move.end) in get_piece_moves(board_state, translate_move(move.start), col, player_turn, 'N'):
-        if move in valid_moves: 
+
+        move_tuple = translate_move_s2t(move)
+        move_from = move_tuple[0]
+        move_to = move_tuple[1]
         
+        if move_to in valid_moves[move_from]:
+            print("reached")
             # Update game board state
-            board_state = update_board(move, gs)
-            graphics.draw(board_state, gs)
+            board_state = update_board(board_state, move)
+            # graphics.draw(board_state, gs)
             
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())
 
             # Check for endgame conditions
             handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
+        
+        for el in board_state:
+            print(el)
+        time.sleep(3) 
 
 if __name__ == "__main__":
     run()

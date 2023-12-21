@@ -43,7 +43,7 @@ class Square(pygame.sprite.Sprite):
 # Displays time, material count
 
 class Graphics:
-    def __init__(self, board=None, game: GameState=None, display_index=0) -> None:
+    def __init__(self) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
         

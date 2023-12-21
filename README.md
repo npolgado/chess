@@ -9,11 +9,10 @@ Game.py holds all the logic for the chess game. Run this file
 
 # TODO - Nick:
 
-- Update_Board function (Eric) 
-
-- TODO 1 (Eric)
-	- [ ] checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
-	- [ ] make the valid moves array a dictionary
+- Getting the Game to Flow (Eric)
+	- [X] checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
+	- [X] make the valid moves array a dictionary
+    - [ ] AI's making random valid moves (see gameplay on output)
 	- [ ] change end_game() logic
 
 - Tests outline (Nick)

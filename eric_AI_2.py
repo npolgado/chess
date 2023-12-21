@@ -1,6 +1,7 @@
 import random
 import copy
 import math
+from __init__ import *
 # Agent that plays chess
 
 # TODO: variable that keeps track of current board state
@@ -21,13 +22,31 @@ class AI :
         print("Score:", self.root.calculate_score())
 
 
-    def get_move(self) -> tuple:
-        move = ("a1", "b1")
+    def get_target_move(self, valid_moves) -> tuple:
+
+        count = 0
+        for key in valid_moves:
+            count += len(valid_moves[key])
+        
+        random_index = random.choice(range(count))
+
+        for key in valid_moves:
+            for value in valid_moves[key]:
+                random_index -= 1
+                if random_index == 0:
+                    random_move = (key, value)
+        
+        print(valid_moves)
+        print("random move:", random_move)
+
+        move = translate_move_t2s(random_move[0][0], random_move[0][1], random_move[1][0], random_move[1][1])
+
+        print("MOVE:", move)
 
         return move
 
-    def receive_move(self):
-        pass    # TODO
+    def recieve(self, move):
+        return None
     
     class Node:
         def __init__(self, board_state, children=[]):
