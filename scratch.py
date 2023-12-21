@@ -1,55 +1,31 @@
 
+def translate_move_s2t(notation: str) -> (int, int):
+    ''' Converts string into a tuple of row and col
+        example: A1 -> (0, 0)
+                H8 -> (7, 7)
+        NOTE: Assumes "A1H8" (capital)
+    '''
+    start_col = ord(notation[0]) - 65
+    start_row = int(notation[1]) - 1
 
-en_passant = (3, 4)
+    end_col = ord(notation[2]) - 65
+    end_row = int(notation[3]) - 1
 
-    
-def get_pawn_moves(board_state, row, col, player_turn):
-    if player_turn == 0:
-        direc = 1
-        starting_row = 1
-    else:
-        direc = -1
-        starting_row = 7
-
-    moves = []
-
-    # advances
-    if board_state[row + direc][col] == "-":
-        moves.append((row + direc, col))
-        if board_state[row + 2*direc][col] == "-":
-            moves.append((row + 2*direc, col))
-    
-    # captures
-    if col + 1 < 8:
-        # right captures
-        if board_state[row + direc][col + 1] != "-":
-            moves.append((row, col + 1))
-        # en passant
-        if (row, col+1) == en_passant:
-            moves.append((row, col+1))
-
-    if col - 1 >= 0:
-        # left captures
-        if board_state[row + direc][col - 1] != "-":
-            moves.append((row, col - 1))
-        # en passant
-        if (row, col-1) == en_passant:
-            moves.append((row, col - 1))
-        
-    return moves
+    return (start_row, start_col), (end_row, end_col)
 
 
 
+def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: int) -> str:
+    ''' Converts row and col to chess position 
+        example: row 0, col 0 -> A1
+                row 7, col 7 -> H8
+    '''
+    ans = ""
+    ans += chr(start_col + 65)
+    ans += str(start_row + 1)
+    ans += chr(end_col + 65)
+    ans += str(end_row + 1)
+    return ans
 
-board_state = [
-    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'], 
-    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-    ['-', '-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-', '-'],
-    ['R', 'N', 'N', 'Q', 'K', 'B', 'N', 'R'],
-    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']]
 
-
-print(get_pawn_moves(board_state, 1, 1, 0))
+print(translate_move_s2t("G2G4"))

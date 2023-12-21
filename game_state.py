@@ -36,6 +36,9 @@ class GameState:
 
     def get_three_fold_repetition(self):
         return self.is_three_fold_repetition
+    
+    def get_en_passant_square(self):
+        return self.enpassant_square
 
     def archive(self, board):
         board_str = board_to_string(self.board)
