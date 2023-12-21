@@ -20,13 +20,29 @@ class GameState:
 
         self.time = (0,0)
 
-    def update_castling_rights(self, board) -> None:
-        '''
-        look at the current board to determine if there are castling rights
+    def update_castling_rights(self, board_state) -> None:
+        # if the kings or rooks aren't in their starting position, update appropriate castling rights to False (never can be changed to True once False)
+        if board_state[0][4] != 'k':
+            if self.castling_rights['b_Q']:
+                self.castling_rights['b_Q'] = False
+            if self.castling_rights['b_K']:
+                self.castling_rights['b_K'] = False
+        if board_state[0][0] != 'r' and self.castling_rights['b_Q']:
+            self.castling_rights['b_Q'] = False
+        if board_state[0][7] != 'r' and self.castling_rights['b_K']:
+            self.castling_rights['b_K'] = False
 
-        check if king and rooks are on starting sqaures, set to true, else false
-        '''
-        pass
+        if board_state[7][4] != 'K':
+            if self.castling_rights['w_Q']:
+                self.castling_rights['w_Q'] = False
+            if self.castling_rights['w_K']:
+                self.castling_rights['w_K'] = False
+        if board_state[7][0] != 'R' and self.castling_rights['w_Q']:
+            self.castling_rights['w_Q'] = False
+        if board_state[7][7] != 'R' and self.castling_rights['w_K']:
+            self.castling_rights['w_K'] = False
+
+        print(self.castling_rights, "\n")
 
     def get_player_turn(self):
         return self.bool_turn
@@ -40,8 +56,12 @@ class GameState:
     def get_en_passant_square(self):
         return self.enpassant_square
 
+    def set_en_passant_square(self, en_passant_square):
+        self.enpassant_square = en_passant_square
+        print("En Passant Square = ", en_passant_square)
+
     def archive(self, board):
-        board_str = board_to_string(self.board)
+        board_str = board_to_string(board)
         self.board_history.append(board_str)
 
         if board_str in self.board_dict:
@@ -51,9 +71,9 @@ class GameState:
         else:
             self.board_dict[board_str] = 1
 
-    def update(self, board, en_passant=None):
-        self.enpassant_square = en_passant
+    def update(self, board):
         self.update_castling_rights(board)
         self.archive(board)
         self.turn += 1
         self.bool_turn = not self.bool_turn
+        

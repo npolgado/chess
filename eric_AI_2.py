@@ -33,7 +33,6 @@ class AI :
         
         for key in valid_moves:
             for value in valid_moves[key]:
-                print(random_index, key, value)
                 if random_index == 0:
                     random_move = (key, value)
                 random_index -= 1

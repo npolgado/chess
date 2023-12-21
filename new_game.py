@@ -186,7 +186,6 @@ def get_valid_moves(board_state, current_player_turn, en_passant=None):
                 a = get_piece_moves(board_state, r, c, current_player_turn, piece, en_passant)
                 valid_moves[(r,c)] = a
 
-    # print(valid_moves_arr)
     return valid_moves
 
 def handle_end_game(board_state, gs, valid_moves, current_player_turn):
@@ -216,8 +215,7 @@ def handle_end_game(board_state, gs, valid_moves, current_player_turn):
 ###############################################################
 # GAME FUNCTIONS
 ###############################################################
-def update_board(board_state, move):
-
+def update_board(board_state, move, gs):
     move_tuple = translate_move_s2t(move)
     move_from = move_tuple[0]
     move_from_row = move_from[0]
@@ -231,19 +229,19 @@ def update_board(board_state, move):
     board_state[move_to_row][move_to_col] = moving_piece
     board_state[move_from_row][move_from_col] = '-'
 
-    # TODO: pass en passant to game state
-    # game_state.en_passant = None
-    if moving_piece == 'p':
-        if abs(move_from_row - move_to_row) == 2:
-            middle_row = (move_from_row + move_to_row) // 2
-            # game_state.en_passant = (middle_row, move_from_col)
-            print("EN PASSANT AVAILABLE AT: ", middle_row, move_from_col)
+    # En Passant Update
+    gs.set_en_passant = None
+    if moving_piece == 'p' and abs(move_from_row - move_to_row) == 2:
+        middle_row = (move_from_row + move_to_row) // 2
+        gs.set_en_passant = (middle_row, move_from_col)
 
-    # TODO: promotion logic
-    # TODO: reset/update EN PASSAN
-    # TODO: update castling rights
-    # TODO: return new board state
+    # Promotion Logic (auto-queen)
+    if moving_piece == 'p' and move_to_row == 7:
+        board_state[move_to_row][move_to_col] = 'q'
 
+    if moving_piece == 'P' and move_to_row == 0:
+        board_state[move_to_row][move_to_col] = 'Q'
+    
     return board_state
     
 def run():
@@ -274,19 +272,14 @@ def run():
             graphics.draw(board_state, gs.time)
             continue
 
-
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_to = move_tuple[1]
-
-        print(move)
-        for el in valid_moves:
-            print(el, valid_moves[el])
-        print(move_from, move_to)
         
         if move_to in valid_moves[move_from]:
             # Update game board state
-            board_state = update_board(board_state, move)
+            board_state = update_board(board_state, move, gs)
+            gs.update(board_state)
             graphics.draw(board_state, gs.time)
             
             # Checks new board state for valid moves
@@ -297,7 +290,8 @@ def run():
         
         for el in board_state:
             print(el)
-        time.sleep(.5) 
+        print("\n")
+        time.sleep(.05) 
 
 if __name__ == "__main__":
     run()
