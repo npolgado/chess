@@ -253,7 +253,6 @@ def run():
     # graphics = Graphics()
 
     # Check and verify initial board state
-    print(board_state)
     valid_moves = get_valid_moves(board_state, gs.get_player_turn())
 
     p1 = eric_bot.AI()
@@ -263,7 +262,6 @@ def run():
 
     move = None
 
-    print("start.")
     while True:
         # Send updated move to the other player ai
         players[not gs.get_player_turn()].recieve(move)
@@ -273,19 +271,23 @@ def run():
 
         # If the players move is None, we have not recieved a new move, so just draw
         if move == None:  # TODO: this needs to check if the move is the same as the last? 
-            graphics.draw(board_state, gs.time)
+            # graphics.draw(board_state, gs.time)
             continue
 
 
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_to = move_tuple[1]
+
+        print(move)
+        for el in valid_moves:
+            print(el, valid_moves[el])
+        print(move_from, move_to)
         
         if move_to in valid_moves[move_from]:
-            print("reached")
             # Update game board state
-            board_state = update_board(move, gs.time)
-            graphics.draw(board_state, gs)
+            board_state = update_board(board_state, move)
+            # graphics.draw(board_state, gs)
             
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())

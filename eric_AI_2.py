@@ -36,12 +36,7 @@ class AI :
                 if random_index == 0:
                     random_move = (key, value)
         
-        print(valid_moves)
-        print("random move:", random_move)
-
         move = translate_move_t2s(random_move[0][0], random_move[0][1], random_move[1][0], random_move[1][1])
-
-        print("MOVE:", move)
 
         return move
 

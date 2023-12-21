@@ -81,6 +81,7 @@ def translate_move_s2t(notation: str) -> (int, int):
     ''' Converts string into a tuple of row and col
         example: A1 -> (0, 0)
                 H8 -> (7, 7)
+        NOTE: Assumes "A1H8" (capital)
     '''
     start_col = ord(notation[0]) - 65
     start_row = int(notation[1]) - 1
