@@ -59,25 +59,25 @@ def get_pawn_moves(board_state, row, col, player_turn, en_passant):
     # advances
     if board_state[row + direc][col] == "-":
         moves.append((row + direc, col))
-        if board_state[row + 2*direc][col] == "-":
+        if row == starting_row and board_state[row + 2*direc][col] == "-":
             moves.append((row + 2*direc, col))
     
     # captures
     if col + 1 < 8:
         # right captures
-        if board_state[row + direc][col + 1] != "-":
-            moves.append((row, col + 1))
+        if board_state[row + direc][col + 1] != "-" and board_state[row + direc][col + 1].isupper() != player_turn:
+            moves.append((row + direc, col + 1))
         # en passant
-        if (row, col+1) == en_passant:
-            moves.append((row, col+1))
+        if (row + direc, col + 1) == en_passant and board_state[row + direc][col + 1].isupper() != player_turn:
+            moves.append((row + direc, col+1))
 
     if col - 1 >= 0:
         # left captures
-        if board_state[row + direc][col - 1] != "-":
-            moves.append((row, col - 1))
+        if board_state[row + direc][col - 1] != "-" and board_state[row + direc][col - 1].isupper() != player_turn:
+            moves.append((row + direc, col - 1))
         # en passant
-        if (row, col-1) == en_passant:
-            moves.append((row, col - 1))
+        if (row, col-1) == en_passant and board_state[row + direc][col - 1].isupper() != player_turn:
+            moves.append((row + direc, col - 1))
     
     return moves
 
@@ -229,7 +229,7 @@ def update_board(board_state, move):
     piece_removed = board_state[move_to_row][move_to_col]
     moving_piece = board_state[move_from_row][move_from_col]
     board_state[move_to_row][move_to_col] = moving_piece
-    board_state[move_from_row][move_to_col] = '-'
+    board_state[move_from_row][move_from_col] = '-'
 
     # TODO: pass en passant to game state
     # game_state.en_passant = None
@@ -250,7 +250,7 @@ def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
-    # graphics = Graphics()
+    graphics = Graphics()
 
     # Check and verify initial board state
     valid_moves = get_valid_moves(board_state, gs.get_player_turn())
@@ -271,7 +271,7 @@ def run():
 
         # If the players move is None, we have not recieved a new move, so just draw
         if move == None:  # TODO: this needs to check if the move is the same as the last? 
-            # graphics.draw(board_state, gs.time)
+            graphics.draw(board_state, gs.time)
             continue
 
 
@@ -287,7 +287,7 @@ def run():
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = update_board(board_state, move)
-            # graphics.draw(board_state, gs)
+            graphics.draw(board_state, gs.time)
             
             # Checks new board state for valid moves
             valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())
@@ -297,7 +297,7 @@ def run():
         
         for el in board_state:
             print(el)
-        time.sleep(3) 
+        time.sleep(.5) 
 
 if __name__ == "__main__":
     run()
