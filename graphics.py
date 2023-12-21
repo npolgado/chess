@@ -38,19 +38,20 @@ class Square(pygame.sprite.Sprite):
        self.image.fill(color)
        self.rect = self.image.get_rect()
 
+
+# Draws board and pieces
+# Displays time, material count
+
 class Graphics:
-    def __init__(self, board=None, game=None, display_index=0) -> None:
+    def __init__(self, board=None, game: GameState=None, display_index=0) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
+        
         self.board_size = 8
         self.square_size = 100
         self.border_size = 100
+
         self.display_size = self.board_size * self.square_size + (2*self.border_size)
-
-        self.framerate = 30
-
-        self.clicked = False
-        self.click_pos = (0,0)
 
         self.display = pygame.display.set_mode(
             size=(self.display_size, self.display_size),
@@ -59,19 +60,15 @@ class Graphics:
         )
 
         self.game_timer = pygame.font.SysFont('Arial', 30)
-        self.start_time = time.monotonic()
-        self.game_time = 0
+        self.time = None
 
         self.board = board
         self.game = game
         self.piece_images = {}
 
         self.running = True
-
         self.load_images()
-        
         self.draw_board()
-        
         self.draw(self.board, self.game)
 
 ## PYGAME ##
@@ -88,41 +85,41 @@ class Graphics:
                 if event.key == K_ESCAPE or event.key == ord('q'):
                     self.running = False
 
-            # Mouse Click
-            if event.type == pygame.MOUSEBUTTONUP:
-                # self.click_pos = pygame.mouse.get_pos()
-                # self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+            # # Mouse Click
+            # if event.type == pygame.MOUSEBUTTONUP:
+            #     # self.click_pos = pygame.mouse.get_pos()
+            #     # self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
-                # TODO: Right click (cancel if clicked on square)
-                if event.button == 3:
-                    self.clicked = False
-                    self.clicked_square = None
-                    # unhighlight
+            #     # TODO: Right click (cancel if clicked on square)
+            #     if event.button == 3:
+            #         self.clicked = False
+            #         self.clicked_square = None
+            #         # unhighlight
 
-                # TODO: Left Click (select square OR move piece if your turn)
-                else:
-                    # case: second click (move piece)
-                    if self.clicked:
-                        # save current click pos and clicked square
+            #     # TODO: Left Click (select square OR move piece if your turn)
+            #     else:
+            #         # case: second click (move piece)
+            #         if self.clicked:
+            #             # save current click pos and clicked square
 
-                        # update click state
-                        self.clicked = True
-                        self.click_pos = pygame.mouse.get_pos()
-                        self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+            #             # update click state
+            #             self.clicked = True
+            #             self.click_pos = pygame.mouse.get_pos()
+            #             self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
-                        # unhighlight
+            #             # unhighlight
 
-                    # case: first click (select piece)
-                    else:
-                        # save current click pos and clicked square
+            #         # case: first click (select piece)
+            #         else:
+            #             # save current click pos and clicked square
                         
-                        # update click state
-                        self.clicked = True
-                        self.click_pos = pygame.mouse.get_pos()
-                        self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+            #             # update click state
+            #             self.clicked = True
+            #             self.click_pos = pygame.mouse.get_pos()
+            #             self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
-                        # highlight
-                        # highlight possible moves
+            #             # highlight
+            #             # highlight possible moves
 
             # Quit
             elif event.type == QUIT:
@@ -173,36 +170,32 @@ class Graphics:
         # draw board grid (TODO: add row column labels)
         self.draw_grid()
 
-        # get formatted string of self.game_time as XX:XX:XX of minutes and seconds and miliseconds elapsed
-        time_str = time.strftime("%H:%M:%S", time.gmtime(self.game_time))
-
         # initialize game timer drawing
-        self.display.blit(self.game_timer.render(time_str, True, WHITE), (self.border_size, self.border_size/2))
+        self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
 
     def draw_turn(self):
         pass
 
     def draw(self, board, game):
-        self.handle_game_events()
+        self.game = game
+        self.board = board
+
+        self.time = time.strftime("%H:%M:%S", time.gmtime(self.game.time))
+        
+        self.handle_game_events() # TODO: player on player
+
         # TODO: redrawing?? clear here
-        # self.draw_pieces() # TODO: this
+        self.draw_pieces() # TODO: this
         self.draw_time()
         self.draw_turn() # TODO: this
         pygame.display.flip()
 
-    def draw_time(self, update=True):
-        # TODO: draw time: update self.game_timer
-
-        # get current game time
-        curr_time = time.monotonic()
-        new_time = float(curr_time - self.start_time)
-        time_str = time.strftime("%H:%M:%S", time.gmtime(new_time))
-        
+    def draw_time(self, update=True):        
         if update:
             # remove old time from display
             self.display.fill(BLACK, (self.border_size, self.border_size/2, self.border_size*2, self.border_size/2))
             # draw new time
-            self.display.blit(self.game_timer.render(time_str, True, WHITE), (self.border_size, self.border_size/2))
+            self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
 
 ## HELPERS ##
 
@@ -220,7 +213,7 @@ if __name__ == '__main__':
 
     b = init_empty_board()
     gs = GameState()
-    g = Graphics()
+    g = Graphics(display_index=1)
     
     # g.draw(b, gs)
     # TODO: make move

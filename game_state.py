@@ -1,4 +1,5 @@
 import numpy as np
+from . import board_to_string
 
 class GameState:
     def __init__(self, turn: int=1) -> None:
@@ -16,6 +17,8 @@ class GameState:
             "b_Q": True,
             "b_K": True
         }
+
+        self.time = 0
 
     def update_castling_rights(self, board) -> None:
         '''
