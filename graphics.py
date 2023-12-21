@@ -41,6 +41,17 @@ FULL_NAMES = {
     'k': 'King'
 }
 
+TEST_BOARD_3 = [
+    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+    ['p', 'p', 'p', '-', 'p', 'p', 'p', 'p'],
+    ['-', '-', '-', '-', '-', '-', '-', '-'], 
+    ['-', '-', '-', 'p', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', 'P', '-', '-', '-'], 
+    ['-', '-', '-', '-', '-', '-', '-', '-'], 
+    ['P', 'P', 'P', 'P', '-', 'P', 'P', 'P'],
+    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+]
+
 class White(pygame.sprite.Sprite):
     def __init__(self, piece, size):
         pygame.sprite.Sprite.__init__(self)
@@ -262,16 +273,7 @@ if __name__ == '__main__':
         gs.time = (curr_time,curr_time) #TODO: time is using time.gmtime() so it is not accurate
 
         if gs.time[0] > 3 and gs.time[1] > 3.02:
-            b = [
-                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-                ['p', 'p', 'p', 'p', '-', 'p', 'p', 'p'],
-                ['-', '-', '-', '-', '-', '-', '-', '-'],
-                ['-', '-', '-', '-', 'p', '-', '-', '-'],
-                ['-', '-', '-', 'P', '-', '-', '-', '-'],
-                ['-', '-', '-', '-', '-', '-', '-', '-'],
-                ['P', 'P', 'P', '-', 'P', 'P', 'P', 'P'],
-                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-            ]
+            b = TEST_BOARD_3
 
         if gs.time[0] > 6 and gs.time[1] > 6.02:
             b = [

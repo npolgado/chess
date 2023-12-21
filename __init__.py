@@ -5,11 +5,8 @@ def board_to_string(board_state) -> str:
     string = ""
 
     for row in range(8):
-        
         space_count = 0
-        
         for col in range(8):
-            
             letter = board_state[row][col]
             
             # if space, keep count and add count once a piece is found
@@ -20,6 +17,7 @@ def board_to_string(board_state) -> str:
             else:
                 if space_count > 0:
                     string += str(space_count)
+                    space_count = 0
                 string += letter
 
         # end of row also resets space count
@@ -30,6 +28,7 @@ def board_to_string(board_state) -> str:
         if row != 7:
             string += "/"
 
+    # print(string)
     return string
 
 def string_to_board(board_string):
@@ -46,7 +45,6 @@ def string_to_board(board_string):
 
             # if the letter in the row is a number, we skip that many positions in the array
             if letter.isnumeric():
-                
                 skip = int(letter)
                 
                 # add - for every empty space
@@ -56,7 +54,6 @@ def string_to_board(board_string):
             
             # if the letter is not numeric we add it to the array
             else:
-                
                 arr[row][col] = letter
                 col += 1
 
@@ -71,10 +68,12 @@ def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: in
                 row 7, col 7 -> H8
     '''
     ans = ""
-    ans += chr(start_col + 65)
-    ans += str(start_row + 1)
-    ans += chr(end_col + 65)
-    ans += str(end_row + 1)
+    ans += chr(start_row + 65)
+    ans += str(start_col + 1)
+    ans += chr(end_row + 65)
+    ans += str(end_col + 1)
+
+    print(ans)
     return ans
 
 def translate_move_s2t(notation: str) -> (int, int):
@@ -83,12 +82,13 @@ def translate_move_s2t(notation: str) -> (int, int):
                 H8 -> (7, 7)
         NOTE: Assumes "A1H8" (capital)
     '''
-    start_col = ord(notation[0]) - 65
-    start_row = int(notation[1]) - 1
+    start_row = ord(notation[0]) - 65
+    start_col = int(notation[1]) - 1
 
-    end_col = ord(notation[2]) - 65
-    end_row = int(notation[3]) - 1
+    end_row = ord(notation[2]) - 65
+    end_col = int(notation[3]) - 1
 
+    # print((start_row, start_col), (end_row, end_col))
     return (start_row, start_col), (end_row, end_col)
 
 def init_empty_board():
