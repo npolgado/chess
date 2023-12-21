@@ -1,9 +1,7 @@
 import time
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
 import pygame
-
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
 from pygame.locals import (
@@ -15,6 +13,8 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
+from __init__ import *
+import numpy as np
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -26,16 +26,66 @@ HIGHLIGHT_COLOR = (255, 255, 0)
 
 IMAGE_ROOT = 'images/'
 
-class Piece(pygame.sprite.Sprite):
-    def __init__(self, piece, im, size):
+FULL_NAMES = {
+    'P': 'Pawn',
+    'N': 'Knight',
+    'B': 'Bishop',
+    'R': 'Rook',
+    'Q': 'Queen',
+    'K': 'King',
+    'p': 'Pawn',
+    'n': 'Knight',
+    'b': 'Bishop',
+    'r': 'Rook',
+    'q': 'Queen',
+    'k': 'King'
+}
+
+class White(pygame.sprite.Sprite):
+    def __init__(self, piece, size):
         pygame.sprite.Sprite.__init__(self)
-        # TODO: resize image to size
+
+        # get image filepath
+        im = os.path.join(IMAGE_ROOT, 'White', FULL_NAMES[piece] + '.png')
+
+        # Load image from file path im
+        self.image = pygame.image.load(im).convert_alpha()
+        self.image.set_colorkey(None)
+
+        # Scale image to size
+        self.image = pygame.transform.scale(self.image, (size, size))
+
+        # Set image background to transparent
+        self.rect = self.image.get_rect()
+
+class Black(pygame.sprite.Sprite):
+    def __init__(self, piece, size):
+        pygame.sprite.Sprite.__init__(self)
+
+        # get image filepath
+        im = os.path.join(IMAGE_ROOT, 'Black', FULL_NAMES[piece] + '.png')
+
+        # Load image from file path im
+        self.image = pygame.image.load(im).convert_alpha()
+        self.image.set_colorkey(None)
+
+        # Scale image to size
+        self.image = pygame.transform.scale(self.image, (size, size))
+
+        # Set image background to transparent
+        self.rect = self.image.get_rect()
 
 class Square(pygame.sprite.Sprite):
     def __init__(self, color, size):
        pygame.sprite.Sprite.__init__(self)
+
+       # Create a square image of the given size
        self.image = pygame.Surface([size, size])
+       
+       # Fill the square with the given color
        self.image.fill(color)
+       
+       # Set image background to transparent
        self.rect = self.image.get_rect()
 
 # Draws board and pieces
@@ -46,30 +96,34 @@ class Graphics:
         pygame.init()
         
         self.board_size = 8
-        self.square_size = 100
+        self.square_size = 75
         self.border_size = 100
+        self.piece_padding = 10
+        self.pos_offset = self.piece_padding / 2
 
+        self.display = None
         self.display_size = self.board_size * self.square_size + (2*self.border_size)
 
+        self.board = board
+        self.running = True
+
+        self.game_timer_white = pygame.font.SysFont('Arial', 30)
+        self.game_timer_black = pygame.font.SysFont('Arial', 30)
+
+        self.game_time_white = "00:00:00" if game_time == None else time.strftime("%H:%M:%S", time.gmtime(game_time[0]))
+        self.game_time_black = "00:00:00" if game_time == None else time.strftime("%H:%M:%S", time.gmtime(game_time[1]))
+
+        self.init(display_index)
+
+    def init(self, display_index):
         self.display = pygame.display.set_mode(
             size=(self.display_size, self.display_size),
-            flags=pygame.RESIZABLE|pygame.SCALED,
+            flags=pygame.RESIZABLE|pygame.SCALED|pygame.SRCALPHA,
             display=display_index
         )
-
-        self.game_timer = pygame.font.SysFont('Arial', 30)
-
-        self.board = board
-        self.piece_images = {}
-
-        self.game_time = time.strftime("%H:%M:%S", time.gmtime(game_time))
-        
-        self.running = True
-        self.load_images()
-
-        self.draw(self.board, self.game_time)
-
-## PYGAME ##
+        pygame.display.set_caption('Chess')
+        pygame.display.set_icon(pygame.image.load(os.path.join(IMAGE_ROOT, 'Black', 'King.png')))
+        pygame.display.flip()
 
     def handle_game_events(self):
         # Look at every event in the queue
@@ -122,13 +176,12 @@ class Graphics:
             # Quit
             elif event.type == QUIT:
                 self.running = False
-
-## DRAWING ##
                 
     def draw(self, board, game_time):
         # update state
-        self.game_time = time.strftime("%H:%M:%S", time.gmtime(game_time))
-        self.board = board
+        self.game_time_white = "00:00:00" if game_time == None else time.strftime("%H:%M:%S", time.gmtime(game_time[0]))
+        self.game_time_black = "00:00:00" if game_time == None else time.strftime("%H:%M:%S", time.gmtime(game_time[1]))
+        self.board = np.flip(board, axis=0)
         
         # TODO: player on player
         self.handle_game_events()
@@ -136,15 +189,15 @@ class Graphics:
         # Clear the entire screen
         self.display.fill(BLACK)
 
-        # Draw Time
-        self.display.blit(self.game_timer.render(self.time, True, WHITE), (self.border_size, self.border_size/2))
+        # Draw white time
+        self.display.blit(self.game_timer_white.render(self.game_time_white, True, WHITE), (self.border_size, self.border_size/2))
 
-        # # board size is display size - 2*border size
-        grid_len = self.display_size - self.border_size
+        # Draw black time
+        self.display.blit(self.game_timer_black.render(self.game_time_black, True, WHITE), (self.border_size, self.display_size - self.border_size))
 
         counter = 0 
 
-        # Draw Board
+        # Draw board
         for i in range(self.board_size):
             for j in range(self.board_size):
 
@@ -152,37 +205,37 @@ class Graphics:
                 x = self.border_size + (i * self.square_size)
                 y = self.border_size + (j * self.square_size)
 
-                # if x is even, y is odd, or vice versa, then the square is light
+                # alternate colors
                 color = BOARD_LIGHT_COLOR if counter % 2 == 0 else BOARD_DARK_COLOR
 
                 # get piece notation from board_state
-                piece = self.board[i][j]
+                piece = self.board[j][i]
+
+                # draw squares
+                s = Square(color, self.square_size)
+                self.display.blit(s.image, (x, y))
 
                 # draw piece
                 if piece is not None:
-                    p = Piece(piece, self.piece_images[piece], self.square_size)
-                    self.display.blit(p.image, (x, y))
-                
-                # draw square
-                else:
-                    s = Square(color, self.square_size)
-                    self.display.blit(s.image, (x, y))
+                    if piece == '-':
+                        pass
+
+                    elif piece.isupper():
+                        p = Black(piece, self.square_size-self.piece_padding)
+                        self.display.blit(p.image, (x+self.pos_offset, y+self.pos_offset))
+
+                    else:
+                        p = White(piece, self.square_size-self.piece_padding)
+                        self.display.blit(p.image, (x+self.pos_offset, y+self.pos_offset))                    
 
                 counter += 1
 
             counter += 1
 
-        # update display
+        # Update display
         pygame.display.flip()
 
-## HELPERS ##
-
     def get_square_from_mouse_pos(self, mouse_pos: tuple) -> tuple: # TODO: this
-        pass
-
-    def load_images(self): # TODO: this
-        # TODO: load images for pieces
-        # TODO: create dictionary of piece images
         pass
 
 if __name__ == '__main__':
@@ -198,6 +251,6 @@ if __name__ == '__main__':
     # g.draw(b, gs)
     
     while g.running:
-        g.draw(b, gs)
+        g.draw(b, gs.time)
 
     pygame.quit()

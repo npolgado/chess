@@ -6,7 +6,7 @@ import numpy as np
 from pprint import pprint
 from game_state import GameState
 from graphics import Graphics
-from . import *
+from __init__ import *
 
 # BLACK = 1 = UPPER
 # WHITE = 0 = LOWER

@@ -1,5 +1,5 @@
 import numpy as np
-from . import board_to_string
+from __init__ import board_to_string
 
 class GameState:
     def __init__(self, turn: int=1) -> None:
