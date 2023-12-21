@@ -1,4 +1,3 @@
-import time
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
@@ -15,6 +14,7 @@ from pygame.locals import (
 )
 from __init__ import *
 import numpy as np
+import time
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -104,6 +104,9 @@ class Graphics:
         self.display = board
         self.display_size = self.board_size * self.square_size + (2*self.border_size)
 
+        self.clicked = False
+        self.click_pos = (0,0)
+
         # self.board = board
         self.running = True
 
@@ -139,8 +142,8 @@ class Graphics:
 
             # Mouse Click
             if event.type == pygame.MOUSEBUTTONUP:
-                # self.click_pos = pygame.mouse.get_pos()
-                # self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+                self.click_pos = pygame.mouse.get_pos()
+                self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
                 # TODO: Right click (cancel if clicked on square)
                 if event.button == 3:
@@ -246,7 +249,6 @@ class Graphics:
         pass
 
 if __name__ == '__main__':
-    from new_game import init_empty_board
     from game_state import GameState
 
     b = init_empty_board()
@@ -255,8 +257,9 @@ if __name__ == '__main__':
     
     s = time.monotonic()
     while g.running:
+        curr_time = float(time.monotonic()-s)
         g.draw(b, gs.time)
-        gs.time = (float(time.monotonic()-s),float(time.monotonic()-s)) #TODO: time is using time.gmtime() so it is not accurate
+        gs.time = (curr_time,curr_time) #TODO: time is using time.gmtime() so it is not accurate
 
         if gs.time[0] > 3 and gs.time[1] > 3.02:
             b = [
@@ -269,7 +272,6 @@ if __name__ == '__main__':
                 ['P', 'P', 'P', '-', 'P', 'P', 'P', 'P'],
                 ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
             ]
-
 
         if gs.time[0] > 6 and gs.time[1] > 6.02:
             b = [
