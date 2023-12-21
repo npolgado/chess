@@ -7,7 +7,7 @@ Game.py holds all the logic for the chess game. Run this file
 
 
 
-# TODO:
+# TODO - Nick:
 
 - Update_Board function (Eric) 
 

@@ -1,4 +1,4 @@
-import eric_AI as eric_bot
+import eric_AI_2 as eric_bot
 import nick_AI as nick_bot
 import time
 import sys
@@ -134,7 +134,7 @@ def translate_move_s2t(notation: str) -> (int, int):
 
     return (start_row, start_col), (start_row, start_col)
 
-def get_pawn_moves(board_state, row, col, player_turn):
+def get_pawn_moves(board_state, row, col, player_turn, en_passant):
     if player_turn == 0:
         direc = 1
         starting_row = 1
@@ -166,9 +166,9 @@ def get_pawn_moves(board_state, row, col, player_turn):
         # en passant
         if (row, col-1) == en_passant:
             moves.append((row, col - 1))
-        
+    
     return moves
-def get_piece_moves(board_state, row, col, player_turn, piece_str):
+def get_piece_moves(board_state, row, col, player_turn, piece_str, en_passant):
     piece_str = piece_str.lower()
     if piece_str == "r":
         directions = [(1,0), (0,1), (-1, 0), (0, -1)]   # down, up, left, right
@@ -183,7 +183,7 @@ def get_piece_moves(board_state, row, col, player_turn, piece_str):
         directions =  [(1, 1), (-1, 1), (-1, 1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
         depth = 8 if piece_str == "queen" else 1
     elif piece_str == "p":
-        return get_pawn_moves(board_state, row, col, player_turn)
+        return get_pawn_moves(board_state, row, col, player_turn, en_passant)
 
     else:
         print("error. piece str = ", piece_str)
@@ -260,7 +260,7 @@ def end_game(status_string, winner_player=-1):
 # BOARD STATE FUNCTIONS
 ###############################################################
 
-def get_valid_moves(board_state, current_player_turn, en_passant_square=None):
+def get_valid_moves(board_state, current_player_turn, en_passant=None):
     current_player_turn
     valid_moves_arr = []
     for r in range(8):
@@ -269,7 +269,7 @@ def get_valid_moves(board_state, current_player_turn, en_passant_square=None):
             if piece == "-":
                 continue
             if piece.isupper() == current_player_turn:  # is piece white == is turn white
-                a = get_piece_moves(board_state, r, c, current_player_turn, piece)
+                a = get_piece_moves(board_state, r, c, current_player_turn, piece, en_passant)
                 valid_moves_arr.append( a )
                 print(piece, ":", a)
 
@@ -318,6 +318,7 @@ def init_empty_board():
     return init_array
 
 def update_board(board_state, move, gs):
+    
     # TODO: update board based on move
     # TODO: promotion logic
     # TODO: reset/update EN PASSAN
@@ -345,7 +346,16 @@ def run():
 
     while True:
         # Get move from player ai
-        move = players[gs.get_player_turn()].get_move()
+
+        players[not gs.get_player_turn()].recieve_last_move_and_start_calculating(opponents_last_move)
+        
+        target_move = players[gs.get_player_turn()].get_target_move()
+
+        if target_move is None:
+            draw()
+            continue
+
+
 
         # Check if move is valid
         # TODO: fix
@@ -357,13 +367,13 @@ def run():
             graphics.draw(board_state, gs)
             
             # Checks new board state for valid moves
-            valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.enpassant_square)
+            valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())
 
             # Check for endgame conditions
             handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
 
             # Send updated move to the other player ai
-            players[not gs.get_player_turn()].recieve_opponent_move(move)
+            
 
 if __name__ == "__main__":
     run()

@@ -10,13 +10,13 @@ import math
 
 class AI :
     
-    def __init__(self, board_state):
-        self.current_board_state = board_state
+    def __init__(self):
+        self.current_board_state = init_empty_board()
 
-        for el in board_state:
+        for el in self.current_board_state:
             print(el)
 
-        self.root = self.Node(board_state)  
+        self.root = self.Node(self.current_board_state)  
 
         print("Score:", self.root.calculate_score())
 
