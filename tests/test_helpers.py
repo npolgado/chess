@@ -44,7 +44,7 @@ TEST_MOVE_3 = "E1E2"
 TEST_MOVE_4 = "A1H8"
 TEST_MOVE_5 = "A8H1"
 
-TEST_MOVE_TUPLE_1 = ((4, 1), (4, 3))
+TEST_MOVE_TUPLE_1 = ((4, 1), (4, 3)) # TODO: this is wrong, E2 should be 1, 4 and E4 should be 3, 4
 TEST_MOVE_TUPLE_2 = ((4, 6), (4, 4))
 TEST_MOVE_TUPLE_3 = ((4, 0), (4, 1))
 TEST_MOVE_TUPLE_4 = ((0, 0), (7, 7))
