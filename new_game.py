@@ -32,20 +32,6 @@ move: str
 
 '''
 
-# Board State should be a string representing the current position of pieces on the board
-board_state = []
-board_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-
-# Board History is used to keep track of the moves played
-board_history = ["board_state_1", "board_state_2", "board_state_1"]
-
-# Board State Dict is used to keep track of the number of times a board state has existed during the game
-board_state_dict = {"board_state_1": 3, "board_state_2":1}
-
-###############################################################
-# HELPER FUNCTIONS
-###############################################################
-
 def get_pawn_moves(board_state, row, col, player_turn, en_passant):
     if player_turn == 0:
         direc = 1
@@ -137,10 +123,6 @@ def get_king_position(current_player_turn):
                 return r, c
     return None
 
-###############################################################
-# ENDGAME CONDITIONS
-###############################################################
-
 def is_checked(board_state, king_row, king_col, player_turn):
     if king_col == None or king_row == None:
         return False
@@ -170,10 +152,6 @@ def end_game(status_string, winner_player=-1):
     time.sleep(1000)
 
     sys.exit()
-
-###############################################################
-# BOARD STATE FUNCTIONS
-###############################################################
 
 def get_valid_moves(board_state, current_player_turn, en_passant=None):
     current_player_turn
@@ -214,9 +192,6 @@ def handle_end_game(board_state, gs, valid_moves, current_player_turn):
     if is_fifty_move_rule():
         end_game("stalemate")
 
-###############################################################
-# GAME FUNCTIONS
-###############################################################
 def update_board(board_state, move):
 
     move_tuple = translate_move_s2t(move)
@@ -266,28 +241,32 @@ def run():
     while True:
         # Update game time
         gs.tick()
+        
+        # Get boolean for current players turn
+        current_turn = gs.get_player_turn()
 
         # Send updated move to the other player ai
-        players[not gs.get_player_turn()].recieve(move)
+        players[not current_turn].recieve(move)
 
-        # get potential move from player
-        move = players[gs.get_player_turn()].get_target_move(valid_moves)
+        # Get potential move from player
+        move = players[current_turn].get_target_move(valid_moves)
 
         # If the players move is None, we have not recieved a new move, so just draw
-        if move == None:  # TODO: this needs to check if the move is the same as the last? 
+        if move == None:
             graphics.draw(board_state, gs.time)
             continue
 
-
+        # Translate move from string to tuple
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_to = move_tuple[1]
 
-        print(move)
+        # print(move)
         # for el in valid_moves:
         #     print(el, valid_moves[el])
         # print(move_from, move_to)
         
+        # Check if move is valid from the piece in the starting position
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = update_board(board_state, move)
@@ -299,10 +278,10 @@ def run():
             graphics.draw(board_state, gs.time)
             
             # Checks new board state for valid moves
-            valid_moves = get_valid_moves(board_state, gs.get_player_turn(), gs.get_en_passant_square())
+            valid_moves = get_valid_moves(board_state, current_turn, gs.get_en_passant_square())
 
             # Check for endgame conditions
-            handle_end_game(board_state, gs, valid_moves, gs.get_player_turn())
+            handle_end_game(board_state, gs, valid_moves, current_turn)
         
         # print_board(board_state)
         time.sleep(.2) 
