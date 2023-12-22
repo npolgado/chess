@@ -9,6 +9,7 @@ from pygame.locals import (
     # K_LEFT,
     # K_RIGHT,
     K_ESCAPE,
+    K_SPACE,
     KEYDOWN,
     QUIT,
 )
@@ -133,12 +134,15 @@ class Graphics:
         pygame.display.flip()
 
     def handle_game_events(self):
-        # Look at every event in the queue
         for event in pygame.event.get():
 
             # Key Press
             if event.type == KEYDOWN:
                 # TODO: add key press events after game to review game
+
+                # Space for Pause
+                if event.key == K_SPACE:
+                    self.running = not self.running
 
                 # Q for Quit, or Esc i guess.. 
                 if event.key == K_ESCAPE or event.key == ord('q'):
@@ -183,7 +187,7 @@ class Graphics:
 
             # Quit
             elif event.type == QUIT:
-                self.running = False
+                exit()
                 
     def draw(self, board, game_time):
         # update state

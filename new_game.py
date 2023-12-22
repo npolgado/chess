@@ -42,6 +42,11 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
     move = None
 
     while True:
+        # busy if graphics paused
+        if not graphics.running: 
+            graphics.handle_game_events()
+            continue
+        
         # Update game time
         gs.tick()
         
