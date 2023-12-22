@@ -24,14 +24,6 @@ class GameState:
         self.time_white = 0
         self.time_black = 0
 
-    def update_castling_rights(self, board) -> None:
-        '''
-        look at the current board to determine if there are castling rights
-
-        check if king and rooks are on starting sqaures, set to true, else false
-        '''
-        pass
-
     def get_player_turn(self):
         return self.bool_turn
     
@@ -71,6 +63,14 @@ class GameState:
 
         # update time
         self.time = (self.time_white,self.time_black)
+
+    def update_castling_rights(self, board) -> None:
+        '''
+        look at the current board to determine if there are castling rights
+
+        check if king and rooks are on starting sqaures, set to true, else false
+        '''
+        pass
 
     def update(self, board, en_passant=None):
         self.enpassant_square = en_passant
