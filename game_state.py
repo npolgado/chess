@@ -46,7 +46,7 @@ class GameState:
         if board_state[7][7] != 'R' and self.castling_rights['w_K']:
             self.castling_rights['w_K'] = False
 
-        print(self.castling_rights, "\n")
+        # print(self.castling_rights, "\n")
 
     def get_player_turn(self):
         return self.bool_turn

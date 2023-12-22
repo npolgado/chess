@@ -223,7 +223,7 @@ def update_board(board_state, move, gs):
     
     return board_state
     
-def run():
+def run(DEBUG = False):
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
@@ -261,17 +261,19 @@ def run():
         move_from = move_tuple[0]
         move_to = move_tuple[1]
 
-        print(move)
-        for el in valid_moves:
-            print(el, valid_moves[el])
-        print(move_from, move_to)
+        if DEBUG:
+            print(move)
+            for el in valid_moves:
+                print(el, valid_moves[el])
+            print(move_from, move_to)
         
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = update_board(board_state, move, gs)
             gs.update(board_state)
             
-            # print(evaluate_board(board_state))
+            if DEBUG:
+                print(evaluate_board(board_state))
 
             # Draw
             graphics.draw(board_state, gs.time)
@@ -283,7 +285,8 @@ def run():
             handle_end_game(board_state, gs, valid_moves, current_turn)
         
         # print_board(board_state)
-        time.sleep(.2) 
+        time.sleep(0.3) 
 
 if __name__ == "__main__":
-    run()
+    DEBUG = True
+    run(DEBUG)

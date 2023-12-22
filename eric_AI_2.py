@@ -14,12 +14,12 @@ class AI :
     def __init__(self):
         self.current_board_state = init_empty_board()
 
-        for el in self.current_board_state:
-            print(el)
+        # for el in self.current_board_state:
+        #     print(el)
 
         self.root = self.Node(self.current_board_state)  
 
-        print("Score:", self.root.calculate_score())
+        # print("Score:", self.root.calculate_score())
 
 
     def get_target_move(self, valid_moves) -> tuple:
