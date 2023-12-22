@@ -26,7 +26,10 @@ move: str
 def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
     # Initialize board state and turn counter 
     gs = GameState(init_empty_board(), DEBUG=DEBUG)
-    graphics = Graphics(display_index=1)
+    graphics = Graphics(
+        display_index=1,
+        fullscreen=False
+    )
 
     # Check and verify initial board state
     valid_moves = gs.get_valid_moves()
@@ -60,21 +63,10 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_to = move_tuple[1]
-
-        if DEBUG:
-            print(move)
-            for el in valid_moves:
-                print(el, valid_moves[el])
-            print(move_from, move_to)
         
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = gs.update(move)
-            
-            if DEBUG:
-                print(evaluate_board(board_state))
-                print("\n\n")
-                print_board(board_state)
 
             # Draw
             graphics.draw(board_state, gs.time)
@@ -84,8 +76,21 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
 
             # Check for endgame conditions
             gs.handle_end_game()
-        
-        # print_board(board_state)
+
+        if DEBUG:
+            print("\n\n")
+            print(move)
+            print("\n\n")
+            for el in valid_moves:
+                print(el, valid_moves[el])
+            print("\n\n")
+            print(move_from, move_to)
+            print("\n\n")
+            print(evaluate_board(board_state))
+            print("\n\n")
+            print_board(board_state)
+            print("\n\n")
+
         time.sleep(0.1) 
 
 if __name__ == "__main__":

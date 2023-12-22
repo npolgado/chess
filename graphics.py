@@ -91,14 +91,14 @@ class Square(pygame.sprite.Sprite):
 # Draws board and pieces
 # Displays time, material count
 class Graphics:
-    def __init__(self, board=None, game_time: tuple=None, display_index=0) -> None:
+    def __init__(self, board=None, game_time: tuple=None, display_index=0, fullscreen=False) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
         
         self.board_size = 8
         self.square_size = 75
         self.border_size = 100
-        self.piece_padding = 10
+        self.piece_padding = 20
         self.pos_offset = self.piece_padding / 2
 
         self.display = board
@@ -107,7 +107,6 @@ class Graphics:
         self.clicked = False
         self.click_pos = (0,0)
 
-        # self.board = board
         self.running = True
 
         self.game_timer_white = pygame.font.SysFont('Arial', 30)
@@ -116,16 +115,21 @@ class Graphics:
         self.game_time_white = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[0])
         self.game_time_black = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[1])
 
-        self.init(display_index)
+        self.init(display_index, fullscreen)
 
-    def init(self, display_index):
+    def init(self, display_index, fullscreen):
         self.display = pygame.display.set_mode(
             size=(self.display_size, self.display_size),
             flags=pygame.RESIZABLE|pygame.SCALED|pygame.SRCALPHA,
             display=display_index
         )
+        
         pygame.display.set_caption('Chess')
         pygame.display.set_icon(pygame.image.load(os.path.join(IMAGE_ROOT, 'Black', 'King.png')))
+        
+        if fullscreen:
+            pygame.display.toggle_fullscreen()
+        
         pygame.display.flip()
 
     def handle_game_events(self):
