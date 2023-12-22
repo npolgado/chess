@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import sys
 from __init__ import *
 
 class GameState:
@@ -75,9 +76,8 @@ class GameState:
         return self.enpassant_square
 
     def get_board_evaluation(self):
-        val = evaluate_board(self.board)
-        self.board_evaluation = val 
-        return val
+        self.board_evaluation = evaluate_board(self.board) 
+        return self.board_evaluation
 
     def get_pawn_moves(self, row, col):
         player_turn = self.bool_turn
@@ -273,19 +273,13 @@ class GameState:
         return self.board
 
     def end_game(self, status_string, winner_player=-1):
-
         print(f"Game Ended in {status_string}. Player {winner_player} wins!")     # TODO: player_turn doesnt matter if stalemate
-
         time.sleep(1000)
-
-        import sys
         sys.exit()
 
     def handle_end_game(self):
-        valid_moves = self.get_valid_moves()
-
         # if there are no valid moves, it's either checkmate and stalemate
-        if valid_moves == []:
+        if self.valid_moves == []:
             king_row, king_col = self.get_king_position(self.bool_turn)
             
             if self.is_checked(king_row, king_col, self.bool_turn):
