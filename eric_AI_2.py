@@ -28,7 +28,10 @@ class AI :
         for key in valid_moves:
             count += len(valid_moves[key])
         
-        random_index = random.choice(range(count))
+        if count > 0:
+            random_index = random.choice(range(count))
+        else:
+            return None
 
         
         for key in valid_moves:
