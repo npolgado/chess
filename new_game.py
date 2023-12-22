@@ -55,7 +55,8 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
         if move == None:
             graphics.draw(board_state, gs.time)
             continue
-
+            
+        # Translate move from tuple to string
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_to = move_tuple[1]
@@ -69,7 +70,6 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
         if move_to in valid_moves[move_from]:
             # Update game board state
             board_state = gs.update(move)
-            
             
             if DEBUG:
                 print(evaluate_board(board_state))

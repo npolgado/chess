@@ -20,6 +20,9 @@ class GameState:
         self.board_history = []
         self.board_dict = {}
 
+        self.valid_moves = {}
+        self.board_evaluation = evaluate_board(self.board)
+
         self.is_three_fold_repetition = False
         self.is_insufficient_material_bool = False
         self.is_fifty_move_rule_bool = False
@@ -70,6 +73,11 @@ class GameState:
 
     def get_en_passant_square(self):
         return self.enpassant_square
+
+    def get_board_evaluation(self):
+        val = evaluate_board(self.board)
+        self.board_evaluation = val 
+        return val
 
     def get_pawn_moves(self, row, col):
         player_turn = self.bool_turn
@@ -176,6 +184,7 @@ class GameState:
                     a = self.get_piece_moves(r, c, piece)
                     valid_moves[(r,c)] = a
 
+        self.valid_moves = valid_moves
         return valid_moves
 
     def set_en_passant_square(self, en_passant_square):
