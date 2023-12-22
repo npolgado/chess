@@ -223,7 +223,7 @@ def update_board(board_state, move, gs):
     
     return board_state
     
-def run(DEBUG = False):
+def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
@@ -288,5 +288,5 @@ def run(DEBUG = False):
         time.sleep(0.3) 
 
 if __name__ == "__main__":
-    DEBUG = True
+    DEBUG = True # PLEASE USE THIS INSTEAD OF COMMENTING OUT
     run(DEBUG)
