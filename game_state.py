@@ -6,10 +6,10 @@ from __init__ import *
 
 
 class GameState:
-    def __init__(self, turn: int = 1) -> None:
-        self.turn = turn
+    def __init__(self) -> None:
+        self.turn_num = 1
 
-        self.player_turn = (self.turn - 1) % 2
+        self.player_turn = 0
         self.en_passant = None
 
         self.board = init_empty_board()
@@ -95,7 +95,7 @@ class GameState:
 
         self.update_castling_rights()
         self.archive()
-        self.turn += 1
+        self.turn_num += 1
         self.player_turn = not self.player_turn
 
     def get_pawn_moves(self, row, col):
@@ -269,7 +269,7 @@ class GameState:
                 self.end_game("stalemate")
                 # TODO: remove this? it would exit file before checking three fold or other endgame conditions
                 #   ERIC: No because the game is over since a player has no valid moves
-                
+
         if self.is_three_fold_repetition:
             self.end_game("stalemate")
 
