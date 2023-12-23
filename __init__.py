@@ -1,6 +1,16 @@
 import numpy as np
 from pprint import pprint
 
+PIECE_VALUES = {
+    'p': 1,
+    'n': 3, # up for debate
+    'b': 3.5, # up for debate
+    'r': 5,
+    'q': 9,
+    'k': 0
+}
+
+
 def board_to_string(board_state) -> str:
     string = ""
 
@@ -68,10 +78,10 @@ def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: in
                 row 7, col 7 -> H8
     '''
     ans = ""
-    ans += chr(start_row + 65)
-    ans += str(start_col + 1)
-    ans += chr(end_row + 65)
-    ans += str(end_col + 1)
+    ans += chr(start_col + 65)
+    ans += str(start_row + 1)
+    ans += chr(end_col + 65)
+    ans += str(end_row + 1)
 
     # print(ans)
     return ans
@@ -82,11 +92,11 @@ def translate_move_s2t(notation: str) -> (int, int):
                 H8 -> (7, 7)
         NOTE: Assumes "A1H8" (capital)
     '''
-    start_row = ord(notation[0]) - 65
-    start_col = int(notation[1]) - 1
+    start_col = ord(notation[0]) - 65
+    start_row = int(notation[1]) - 1
 
-    end_row = ord(notation[2]) - 65
-    end_col = int(notation[3]) - 1
+    end_col = ord(notation[2]) - 65
+    end_row = int(notation[3]) - 1
 
     # print((start_row, start_col), (end_row, end_col))
     return (start_row, start_col), (end_row, end_col)
@@ -107,16 +117,6 @@ def init_empty_board():
 
 def evaluate_board(board):
     # given the board and player's turn, return a score
-
-    vals = {
-        'p': 1,
-        'n': 3,
-        'b': 3,
-        'r': 5,
-        'q': 9,
-        'k': 0
-    }
-
     ans = 0
 
     for i in range(8):
@@ -128,9 +128,9 @@ def evaluate_board(board):
 
             if piece.isupper():
                 key = piece.lower()
-                ans -= vals[key]
+                ans -= PIECE_VALUES[key]
             else:
-                ans += vals[piece]
+                ans += PIECE_VALUES[piece]
     
     return ans
 
@@ -138,8 +138,8 @@ def make_move(board, move):
     # given a board array and move of notation "A1H8", make the move and return the new board
     # NOTE: this accesses the board in col, row format
     start, end = translate_move_s2t(move)
-    board[end[1]][end[0]] = board[start[1]][start[0]]
-    board[start[1]][start[0]] = '-'
+    board[end[0]][end[1]] = board[start[0]][start[1]]
+    board[start[0]][start[1]] = '-'
     return board
 
 if __name__ == "__main__":

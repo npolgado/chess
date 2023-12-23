@@ -42,6 +42,18 @@ TEST_BOARD_3 = [
 TEST_BOARD_STR_3 = "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR"
 
 
+TEST_BOARD_4 = [
+    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+    ['p', 'p', 'p', 'p', '-', 'p', 'p', 'p'],
+    ['-', '-', '-', '-', '-', '-', '-', '-'], 
+    ['-', '-', '-', '-', 'p', '-', '-', '-'],
+    ['-', '-', '-', '-', '-', '-', '-', '-'], 
+    ['-', '-', '-', '-', '-', '-', '-', '-'], 
+    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+]
+
+
 TEST_MOVE_1 = "E2E4"
 TEST_MOVE_TUPLE_1 = ((1, 4), (3, 4)) # TODO: RETEST WITH ACCURATE TEST SETS
 
@@ -55,7 +67,7 @@ TEST_MOVE_4 = "A1H8"
 TEST_MOVE_TUPLE_4 = ((0, 0), (7, 7))
 
 TEST_MOVE_5 = "A8H1"
-TEST_MOVE_TUPLE_5 = ((7, 1), (0, 7))
+TEST_MOVE_TUPLE_5 = ((7, 0), (0, 7))
 
 def test_board_to_string():
     assert board_to_string(TEST_BOARD_1) == TEST_BOARD_STR_1
@@ -86,10 +98,20 @@ def test_translate_move_t2s():
     assert translate_move_t2s(*TEST_MOVE_TUPLE_4[0], *TEST_MOVE_TUPLE_4[1]) == TEST_MOVE_4
     assert translate_move_t2s(*TEST_MOVE_TUPLE_5[0], *TEST_MOVE_TUPLE_5[1]) == TEST_MOVE_5
 
+def test_evaluate_board():
+    assert evaluate_board(TEST_BOARD_1) == 0
+    assert evaluate_board(TEST_BOARD_2) == 0
+    assert evaluate_board(TEST_BOARD_3) == 0
+
+def test_make_move():
+    assert make_move(TEST_BOARD_1, TEST_MOVE_1) == TEST_BOARD_4
+
 if __name__ == "__main__":
     assert TEST_BOARD_1 == init_empty_board()
     test_board_to_string()
     test_string_to_board()
     test_translate_move_s2t()
     test_translate_move_t2s()
+    test_evaluate_board()
+    test_make_move()
     print("All tests passed!")
