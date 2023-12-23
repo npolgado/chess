@@ -36,6 +36,7 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
 
     p1 = eric_bot.AI()
     p2 = eric_bot.AI()
+    # p2 = nick_bot.AI()
 
     players = (p1, p2)
 
@@ -61,7 +62,7 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
 
         # If the players move is None, we have not recieved a new move, so just draw
         if move == None:
-            graphics.draw(board_state, gs.time)
+            graphics.draw(gs.board, gs.time)
             continue
             
         # Translate move from tuple to string
