@@ -1,4 +1,3 @@
-import time
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
@@ -10,11 +9,13 @@ from pygame.locals import (
     # K_LEFT,
     # K_RIGHT,
     K_ESCAPE,
+    K_SPACE,
     KEYDOWN,
     QUIT,
 )
 from __init__ import *
 import numpy as np
+import time
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -91,20 +92,22 @@ class Square(pygame.sprite.Sprite):
 # Draws board and pieces
 # Displays time, material count
 class Graphics:
-    def __init__(self, board=None, game_time: tuple=None, display_index=0) -> None:
+    def __init__(self, board=None, game_time: tuple=None, display_index=0, fullscreen=False) -> None:
         # setup pygame for a chess board of 8x8 squares, and a display of 800x800 pixels
         pygame.init()
         
         self.board_size = 8
         self.square_size = 75
         self.border_size = 100
-        self.piece_padding = 10
+        self.piece_padding = 20
         self.pos_offset = self.piece_padding / 2
 
         self.display = board
         self.display_size = self.board_size * self.square_size + (2*self.border_size)
 
-        # self.board = board
+        self.clicked = False
+        self.click_pos = (0,0)
+
         self.running = True
 
         self.game_timer_white = pygame.font.SysFont('Arial', 30)
@@ -113,34 +116,43 @@ class Graphics:
         self.game_time_white = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[0])
         self.game_time_black = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[1])
 
-        self.init(display_index)
+        self.init(display_index, fullscreen)
 
-    def init(self, display_index):
+    def init(self, display_index, fullscreen):
         self.display = pygame.display.set_mode(
             size=(self.display_size, self.display_size),
             flags=pygame.RESIZABLE|pygame.SCALED|pygame.SRCALPHA,
             display=display_index
         )
+        
         pygame.display.set_caption('Chess')
         pygame.display.set_icon(pygame.image.load(os.path.join(IMAGE_ROOT, 'Black', 'King.png')))
+        
+        if fullscreen:
+            pygame.display.toggle_fullscreen()
+        
         pygame.display.flip()
 
     def handle_game_events(self):
-        # Look at every event in the queue
         for event in pygame.event.get():
 
             # Key Press
             if event.type == KEYDOWN:
                 # TODO: add key press events after game to review game
 
+                # Space for Pause
+                if event.key == K_SPACE:
+                    self.running = not self.running
+
                 # Q for Quit, or Esc i guess.. 
                 if event.key == K_ESCAPE or event.key == ord('q'):
                     self.running = False
+                    exit() # RAISE SIGTERM TO KILL ALL PROCESSES
 
             # Mouse Click
             if event.type == pygame.MOUSEBUTTONUP:
-                # self.click_pos = pygame.mouse.get_pos()
-                # self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
+                self.click_pos = pygame.mouse.get_pos()
+                self.clicked_square = self.get_square_from_mouse_pos(self.click_pos)
 
                 # TODO: Right click (cancel if clicked on square)
                 if event.button == 3:
@@ -175,7 +187,7 @@ class Graphics:
 
             # Quit
             elif event.type == QUIT:
-                self.running = False
+                exit()
                 
     def draw(self, gs):
         # update state
@@ -246,22 +258,33 @@ class Graphics:
         pass
 
 if __name__ == '__main__':
-    from new_game import init_empty_board
     from game_state import GameState
+    from tests.test_helpers import TEST_BOARD_3
+
 
     b = init_empty_board()
     gs = GameState()
-    g = Graphics(display_index=1)
+    g = Graphics(display_index=0)
     
-    # g.draw(b, gs)
-    # TODO: make move
-    # g.draw(b, gs)
     s = time.monotonic()
     while g.running:
+        curr_time = float(time.monotonic()-s)
         g.draw(b, gs.time)
-        gs.time = (float(time.monotonic()-s),float(time.monotonic()-s)) #TODO: time is using time.gmtime() so it is not accurate
+        gs.time = (curr_time,curr_time) #TODO: time is using time.gmtime() so it is not accurate
 
-        if gs.time[0] > 3:
-            g.running = False
+        if gs.time[0] > 3 and gs.time[1] > 3.02:
+            b = TEST_BOARD_3
+
+        if gs.time[0] > 6 and gs.time[1] > 6.02:
+            b = [
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                ['p', 'p', 'p', 'p', '-', 'p', 'p', 'p'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', 'p', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['P', 'P', 'P', '-', 'P', 'P', 'P', 'P'],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            ]
 
     pygame.quit()

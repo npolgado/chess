@@ -66,8 +66,6 @@ def run():
         move_from = move_tuple[0]
         move_to = move_tuple[1]
 
-        print("B")
-
         if move_to in valid_moves[move_from]:
             # Update game board state
             gs.update(move)
