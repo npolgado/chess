@@ -10,7 +10,6 @@ PIECE_VALUES = {
     'k': 0
 }
 
-
 def board_to_string(board_state) -> str:
     string = ""
 
@@ -142,21 +141,21 @@ def make_move(board, move):
     board[start[0]][start[1]] = '-'
     return board
 
-if __name__ == "__main__":
-    import time
+# if __name__ == "__main__":
+#     import time
 
-    b = init_empty_board()
-    print_board(b)    
-    print(evaluate_board(b))
+#     b = init_empty_board()
+#     print_board(b)    
+#     print(evaluate_board(b))
 
-    b = make_move(b, "A2A3")
-    print_board(b)
-    print(evaluate_board(b))
+#     b = make_move(b, "A2A3")
+#     print_board(b)
+#     print(evaluate_board(b))
     
-    b = make_move(b, "A1B1")
-    print_board(b)
-    print(evaluate_board(b))
+#     b = make_move(b, "A1B1")
+#     print_board(b)
+#     print(evaluate_board(b))
     
-    b = make_move(b, "B1C1")
-    print_board(b)
-    print(evaluate_board(b))
+#     b = make_move(b, "B1C1")
+#     print_board(b)
+#     print(evaluate_board(b))

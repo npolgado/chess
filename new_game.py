@@ -35,10 +35,10 @@ def run(DEBUG = False): # PLEASE USE THIS DEBUG INSTEAD OF COMMENTING OUT
     valid_moves = gs.get_valid_moves()
 
     p1 = eric_bot.AI()
-    p2 = eric_bot.AI()
-    # p2 = nick_bot.AI()
+    # p2 = eric_bot.AI()
+    p2 = nick_bot.AI()
 
-    players = (p1, p2)
+    players = (p1, p1)
 
     move = None
 

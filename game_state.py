@@ -239,6 +239,11 @@ class GameState:
         self.time = (self.time_white,self.time_black)
 
     def update(self, move):
+        # if no move given, pass
+        if move == None:
+            return self.board
+        
+        # extract coordinates
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_from_row = move_from[0]
@@ -247,8 +252,11 @@ class GameState:
         move_to_row = move_to[0]
         move_to_col = move_to[1]
 
+        # find piece being captured
         piece_removed = self.board[move_to_row][move_to_col]
         moving_piece = self.board[move_from_row][move_from_col]
+        
+        # make the move
         self.board[move_to_row][move_to_col] = moving_piece
         self.board[move_from_row][move_from_col] = '-'
 
@@ -267,9 +275,9 @@ class GameState:
 
         self.update_castling_rights()
         self.archive()
+        
         self.turn += 1
         self.bool_turn = not self.bool_turn
-
         return self.board
 
     def end_game(self, status_string, winner_player=-1):

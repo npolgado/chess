@@ -105,6 +105,7 @@ def test_evaluate_board():
 
 def test_make_move():
     assert make_move(TEST_BOARD_1, TEST_MOVE_1) == TEST_BOARD_4
+    #TODO: add more testing here
 
 if __name__ == "__main__":
     assert TEST_BOARD_1 == init_empty_board()

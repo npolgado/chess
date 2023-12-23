@@ -35,45 +35,38 @@ class AI :
     
     def process_move(self, move):
         with self.lock:
+            print(f"NICK AI: {move}, turn = {self.g.turn}")
 
-            # CASE: WAITING FOR OTHER PLAYER1
-            if move == None and self.g.turn != 1: 
+            # Update internal board with recieved move and update last move
+            self.g.update(move)
+            self.last_move = move
+
+            print(f"NICK AI: updated board")
+            print_board(self.g.board)
+
+            # CASE: WAITING FOR OTHER PLAYER
+            if move == None and self.g.turn != 1:
+                print(f"NICK AI: waiting for other player on turn {self.g.turn}")
                 self.thinking = False
                 return
             
             # CASE: PLAYER HAS MOVED
             if move != None:
-                self.g.update(move)
-                self.last_move = move
+                notation = translate_move_s2t(move)
+                print(f"NICK AI: got move {notation}")               
+                print(f"NICK AI: player has moved, now it is turn {self.g.turn}")
 
             # update valid moves to only include current players moves
             valid_moves = self.g.get_valid_moves()
             player_valid_moves = {}
 
-            print("VALID MOVES")
-            print(valid_moves)
-            print("\n\n")
-
-            for i in valid_moves:
-                piece = self.g.board[i[0]][i[1]]
-                        
+            for i in valid_moves:                        
                 # ignore pieces without valid moves
                 if valid_moves[i] == []:
                     continue
                 
-                # if black ignore lowercase keys
-                if self.g.bool_turn and piece.islower():
-                    continue
-                
-                # if white, ignore upper case keys, 
-                elif not self.g.bool_turn and piece.isupper():
-                    continue
-                
+                # add to new valid_moves dict
                 player_valid_moves[i] = valid_moves[i]
-
-            print("VALID MOVES")
-            print(player_valid_moves)
-            print("\n\n")
 
             # Find a random move where the keys are the from_pos, and the values are the to_pos
             from_pos = random.choice(list(player_valid_moves.keys()))
@@ -81,8 +74,8 @@ class AI :
 
             # Construct Target Move          
             target_move = translate_move_t2s(from_pos[0], from_pos[1], to_pos[0], to_pos[1])
-            print(f"AI move: {from_pos} -> {to_pos}")
-            print(f"AI move: {target_move}")
+            print(f"NICK AI TARGET: {from_pos} -> {to_pos}")
+            print(f"NICK AI TARGET: {target_move}")
 
             # Update game board state from target move
             self.g.update(target_move)
