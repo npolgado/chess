@@ -45,7 +45,7 @@ def run():
     p1 = eric_bot.AI()
     p2 = eric_bot.AI()
 
-    players = (p1, p2)
+    players = (p1, p1)
 
     move = None
 

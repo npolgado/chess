@@ -23,7 +23,6 @@ class GameState:
             "b_Q": True,
             "b_K": True
         }
-
         self.time = (0, 0)
 
     def update_castling_rights(self) -> None:
@@ -109,7 +108,7 @@ class GameState:
         moves = []
 
         # advances
-        if self.board[row + direc][col] == "-":
+        if 0 <= row + direc < 8 and self.board[row + direc][col] == "-":
             moves.append((row + direc, col))
             if row == starting_row and self.board[row + 2 * direc][col] == "-":
                 moves.append((row + 2 * direc, col))
@@ -117,18 +116,18 @@ class GameState:
         # captures
         if col + 1 < 8:
             # right captures
-            if self.board[row + direc][col + 1] != "-" and self.board[row + direc][col + 1].isupper() != self.player_turn:
+            if 0 <= row + direc < 8 and self.board[row + direc][col + 1] != "-" and self.board[row + direc][col + 1].isupper() != self.player_turn:
                 moves.append((row + direc, col + 1))
             # en passant
-            if (row + direc, col + 1) == self.en_passant and self.board[row + direc][col + 1].isupper() != self.player_turn:
+            if (row + direc, col + 1) == self.en_passant and 0 <= row + direc < 8 and self.board[row + direc][col + 1].isupper() != self.player_turn:
                 moves.append((row + direc, col + 1))
 
         if col - 1 >= 0:
             # left captures
-            if self.board[row + direc][col - 1] != "-" and self.board[row + direc][col - 1].isupper() != self.player_turn:
+            if 0 <= row + direc < 8 and self.board[row + direc][col - 1] != "-" and self.board[row + direc][col - 1].isupper() != self.player_turn:
                 moves.append((row + direc, col - 1))
             # en passant
-            if (row, col - 1) == self.en_passant and self.board[row + direc][col - 1].isupper() != self.player_turn:
+            if (row, col - 1) == self.en_passant and 0 <= row + direc < 8 and self.board[row + direc][col - 1].isupper() != self.player_turn:
                 moves.append((row + direc, col - 1))
 
         return moves
@@ -214,35 +213,13 @@ class GameState:
     def is_fifty_move_rule(self):
         pass
 
-    def end_game(self, status_string, winner_player = -1):
+    def end_game(self, status_string, winner_player=-1):
         print(
             f"Game Ended in {status_string}. Player {winner_player} wins!")  # TODO: player_turn doesnt matter if stalemate
 
         time.sleep(1000)
 
         sys.exit()
-
-    def update(self, move):
-        # if no move given, pass
-        if move == None:
-            return self.board
-        
-        # extract coordinates
-        move_tuple = translate_move_s2t(move)
-        move_from = move_tuple[0]
-        move_from_row = move_from[0]
-        move_from_col = move_from[1]
-        move_to = move_tuple[1]
-        move_to_row = move_to[0]
-        move_to_col = move_to[1]
-
-        # find piece being captured
-        piece_removed = self.board[move_to_row][move_to_col]
-        moving_piece = self.board[move_from_row][move_from_col]
-        
-        # make the move
-        self.board[move_to_row][move_to_col] = moving_piece
-        self.board[move_from_row][move_from_col] = '-'
 
     def get_valid_moves(self):
         valid_moves = {}
