@@ -189,11 +189,11 @@ class Graphics:
             elif event.type == QUIT:
                 exit()
                 
-    def draw(self, board, game_time):
+    def draw(self, gs):
         # update state
-        self.game_time_white = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[0])
-        self.game_time_black = "00:00:00" if game_time == None else self.format_elapsed_time(game_time[1])
-        self.board = np.flip(board, axis=0)
+        self.game_time_white = "00:00:00" if gs.time is None else self.format_elapsed_time(gs.time[0])
+        self.game_time_black = "00:00:00" if gs.time is None else self.format_elapsed_time(gs.time[1])
+        self.board = np.flip(gs.board, axis=0)
         
         # TODO: player on player
         self.handle_game_events()
