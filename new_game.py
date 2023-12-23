@@ -32,6 +32,7 @@ move: str
 
 '''
 
+
 def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
@@ -49,7 +50,6 @@ def run():
     move = None
 
     while True:
-
         turn = gs.get_player_turn()
         # Send updated move to the other player ai
         players[not turn].recieve(move)
@@ -59,7 +59,7 @@ def run():
 
         # If the players move is None, we have not recieved a new move, so just draw
         if move is None:  # TODO: this needs to check if the move is the same as the last?
-            graphics.draw(board_state, gs.time)
+            graphics.draw(gs)
             continue
 
         move_tuple = translate_move_s2t(move)
