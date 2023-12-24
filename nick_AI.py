@@ -7,7 +7,7 @@ import time
 
 class AI :
     def __init__(self):
-        self.g = GameState(init_empty_board())
+        self.g = GameState()
 
         self.thinking = False
         
@@ -35,7 +35,7 @@ class AI :
     
     def process_move(self, move):
         with self.lock:
-            print(f"NICK AI: {move}, turn = {self.g.turn}")
+            print(f"NICK AI: {move}, turn = {self.g.turn_num}")
 
             # Update internal board with recieved move and update last move
             self.g.update(move)
@@ -45,8 +45,8 @@ class AI :
             print_board(self.g.board)
 
             # CASE: WAITING FOR OTHER PLAYER
-            if move == None and self.g.turn != 1:
-                print(f"NICK AI: waiting for other player on turn {self.g.turn}")
+            if move == None and self.g.turn_num != 1:
+                print(f"NICK AI: waiting for other player on turn {self.g.turn_num}")
                 self.thinking = False
                 return
             
@@ -54,7 +54,7 @@ class AI :
             if move != None:
                 notation = translate_move_s2t(move)
                 print(f"NICK AI: got move {notation}")               
-                print(f"NICK AI: player has moved, now it is turn {self.g.turn}")
+                print(f"NICK AI: player has moved, now it is turn {self.g.turn_num}")
 
             # update valid moves to only include current players moves
             valid_moves = self.g.get_valid_moves()

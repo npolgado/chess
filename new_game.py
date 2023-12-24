@@ -44,6 +44,7 @@ def run():
 
     p1 = eric_bot.AI()
     p2 = eric_bot.AI()
+    # p2 = nick_bot.AI()
 
     players = (p1, p2)
 
