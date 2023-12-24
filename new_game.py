@@ -33,7 +33,7 @@ move: str
 '''
 
 
-def run():
+def run(DEBUG = False):
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
@@ -43,8 +43,8 @@ def run():
     valid_moves = gs.get_valid_moves()
 
     p1 = eric_bot.AI()
-    p2 = eric_bot.AI()
-    # p2 = nick_bot.AI()
+    # p2 = eric_bot.AI()
+    p2 = nick_bot.AI()
 
     players = (p1, p2)
 
@@ -52,6 +52,7 @@ def run():
 
     while True:
         turn = gs.get_player_turn()
+
         # Send updated move to the other player ai
         players[not turn].recieve(move)
 
@@ -75,14 +76,15 @@ def run():
             # Checks new board state for valid moves
             valid_moves = gs.get_valid_moves()
 
-            # Check for endgame conditions
-            gs.handle_end_game(valid_moves)
+            # Check for endgame conditions TODO: remove this it is being called in gs.draw()
+            # gs.handle_end_game(valid_moves)
         
-        for el in board_state:
-            print(el)
-        print("\n")
-        time.sleep(.05) 
+        if DEBUG: 
+            for el in board_state:
+                print(el)
+            print("\n")
+        time.sleep(.2) 
 
 
 if __name__ == "__main__":
-    run()
+    run(DEBUG = False)

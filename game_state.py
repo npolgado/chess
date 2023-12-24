@@ -67,6 +67,10 @@ class GameState:
             self.board_dict[board_str] = 1
 
     def update(self, move):
+        # if no move given, pass
+        if move == None:
+            return
+
         move_tuple = translate_move_s2t(move)
         move_from = move_tuple[0]
         move_from_row = move_from[0]
@@ -221,28 +225,6 @@ class GameState:
         time.sleep(1000)
 
         sys.exit()
-
-    def update(self, move):
-        # if no move given, pass
-        if move == None:
-            return self.board
-        
-        # extract coordinates
-        move_tuple = translate_move_s2t(move)
-        move_from = move_tuple[0]
-        move_from_row = move_from[0]
-        move_from_col = move_from[1]
-        move_to = move_tuple[1]
-        move_to_row = move_to[0]
-        move_to_col = move_to[1]
-
-        # find piece being captured
-        piece_removed = self.board[move_to_row][move_to_col]
-        moving_piece = self.board[move_from_row][move_from_col]
-        
-        # make the move
-        self.board[move_to_row][move_to_col] = moving_piece
-        self.board[move_from_row][move_from_col] = '-'
 
     def get_valid_moves(self):
         valid_moves = {}
