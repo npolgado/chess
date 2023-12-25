@@ -57,7 +57,7 @@ def run():
         # get potential move from player
         move = players[turn].get_random_move(valid_moves)
 
-        # If the players move is None, we have not recieved a new move, so just draw
+        # If the players move is None, we have not received a new move, so just draw
         if move is None:  # TODO: this needs to check if the move is the same as the last?
             graphics.draw(gs)
             continue
@@ -77,10 +77,11 @@ def run():
             # Check for endgame conditions
             gs.handle_end_game(valid_moves)
         
-        for el in board_state:
-            print(el)
-        print("\n")
-        time.sleep(.05) 
+        # for el in board_state:
+        #     print(el)
+        # print("\n")
+
+        time.sleep(.1)
 
 
 if __name__ == "__main__":
