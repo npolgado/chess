@@ -76,4 +76,7 @@ class GameState:
         self.archive(board)
         self.turn += 1
         self.bool_turn = not self.bool_turn
+
+
+        
         
