@@ -318,8 +318,6 @@ class GameState:
     def get_player_turn(self):
         return self.player_turn
     
-
-
     def tick(self):
         # # start time if it is turn 1
         # if self.turn == 0:
@@ -336,12 +334,6 @@ class GameState:
 
         # update time
         self.time = (self.time_white,self.time_black)
-
-    def tick(self):
-        # if its blacks/whites turn, increase their time by float(time.monotonic - start_time)
-        # update start_time to now
-        # update self.time tuple to be (white_time, black_time)
-        pass
 
 if __name__ == "__main__":
     test = [
