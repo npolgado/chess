@@ -37,7 +37,10 @@ def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
-    graphics = Graphics()
+    graphics = Graphics(
+        display_index=1,
+        fullscreen=False
+    )
 
     # Check and verify initial board state
     valid_moves = gs.get_valid_moves()
@@ -50,6 +53,13 @@ def run():
     move = None
 
     while True:
+        if not graphics.running:
+            graphics.handle_game_events()
+            continue
+
+        # Update game time
+        gs.tick()
+
         turn = gs.get_player_turn()
         # Send updated move to the other player ai
         players[not turn].recieve(move)
