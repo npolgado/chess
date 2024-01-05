@@ -24,9 +24,9 @@ class GameState:
             "b_K": True
         }
         self.time = (0, 0)
-        # self.start_time = time.monotonic()
-        # self.black_time = 0
-        # self.white_time = 0
+        self.start_time = time.monotonic()
+        self.time_white = 0
+        self.time_black = 0
 
     def update_castling_rights(self) -> None:
         # if the kings or rooks aren't in their starting position, update appropriate castling rights to False (never
@@ -317,6 +317,25 @@ class GameState:
 
     def get_player_turn(self):
         return self.player_turn
+    
+
+
+    def tick(self):
+        # # start time if it is turn 1
+        # if self.turn == 0:
+        #     self.start_time = time.monotonic()
+        # else:
+        
+        # Capture elapsed time
+        t = time.monotonic() - self.start_time
+        self.start_time = time.monotonic()
+
+        # update players time
+        if self.player_turn: self.time_white += t
+        else: self.time_black += t
+
+        # update time
+        self.time = (self.time_white,self.time_black)
 
     def tick(self):
         # if its blacks/whites turn, increase their time by float(time.monotonic - start_time)
