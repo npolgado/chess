@@ -33,24 +33,35 @@ move: str
 '''
 
 
-def run(DEBUG = False):
+def run():
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
-    graphics = Graphics()
+
+    graphics = Graphics(
+        display_index=1,
+        fullscreen=False
+    )
+    
 
     # Check and verify initial board state
     valid_moves = gs.get_valid_moves()
 
     p1 = eric_bot.AI()
-    # p2 = eric_bot.AI()
-    p2 = nick_bot.AI()
+    p2 = eric_bot.AI()
+    # p2 = nick_bot.AI()
 
-    players = (p1, p2)
+    players = (p1, p1)
 
     move = None
 
     while True:
+        if not graphics.running:
+            graphics.handle_game_events()
+            continue
+
+        # Update game time
+        gs.tick()
         turn = gs.get_player_turn()
 
         # Send updated move to the other player ai
@@ -59,7 +70,7 @@ def run(DEBUG = False):
         # get potential move from player
         move = players[turn].get_random_move(valid_moves)
 
-        # If the players move is None, we have not recieved a new move, so just draw
+        # If the players move is None, we have not received a new move, so just draw
         if move is None:  # TODO: this needs to check if the move is the same as the last?
             graphics.draw(gs)
             continue
@@ -79,12 +90,13 @@ def run(DEBUG = False):
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             # gs.handle_end_game(valid_moves)
         
-        if DEBUG: 
-            for el in board_state:
-                print(el)
-            print("\n")
         time.sleep(.2) 
+        # for el in board_state:
+        #     print(el)
+        # print("\n")
+
+        time.sleep(.1)
 
 
 if __name__ == "__main__":
-    run(DEBUG = False)
+    run()
