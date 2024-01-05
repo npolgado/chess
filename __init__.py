@@ -1,15 +1,21 @@
 import numpy as np
 from pprint import pprint
 
+PIECE_VALUES = {
+    'p': 1,
+    'n': 3, # up for debate
+    'b': 3.5, # up for debate
+    'r': 5,
+    'q': 9,
+    'k': 0
+}
+
 def board_to_string(board_state) -> str:
     string = ""
 
     for row in range(8):
-        
         space_count = 0
-        
         for col in range(8):
-            
             letter = board_state[row][col]
             
             # if space, keep count and add count once a piece is found
@@ -20,6 +26,7 @@ def board_to_string(board_state) -> str:
             else:
                 if space_count > 0:
                     string += str(space_count)
+                    space_count = 0
                 string += letter
 
         # end of row also resets space count
@@ -30,6 +37,7 @@ def board_to_string(board_state) -> str:
         if row != 7:
             string += "/"
 
+    # print(string)
     return string
 
 def string_to_board(board_string):
@@ -46,7 +54,6 @@ def string_to_board(board_string):
 
             # if the letter in the row is a number, we skip that many positions in the array
             if letter.isnumeric():
-                
                 skip = int(letter)
                 
                 # add - for every empty space
@@ -56,7 +63,6 @@ def string_to_board(board_string):
             
             # if the letter is not numeric we add it to the array
             else:
-                
                 arr[row][col] = letter
                 col += 1
 
@@ -75,6 +81,8 @@ def translate_move_t2s(start_row: int, start_col: int, end_row: int, end_col: in
     ans += str(start_row + 1)
     ans += chr(end_col + 65)
     ans += str(end_row + 1)
+
+    # print(ans)
     return ans
 
 def translate_move_s2t(notation: str) -> (int, int):
@@ -89,6 +97,7 @@ def translate_move_s2t(notation: str) -> (int, int):
     end_col = ord(notation[2]) - 65
     end_row = int(notation[3]) - 1
 
+    # print((start_row, start_col), (end_row, end_col))
     return (start_row, start_col), (end_row, end_col)
 
 def init_empty_board():
@@ -105,6 +114,67 @@ def init_empty_board():
     ]
     return init_array
 
-if __name__ == "__main__":
-    b = init_empty_board()
-    print_board(b)
+
+def evaluate_board(board):
+    # given the board and player's turn, return a score
+    ans = 0
+
+    for i in range(8):
+        for j in range(8):
+            piece = board[i][j]
+
+            if piece == '-':
+                continue
+
+            if piece.isupper():
+                key = piece.lower()
+                ans -= PIECE_VALUES[key]
+            else:
+                ans += PIECE_VALUES[piece]
+    
+    return ans
+
+
+def make_move(board, move):
+    # given a board array and move of notation "A1H8", make the move and return the new board
+    # handles en_passant (returns the square if relevant) and promotion
+    start, end = move[0], move[1]
+
+    board[end[0]][end[1]] = board[start[0]][start[1]]
+    board[start[0]][start[1]] = '-'
+
+    # En Passant Update
+    en_passant = None
+    if board[end[0]][end[1]] == 'p' and abs(end[0] - start[0]) == 2:
+        middle_row = (start[0] + end[0]) // 2
+        en_passant = (middle_row, start[1])
+
+    # Promotion Logic (auto-queen)
+    if board[end[0]][end[1]] == 'p' and end[0] == 7:
+        board[end[0]][end[1]] = 'q'
+
+    if board[end[0]][end[1]] == 'P' and end[0] == 0:
+        board[end[0]][end[1]] = 'Q'
+
+    return board, en_passant
+
+
+# if __name__ == "__main__":
+#     import time
+
+#     b = init_empty_board()
+#     print_board(b)    
+#     print(evaluate_board(b))
+
+#     b = make_move(b, "A2A3")
+#     print_board(b)
+#     print(evaluate_board(b))
+    
+#     b = make_move(b, "A1B1")
+#     print_board(b)
+#     print(evaluate_board(b))
+    
+#     b = make_move(b, "B1C1")
+#     print_board(b)
+
+#     print(evaluate_board(b))
