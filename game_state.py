@@ -69,35 +69,9 @@ class GameState:
             self.board_dict[board_str] = 1
 
     def update(self, move):
-        # if no move given, pass
-        if move == None:
-            return
 
-        move_tuple = translate_move_s2t(move)
-        move_from = move_tuple[0]
-        move_from_row = move_from[0]
-        move_from_col = move_from[1]
-        move_to = move_tuple[1]
-        move_to_row = move_to[0]
-        move_to_col = move_to[1]
-
-        piece_removed = self.board[move_to_row][move_to_col]
-        moving_piece = self.board[move_from_row][move_from_col]
-        self.board[move_to_row][move_to_col] = moving_piece
-        self.board[move_from_row][move_from_col] = '-'
-
-        # En Passant Update
-        self.en_passant = None
-        if moving_piece == 'p' and abs(move_from_row - move_to_row) == 2:
-            middle_row = (move_from_row + move_to_row) // 2
-            self.en_passant = (middle_row, move_from_col)
-
-        # Promotion Logic (auto-queen)
-        if moving_piece == 'p' and move_to_row == 7:
-            self.board[move_to_row][move_to_col] = 'q'
-
-        if moving_piece == 'P' and move_to_row == 0:
-            self.board[move_to_row][move_to_col] = 'Q'
+        move = translate_move_s2t(move)
+        self.board, self.en_passant = make_move(self.board, move)
 
         self.update_castling_rights()
         self.archive()
@@ -139,22 +113,22 @@ class GameState:
 
         return moves
 
-    def get_piece_moves(self, row, col, piece_str):
+    def get_piece_moves(self, row, col, piece_str, player_turn):
         piece_str = piece_str.lower()
         if piece_str == "r":
             directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]  # down, up, left, right
             depth = 8
         elif piece_str == "b":
-            directions = [(1, 1), (-1, 1), (-1, 1), (-1, -1)]  # down, up, left, right
+            directions = [(1, 1), (-1, 1), (1, -1), (-1, -1)]  # down, up, left, right
             depth = 8
         elif piece_str == "n":
-            directions = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]  # topleft,
+            directions = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]  # top left,
             depth = 1
         elif piece_str == "q":
             depth = 8
-            directions = [(1, 1), (-1, 1), (-1, 1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
+            directions = [(1, 1), (-1, 1), (1, -1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
         elif piece_str == "k":
-            directions = [(1, 1), (-1, 1), (-1, 1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
+            directions = [(1, 1), (-1, 1), (1, -1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
             depth = 1
         elif piece_str == "p":
             return self.get_pawn_moves(row, col)
@@ -174,7 +148,7 @@ class GameState:
                 p = self.board[row + r][col + c]
                 if p != "-":  # run into a piece
                     piece_color = p.isupper()
-                    same_color = piece_color == self.player_turn
+                    same_color = piece_color == player_turn
                     if same_color:
                         break
                     else:
@@ -188,18 +162,52 @@ class GameState:
 
         return valid_moves
 
-    def get_king_position(self):
-        target_king = 'k' if self.player_turn == 0 else 'K'
+    def get_king_position(self, player_turn_, board_):
+        target_king = 'K' if player_turn_ == 0 else 'k'
         for r in range(8):
             for c in range(8):
-                if self.board[r][c] == target_king:
+                if board_[r][c] == target_king:
                     return r, c
         return None
 
-    def is_checked(self, king_row, king_col):
-        # TODO
-        if king_col is None or king_row is None:
-            return False
+    def is_king_safe(self, board_, player_turn_):
+        king_row_col = self.get_king_position(player_turn_, board_)
+
+        print("King RC:", king_row_col)
+        # BLACK = 1 = UPPER
+        # WHITE = 0 = LOWER
+        print("Turn:", "Black (1)" if player_turn_ else "White (0)")
+
+        king_row, king_col = king_row_col[0], king_row_col[1]
+
+        # see if pieces are lined up with king
+        opp_pieces = ['q', 'n', 'b', 'r', 'k']
+        if player_turn_ == 1:
+            opp_pieces = ['Q', 'N', 'B', 'R', 'K']
+
+        for opp_piece_char in opp_pieces:
+            a = self.get_piece_moves(king_row, king_col, opp_piece_char, not player_turn_)
+            for r_c in a:
+                if board_[r_c[0]][r_c[1]] == opp_piece_char:
+                    # print(f"{opp_piece_char} checks at {r_c}")
+                    return False
+
+        # pawns
+        if player_turn_ == 0:
+            row_dir = -1
+            opp_pawn = 'p'
+        else:
+            row_dir = 1
+            opp_pawn = 'P'
+
+        if 0 <= king_row + row_dir < 8:
+            if 0 <= king_col - 1 < 8 and board_[king_row + row_dir][king_col - 1] == opp_pawn:
+                # print(f"Pawn checks at {king_row + row_dir}, {king_col - 1}")
+                return False
+            if 0 <= king_col + 1 < 8 and board_[king_row + row_dir][king_col + 1] == opp_pawn:
+                # print(f"Pawn checks at {king_row + row_dir}, {king_col + 1}")
+                return False
+
         return True
 
     def is_insufficient_material(self):
@@ -228,6 +236,42 @@ class GameState:
 
         sys.exit()
 
+    def validate_valid_moves(self, valid_moves_dict):
+        print("\n-------------------\n")
+        for key in valid_moves_dict:
+            print(self.board[key[0]][key[1]], ":", valid_moves_dict[key])
+        for el in self.board:
+            print(el)
+
+        new_dict = {}
+        for start in valid_moves_dict.keys():
+            arr = []
+            for end in valid_moves_dict[start]:
+                board_copy = []
+                for row in self.board:
+                    a = []
+                    for el in row:
+                        a.append(el)
+                    board_copy.append(a)
+
+                move = (start, end)
+                print(f"Move: {move}, !Player = {not self.player_turn}")
+                potential_board, en_passant = make_move(board_copy, move)
+                for el in potential_board:
+                    print(el)
+                if self.is_king_safe(potential_board, not self.player_turn):
+                    print(f"King Safe")
+                    arr.append(end)
+                else:
+                    print(f"NOT Safe")
+
+                print("\n---------------------\n")
+
+            new_dict[start] = arr
+            print(self.board[start[0]][start[1]], ":", arr)
+
+        return new_dict
+
     def get_valid_moves(self):
         valid_moves = {}
         for r in range(8):
@@ -236,10 +280,18 @@ class GameState:
                 if piece == "-":
                     continue
                 if piece.isupper() == self.player_turn:  # is piece white == is turn white
-                    a = self.get_piece_moves(r, c, piece)
+                    a = self.get_piece_moves(r, c, piece, self.player_turn)
                     valid_moves[(r, c)] = a
 
-        return valid_moves
+        validated_valid_moves = self.validate_valid_moves(valid_moves)
+        # print("Black" if self.player else "White")
+        # for el in self.board:
+        #     print(el)
+        # print(valid_moves)
+        # print("------")
+        # print(validated_valid_moves)
+        # print("\n\n\n")
+        return validated_valid_moves
 
     def handle_end_game(self, valid_moves):
         # if there are no valid moves, it's either checkmate and stalemate
@@ -271,3 +323,18 @@ class GameState:
         # update start_time to now
         # update self.time tuple to be (white_time, black_time)
         pass
+
+if __name__ == "__main__":
+    test = [
+        ['-', 'n', 'b', '-', '-', '-', 'r', '-'],
+        ['-', '-', 'p', '-', 'b', '-', 'k', '-'],
+        ['-', '-', 'p', 'p', '-', 'p', '-', '-'],
+        ['-', '-', '-', '-', '-', '-', 'P', '-'],
+        ['-', '-', '-', '-', '-', 'R', 'P', '-'],
+        ['-', '-', 'P', '-', 'P', 'P', '-', '-'],
+        ['Q', 'P', '-', '-', 'K', '-', '-', '-'],
+        ['r', '-', 'B', '-', '-', '-', '-', 'q']
+    ]
+    gs = GameState()
+    gs.board = test
+    print(gs.is_king_safe(gs.board, 0))

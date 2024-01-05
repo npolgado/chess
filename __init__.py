@@ -114,6 +114,7 @@ def init_empty_board():
     ]
     return init_array
 
+
 def evaluate_board(board):
     # given the board and player's turn, return a score
     ans = 0
@@ -133,13 +134,30 @@ def evaluate_board(board):
     
     return ans
 
+
 def make_move(board, move):
     # given a board array and move of notation "A1H8", make the move and return the new board
-    # NOTE: this accesses the board in col, row format
-    start, end = translate_move_s2t(move)
+    # handles en_passant (returns the square if relevant) and promotion
+    start, end = move[0], move[1]
+
     board[end[0]][end[1]] = board[start[0]][start[1]]
     board[start[0]][start[1]] = '-'
-    return board
+
+    # En Passant Update
+    en_passant = None
+    if board[end[0]][end[1]] == 'p' and abs(end[0] - start[0]) == 2:
+        middle_row = (start[0] + end[0]) // 2
+        en_passant = (middle_row, start[1])
+
+    # Promotion Logic (auto-queen)
+    if board[end[0]][end[1]] == 'p' and end[0] == 7:
+        board[end[0]][end[1]] = 'q'
+
+    if board[end[0]][end[1]] == 'P' and end[0] == 0:
+        board[end[0]][end[1]] = 'Q'
+
+    return board, en_passant
+
 
 # if __name__ == "__main__":
 #     import time
@@ -158,4 +176,5 @@ def make_move(board, move):
     
 #     b = make_move(b, "B1C1")
 #     print_board(b)
+
 #     print(evaluate_board(b))

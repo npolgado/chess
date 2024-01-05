@@ -22,6 +22,7 @@ new_game.py is much better than game.py
     - [X] AI's making random valid moves (see gameplay on output)
 
 - [ ] Move everything to game_state (board, functions)
+
     - [ ] rename board_state to board
 
 - [X] Finish Update board (Eric)
