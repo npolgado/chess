@@ -29,8 +29,7 @@ class GameState:
         self.time_black = 0
 
     def update_castling_rights(self) -> None:
-        # if the kings or rooks aren't in their starting position, update appropriate castling rights to False (never
-        # can be changed to True once False)
+        # if the kings or rooks aren't in their starting position, update appropriate castling rights to False (never can be changed to True once False)
         if self.board[0][4] != 'k':
             if self.castling_rights['b_Q']:
                 self.castling_rights['b_Q'] = False
@@ -78,7 +77,7 @@ class GameState:
         self.turn_num += 1
         self.player_turn = not self.player_turn
 
-    def get_pawn_moves(self, row, col):
+    def get_pawn_moves(self, board_, row, col):
         if self.player_turn == 0:
             direc = 1
             starting_row = 1
@@ -89,31 +88,31 @@ class GameState:
         moves = []
 
         # advances
-        if 0 <= row + direc < 8 and self.board[row + direc][col] == "-":
+        if 0 <= row + direc < 8 and board_[row + direc][col] == "-":
             moves.append((row + direc, col))
-            if row == starting_row and self.board[row + 2 * direc][col] == "-":
+            if row == starting_row and board_[row + 2 * direc][col] == "-":
                 moves.append((row + 2 * direc, col))
 
         # captures
         if col + 1 < 8:
             # right captures
-            if 0 <= row + direc < 8 and self.board[row + direc][col + 1] != "-" and self.board[row + direc][col + 1].isupper() != self.player_turn:
+            if 0 <= row + direc < 8 and board_[row + direc][col + 1] != "-" and board_[row + direc][col + 1].isupper() != self.player_turn:
                 moves.append((row + direc, col + 1))
             # en passant
-            if (row + direc, col + 1) == self.en_passant and 0 <= row + direc < 8 and self.board[row + direc][col + 1].isupper() != self.player_turn:
+            if (row + direc, col + 1) == self.en_passant and 0 <= row + direc < 8 and board_[row + direc][col + 1].isupper() != self.player_turn:
                 moves.append((row + direc, col + 1))
 
         if col - 1 >= 0:
             # left captures
-            if 0 <= row + direc < 8 and self.board[row + direc][col - 1] != "-" and self.board[row + direc][col - 1].isupper() != self.player_turn:
+            if 0 <= row + direc < 8 and board_[row + direc][col - 1] != "-" and board_[row + direc][col - 1].isupper() != self.player_turn:
                 moves.append((row + direc, col - 1))
             # en passant
-            if (row, col - 1) == self.en_passant and 0 <= row + direc < 8 and self.board[row + direc][col - 1].isupper() != self.player_turn:
+            if (row, col - 1) == self.en_passant and 0 <= row + direc < 8 and board_[row + direc][col - 1].isupper() != self.player_turn:
                 moves.append((row + direc, col - 1))
 
         return moves
 
-    def get_piece_moves(self, row, col, piece_str, player_turn):
+    def get_piece_moves(self, board_, row, col, piece_str, player_turn):
         piece_str = piece_str.lower()
         if piece_str == "r":
             directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]  # down, up, left, right
@@ -131,7 +130,7 @@ class GameState:
             directions = [(1, 1), (-1, 1), (1, -1), (-1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
             depth = 1
         elif piece_str == "p":
-            return self.get_pawn_moves(row, col)
+            return self.get_pawn_moves(board_, row, col)
 
         else:
             print("error. piece str = ", piece_str)
@@ -145,7 +144,7 @@ class GameState:
             # loop each direction until you hit the end of board or a piece
             temp_depth = depth
             while (0 <= row + r < 8) and (0 <= col + c < 8) and temp_depth > 0:
-                p = self.board[row + r][col + c]
+                p = board_[row + r][col + c]
                 if p != "-":  # run into a piece
                     piece_color = p.isupper()
                     same_color = piece_color == player_turn
@@ -162,7 +161,7 @@ class GameState:
 
         return valid_moves
 
-    def get_king_position(self, player_turn_, board_):
+    def get_king_position(self, board_, player_turn_):
         target_king = 'K' if player_turn_ == 0 else 'k'
         for r in range(8):
             for c in range(8):
@@ -171,13 +170,7 @@ class GameState:
         return None
 
     def is_king_safe(self, board_, player_turn_):
-        king_row_col = self.get_king_position(player_turn_, board_)
-
-        print("King RC:", king_row_col)
-        # BLACK = 1 = UPPER
-        # WHITE = 0 = LOWER
-        print("Turn:", "Black (1)" if player_turn_ else "White (0)")
-
+        king_row_col = self.get_king_position(board_, player_turn_)
         king_row, king_col = king_row_col[0], king_row_col[1]
 
         # see if pieces are lined up with king
@@ -186,10 +179,11 @@ class GameState:
             opp_pieces = ['Q', 'N', 'B', 'R', 'K']
 
         for opp_piece_char in opp_pieces:
-            a = self.get_piece_moves(king_row, king_col, opp_piece_char, not player_turn_)
+            a = self.get_piece_moves(board_, king_row, king_col, opp_piece_char, not player_turn_)
+            print(f"\tKing | {opp_piece_char} | {a}")
             for r_c in a:
                 if board_[r_c[0]][r_c[1]] == opp_piece_char:
-                    # print(f"{opp_piece_char} checks at {r_c}")
+                    print(f"\tFound opponent piece at {r_c[0]}, {r_c[1]}")
                     return False
 
         # pawns
@@ -202,10 +196,10 @@ class GameState:
 
         if 0 <= king_row + row_dir < 8:
             if 0 <= king_col - 1 < 8 and board_[king_row + row_dir][king_col - 1] == opp_pawn:
-                # print(f"Pawn checks at {king_row + row_dir}, {king_col - 1}")
+                print("\tPawn Attack")
                 return False
             if 0 <= king_col + 1 < 8 and board_[king_row + row_dir][king_col + 1] == opp_pawn:
-                # print(f"Pawn checks at {king_row + row_dir}, {king_col + 1}")
+                print("\tPawn Attack 2")
                 return False
 
         return True
@@ -222,10 +216,28 @@ class GameState:
             a king and bishop
             a king and knight
         '''
-        # TODO: using board state check for the above conditions
-        pass
+        white_count = 0
+        black_count = 0
+        for row in self.board:
+            for el in row:
+                if el == "-":
+                    continue
+                c = el.lower()
+                if c == "p" or c == "q" or c == "r":
+                    return False
+                elif el == "B" or el == "N":
+                    white_count += 1
+                    if white_count >= 2:
+                        return False
+                elif el == "b" or el == "n":
+                    black_count += 1
+                    if black_count >= 2:
+                        return False
+        
+        return True
 
     def is_fifty_move_rule(self):
+        # TODO
         pass
 
     def end_game(self, status_string, winner_player=-1):
@@ -237,12 +249,9 @@ class GameState:
         sys.exit()
 
     def validate_valid_moves(self, valid_moves_dict):
-        print("\n-------------------\n")
-        for key in valid_moves_dict:
-            print(self.board[key[0]][key[1]], ":", valid_moves_dict[key])
         for el in self.board:
             print(el)
-
+        print("\n")
         new_dict = {}
         for start in valid_moves_dict.keys():
             arr = []
@@ -255,21 +264,18 @@ class GameState:
                     board_copy.append(a)
 
                 move = (start, end)
-                print(f"Move: {move}, !Player = {not self.player_turn}")
-                potential_board, en_passant = make_move(board_copy, move)
-                for el in potential_board:
-                    print(el)
+                potential_board, _ = make_move(board_copy, move)
                 if self.is_king_safe(potential_board, not self.player_turn):
-                    print(f"King Safe")
                     arr.append(end)
+                    print("+", end=" ")
                 else:
-                    print(f"NOT Safe")
+                    print("-", end=" ")
 
-                print("\n---------------------\n")
+                print(f"{potential_board[end[0]][end[1]]} {start} => {end}")
 
             new_dict[start] = arr
-            print(self.board[start[0]][start[1]], ":", arr)
 
+        print("\n-------------------\n")
         return new_dict
 
     def get_valid_moves(self):
@@ -280,50 +286,46 @@ class GameState:
                 if piece == "-":
                     continue
                 if piece.isupper() == self.player_turn:  # is piece white == is turn white
-                    a = self.get_piece_moves(r, c, piece, self.player_turn)
+                    a = self.get_piece_moves(self.board, r, c, piece, self.player_turn)
                     valid_moves[(r, c)] = a
 
         validated_valid_moves = self.validate_valid_moves(valid_moves)
-        # print("Black" if self.player else "White")
-        # for el in self.board:
-        #     print(el)
-        # print(valid_moves)
-        # print("------")
-        # print(validated_valid_moves)
-        # print("\n\n\n")
         return validated_valid_moves
 
     def handle_end_game(self, valid_moves):
         # if there are no valid moves, it's either checkmate and stalemate
-        if valid_moves is []:
-            king_row, king_col = self.get_king_position(self.player_turn)
+        no_valid_moves = True
+        for k in valid_moves:
+            if valid_moves[k] != []:
+                no_valid_moves = False
+        
+        if no_valid_moves:
+            king_row, king_col = self.get_king_position(self.board, self.player_turn)
 
-            if self.is_checked(king_row, king_col, self.player_turn):
+            if self.is_king_safe(self.board, king_row, king_col, self.player_turn):
+                print("Checkmate")
                 self.end_game("checkmate", not self.player_turn)
 
             else:
+                print("No valid moves")
                 self.end_game("stalemate")
-                # TODO: remove this? it would exit file before checking three fold or other endgame conditions
-                #   ERIC: No because the game is over since a player has no valid moves
 
         if self.is_three_fold_repetition:
+            print("3 fold repitition")
             self.end_game("stalemate")
 
         if self.is_insufficient_material():
+            print("Insufficient Material")
             self.end_game("stalemate")
 
         if self.is_fifty_move_rule():
+            print("50 move rule")
             self.end_game("stalemate")
-
+        
     def get_player_turn(self):
         return self.player_turn
     
-    def tick(self):
-        # # start time if it is turn 1
-        # if self.turn == 0:
-        #     self.start_time = time.monotonic()
-        # else:
-        
+    def tick(self):        
         # Capture elapsed time
         t = time.monotonic() - self.start_time
         self.start_time = time.monotonic()
@@ -332,9 +334,10 @@ class GameState:
         if self.player_turn: self.time_white += t
         else: self.time_black += t
 
-        # update time
+        # update times
         self.time = (self.time_white,self.time_black)
 
+# Debugging
 if __name__ == "__main__":
     test = [
         ['-', 'n', 'b', '-', '-', '-', 'r', '-'],
