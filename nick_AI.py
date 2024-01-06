@@ -30,13 +30,10 @@ class AI :
                 pos_to = j
                 
                 notation = translate_move_t2s(*pos_from, *pos_to)
-                # print(f"{notation}")
 
                 b = make_move(curr_board, notation)
                 b_eval = evaluate_board(b)
                 evals[notation] = b_eval
-                # print(b_eval)
-                # print(f"{notation} @ {b_eval}")
 
         # find the best move
         # if white, get highest evaluation
@@ -47,9 +44,9 @@ class AI :
 
         # if black, get the lowest eval
         else:
-            # print(f"best as black")
             min_value = np.min(list(evals.values()))
             best = [key for key, value in evals.items() if value == min_value]
+            print(f"NICK BOT best as black {best}")
 
         # extract to string
         if len(best) > 1:

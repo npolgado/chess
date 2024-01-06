@@ -173,10 +173,10 @@ class GameState:
     def is_king_safe(self, board_, player_turn_):
         king_row_col = self.get_king_position(player_turn_, board_)
 
-        print("King RC:", king_row_col)
+        # print("King RC:", king_row_col)
         # BLACK = 1 = UPPER
         # WHITE = 0 = LOWER
-        print("Turn:", "Black (1)" if player_turn_ else "White (0)")
+        # print("Turn:", "Black (1)" if player_turn_ else "White (0)")
 
         king_row, king_col = king_row_col[0], king_row_col[1]
 
@@ -238,10 +238,10 @@ class GameState:
 
     def validate_valid_moves(self, valid_moves_dict):
         print("\n-------------------\n")
-        for key in valid_moves_dict:
-            print(self.board[key[0]][key[1]], ":", valid_moves_dict[key])
-        for el in self.board:
-            print(el)
+        # for key in valid_moves_dict:
+        #     print(self.board[key[0]][key[1]], ":", valid_moves_dict[key])
+        # for el in self.board:
+        #     print(el)
 
         new_dict = {}
         for start in valid_moves_dict.keys():
@@ -255,20 +255,20 @@ class GameState:
                     board_copy.append(a)
 
                 move = (start, end)
-                print(f"Move: {move}, !Player = {not self.player_turn}")
+                # print(f"Move: {move}, !Player = {not self.player_turn}")
                 potential_board, en_passant = make_move(board_copy, move)
-                for el in potential_board:
-                    print(el)
+                # for el in potential_board:
+                #     print(el)
                 if self.is_king_safe(potential_board, not self.player_turn):
-                    print(f"King Safe")
+                    # print(f"King Safe")
                     arr.append(end)
-                else:
-                    print(f"NOT Safe")
+                # else:
+                #     print(f"NOT Safe")
 
-                print("\n---------------------\n")
+                # print("\n---------------------\n")
 
             new_dict[start] = arr
-            print(self.board[start[0]][start[1]], ":", arr)
+            # print(self.board[start[0]][start[1]], ":", arr)
 
         return new_dict
 

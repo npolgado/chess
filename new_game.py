@@ -49,15 +49,16 @@ def run():
 
     p1 = eric_bot.AI()
     p2 = eric_bot.AI()
-    # p2 = nick_bot.AI()
+    p2 = nick_bot.AI()
 
-    players = (p1, p1)
+    players = (p1, p2)
 
     move = None
 
     while True:
         if not graphics.running:
-            graphics.handle_game_events()
+            gs.tick()
+            graphics.draw(gs)
             continue
 
         # Update game time
@@ -90,12 +91,7 @@ def run():
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             # gs.handle_end_game(valid_moves)
         
-        time.sleep(.2) 
-        # for el in board_state:
-        #     print(el)
-        # print("\n")
-
-        time.sleep(.1)
+        time.sleep(.2)
 
 
 if __name__ == "__main__":
