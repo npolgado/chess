@@ -11,17 +11,18 @@ class AI :
         
     # Recieve updated move from the other player ai
     def recieve(self, move):
-        # self.g.update(move)
-        pass  
+        if move is not None: self.g.update(move)  
 
     def get_random_move(self, valid_moves):
+        print(f"NICK_BOT: {evaluate_board(self.g.board)}")
+        print("-----------------------------------")
         keys = list(valid_moves.keys())
 
         # get all possible moves evaluations
         evals = {}
 
         # print_board(self.g.board)
-        curr_board = self.g.board
+        curr_board = np.copy(self.g.board)
 
         for i in keys:
             for j in valid_moves[i]:
@@ -31,7 +32,7 @@ class AI :
                 
                 notation = translate_move_t2s(*pos_from, *pos_to)
 
-                b = make_move(curr_board, notation)
+                b, _ = make_move(curr_board, notation)
                 b_eval = evaluate_board(b)
                 evals[notation] = b_eval
 
@@ -46,7 +47,7 @@ class AI :
         else:
             min_value = np.min(list(evals.values()))
             best = [key for key, value in evals.items() if value == min_value]
-            print(f"NICK BOT best as black {best}")
+            # print(f"NICK BOT best as black : {best}")
 
         # extract to string
         if len(best) > 1:
@@ -54,8 +55,11 @@ class AI :
         else:
             best = best[0]
 
-        print(f"{self.g.player_turn}\t{self.g.turn_num}:\t{best} @ {evals[best]}")
+        tturn = "BLACK" if self.g.player_turn else "WHITE"
+
+        # print(f"{tturn}\t{self.g.turn_num}:\t{best} @ {evals[best]}")
         self.g.update(best)
+        # print_board(self.g.board)
         return best
 
         # pick randomly

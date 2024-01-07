@@ -68,7 +68,6 @@ class GameState:
             self.board_dict[board_str] = 1
 
     def update(self, move):
-
         move = translate_move_s2t(move)
         self.board, self.en_passant = make_move(self.board, move)
 
@@ -180,10 +179,10 @@ class GameState:
 
         for opp_piece_char in opp_pieces:
             a = self.get_piece_moves(board_, king_row, king_col, opp_piece_char, not player_turn_)
-            print(f"\tKing | {opp_piece_char} | {a}")
+            # print(f"\tKing | {opp_piece_char} | {a}")
             for r_c in a:
                 if board_[r_c[0]][r_c[1]] == opp_piece_char:
-                    print(f"\tFound opponent piece at {r_c[0]}, {r_c[1]}")
+                    # print(f"\tFound opponent piece at {r_c[0]}, {r_c[1]}")
                     return False
 
         # pawns
@@ -196,10 +195,10 @@ class GameState:
 
         if 0 <= king_row + row_dir < 8:
             if 0 <= king_col - 1 < 8 and board_[king_row + row_dir][king_col - 1] == opp_pawn:
-                print("\tPawn Attack")
+                # print("\tPawn Attack")
                 return False
             if 0 <= king_col + 1 < 8 and board_[king_row + row_dir][king_col + 1] == opp_pawn:
-                print("\tPawn Attack 2")
+                # print("\tPawn Attack 2")
                 return False
 
         return True
@@ -249,9 +248,9 @@ class GameState:
         sys.exit()
 
     def validate_valid_moves(self, valid_moves_dict):
-        for el in self.board:
-            print(el)
-        print("\n")
+        # for el in self.board:
+        #     print(el)
+        # print("\n")
         new_dict = {}
         for start in valid_moves_dict.keys():
             arr = []
@@ -267,15 +266,15 @@ class GameState:
                 potential_board, _ = make_move(board_copy, move)
                 if self.is_king_safe(potential_board, not self.player_turn):
                     arr.append(end)
-                    print("+", end=" ")
-                else:
-                    print("-", end=" ")
+                #     print("+", end=" ")
+                # else:
+                #     print("-", end=" ")
 
-                print(f"{potential_board[end[0]][end[1]]} {start} => {end}")
+                # print(f"{potential_board[end[0]][end[1]]} {start} => {end}")
 
             new_dict[start] = arr
 
-        print("\n-------------------\n")
+        # print("\n-------------------\n")
         return new_dict
 
     def get_valid_moves(self):

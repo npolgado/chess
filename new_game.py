@@ -48,7 +48,7 @@ def run():
     valid_moves = gs.get_valid_moves()
 
     p1 = eric_bot.AI()
-    p2 = eric_bot.AI()
+    # p2 = eric_bot.AI()
     p2 = nick_bot.AI()
 
     players = (p1, p2)
@@ -56,6 +56,8 @@ def run():
     move = None
 
     while True:
+        print(f"Turn: {gs.turn_num} | {move} | {gs.get_player_turn()} | {evaluate_board(gs.board)} | ")
+        print("-----------------------------------")
         if not graphics.running:
             gs.tick()
             graphics.draw(gs)
@@ -80,8 +82,6 @@ def run():
         move_from = move_tuple[0]
         move_to = move_tuple[1]
 
-        print("A")
-
         if move_to in valid_moves[move_from]:
             # Update game board state
             gs.update(move)
@@ -93,6 +93,8 @@ def run():
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             gs.handle_end_game(valid_moves)
         
+        print_board(gs.board)
+        print("-----------------------------------")
         time.sleep(.3)
 
 
