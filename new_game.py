@@ -35,7 +35,6 @@ move: str
 
 def run(DEBUG=False):
     # Initialize board state and turn counter 
-    board_state = init_empty_board() 
     gs = GameState()
 
     graphics = Graphics(
@@ -60,6 +59,7 @@ def run(DEBUG=False):
             print(f"PLAYER: {gs.get_player_turn()}")
             print("-----------------------------------")
             print("-----------------------------------")
+
         if not graphics.running:
             gs.tick()
             graphics.draw(gs)
@@ -96,10 +96,12 @@ def run(DEBUG=False):
 
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             gs.handle_end_game(valid_moves)
+
+        if DEBUG:        
+            print("gs board")
+            print_board(gs.board)
+            print("-----------------------------------")
         
-        print("gs board")
-        print_board(gs.board)
-        print("-----------------------------------")
         time.sleep(.3)
 
 
