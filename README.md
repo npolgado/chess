@@ -14,23 +14,12 @@ new_game.py is much better than game.py
     - Wouldn't make a huge difference. Is it cleaner though?
 
 
-# TODO - Nick:
-
-- [X] Getting the Game to Flow (Eric)
-	- [X] checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
-	- [X] make the valid moves array a dictionary
-    - [X] AI's making random valid moves (see gameplay on output)
-
-- [ ] Move everything to game_state (board, functions)
-
-    - [ ] rename board_state to board
-
-- [X] Finish Update board (Eric)
+# TODO:
 
 - [ ] King Logic (Eric)
-    - [ ] Move can't put/keep King in check
+    - [x] Move can't put/keep King in check
     - [ ] Castling logic
-	- [ ] change end_game() logic
+	- [x] change end_game() logic
 
 - Tests outline (Nick)
     - [x] helpers testing
@@ -40,15 +29,34 @@ new_game.py is much better than game.py
     - [ ] en passant testing
     - [ ] turn logic testing
 
-- Graphics (Nick)
+- [ ] AI Threading
+    - [ ] Thread function and get_function
+
+- [ ] V1 of AI's work
+    - [ ] time control (optional)
+    - [ ] flesh out revice / get move logic / flow
+    - [ ] Nick
+    - [ ] Eric
+
+- [ ] Full Review, Comment, and Cleanup Session (Eric + Nick)
+
+# COMPLETE
+
+- [x] Move everything to game_state (board, functions)
+
+- [X] Getting the Game to Flow (Eric)
+	- [X] checking if a move is valid (in run) should call get_piece_moves instead of get_valid_moves
+	- [X] make the valid moves array a dictionary
+    - [X] AI's making random valid moves (see gameplay on output)
+    - [X] Finish Update board (Eric)
+
+- [x] Graphics (Nick)
     - [x] initial display and board
     - [x] draw pieces
     - [ ] [NICE TO HAVE] turn counter
     - [x] [NICE TO HAVE] timer with real time
     - [ ] [NICE TO HAVE] move history
     - [ ] [NICE TO HAVE] move highlighting (current / past)
-
-- [ ] Full Review, Comment, and Cleanup Session (Eric + Nick)
 
 # GOALS
 

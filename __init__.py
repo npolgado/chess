@@ -114,7 +114,6 @@ def init_empty_board():
     ]
     return init_array
 
-
 def evaluate_board(board):
     # given the board and player's turn, return a score
     ans = 0
@@ -129,16 +128,19 @@ def evaluate_board(board):
             if piece.isupper():
                 key = piece.lower()
                 ans -= PIECE_VALUES[key]
+                # print(f"{piece} @ {i}, {j} = {PIECE_VALUES[key]} -- {ans}")
             else:
                 ans += PIECE_VALUES[piece]
-    
+                # print(f"{piece} @ {i}, {j} = {PIECE_VALUES[piece]} -- {ans}")
     return ans
-
 
 def make_move(board, move):
     # given a board array and move of notation "A1H8", make the move and return the new board
     # handles en_passant (returns the square if relevant) and promotion
-    start, end = move[0], move[1]
+    if type(move) == str:
+        start, end = translate_move_s2t(move)
+    else:
+        start, end = move[0], move[1]
 
     board[end[0]][end[1]] = board[start[0]][start[1]]
     board[start[0]][start[1]] = '-'
@@ -159,22 +161,25 @@ def make_move(board, move):
     return board, en_passant
 
 
-# if __name__ == "__main__":
-#     import time
+if __name__ == "__main__":
+    import time
 
-#     b = init_empty_board()
-#     print_board(b)    
-#     print(evaluate_board(b))
+    b = init_empty_board()
+    print_board(b)    
+    print(evaluate_board(b))
 
-#     b = make_move(b, "A2A3")
-#     print_board(b)
-#     print(evaluate_board(b))
+    b, _ = make_move(b, "A2A3")
+    print_board(b)
+    print(evaluate_board(b))
     
-#     b = make_move(b, "A1B1")
-#     print_board(b)
-#     print(evaluate_board(b))
+    b, _ = make_move(b, "A1B1")
+    print_board(b)
+    print(evaluate_board(b))
     
-#     b = make_move(b, "B1C1")
-#     print_board(b)
+    b, _ = make_move(b, "B1C1")
+    print_board(b)
+    print(evaluate_board(b))
 
-#     print(evaluate_board(b))
+    b, _ = make_move(b, "D1D8")
+    print_board(b)
+    print(evaluate_board(b))
