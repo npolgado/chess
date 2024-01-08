@@ -25,6 +25,8 @@ class GameState:
         }
         self.time = (0, 0)
         self.start_time = time.monotonic()
+        self.time_control = 10 * 60
+
         self.time_white = 0
         self.time_black = 0
 
@@ -68,7 +70,6 @@ class GameState:
             self.board_dict[board_str] = 1
 
     def update(self, move):
-
         move = translate_move_s2t(move)
         self.board, self.en_passant = make_move(self.board, move)
 
@@ -300,9 +301,9 @@ class GameState:
                 no_valid_moves = False
         
         if no_valid_moves:
-            king_row, king_col = self.get_king_position(self.board, self.player_turn)
+            # king_row, king_col = self.get_king_position(self.board, self.player_turn)
 
-            if self.is_king_safe(self.board, king_row, king_col, self.player_turn):
+            if self.is_king_safe(self.board, self.player_turn):
                 print("Checkmate")
                 self.end_game("checkmate", not self.player_turn)
 
@@ -335,7 +336,7 @@ class GameState:
         else: self.time_black += t
 
         # update times
-        self.time = (self.time_white,self.time_black)
+        self.time = (self.time_control - self.time_white, self.time_control - self.time_black)
 
 # Debugging
 if __name__ == "__main__":

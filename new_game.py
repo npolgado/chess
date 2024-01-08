@@ -79,8 +79,6 @@ def run():
         move_from = move_tuple[0]
         move_to = move_tuple[1]
 
-        print("A")
-
         if move_to in valid_moves[move_from]:
             # Update game board state
             gs.update(move)
@@ -92,7 +90,7 @@ def run():
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             gs.handle_end_game(valid_moves)
         
-        # time.sleep(.3)
+        time.sleep(.1)
 
 
 if __name__ == "__main__":
