@@ -33,7 +33,7 @@ move: str
 '''
 
 
-def run():
+def run(DEBUG=False):
     # Initialize board state and turn counter 
     board_state = init_empty_board() 
     gs = GameState()
@@ -49,15 +49,17 @@ def run():
 
     p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
-    p2 = nick_bot.AI()
+    p2 = nick_bot.AI(DEBUG)
 
     players = (p1, p2)
 
     move = None
 
     while True:
-        print(f"Turn: {gs.turn_num} | {move} | {gs.get_player_turn()} | {evaluate_board(gs.board)} | ")
-        print("-----------------------------------")
+        if DEBUG: 
+            print(f"PLAYER: {gs.get_player_turn()}")
+            print("-----------------------------------")
+            print("-----------------------------------")
         if not graphics.running:
             gs.tick()
             graphics.draw(gs)
@@ -67,8 +69,7 @@ def run():
         gs.tick()
         turn = gs.get_player_turn()
 
-        # Send updated move to the other player ai
-        players[not turn].recieve(move)
+
 
         # get potential move from player
         move = players[turn].get_random_move(valid_moves)
@@ -85,6 +86,9 @@ def run():
         if move_to in valid_moves[move_from]:
             # Update game board state
             gs.update(move)
+            # Send updated move to the other player ai
+            # NOTE: on turn 1, white's move is None at this line, so black will not recieve the first move... 
+            players[not turn].recieve(move)
             graphics.draw(gs)
             
             # Checks new board state for valid moves
@@ -93,10 +97,14 @@ def run():
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             gs.handle_end_game(valid_moves)
         
+        print("gs board")
         print_board(gs.board)
         print("-----------------------------------")
         time.sleep(.3)
 
 
 if __name__ == "__main__":
+    # import cProfile
+    # import re
+    # cProfile.run('run()', sort='tottime')
     run()

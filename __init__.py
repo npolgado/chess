@@ -161,22 +161,25 @@ def make_move(board, move):
     return board, en_passant
 
 
-# if __name__ == "__main__":
-#     import time
+if __name__ == "__main__":
+    import time
 
-#     b = init_empty_board()
-#     print_board(b)    
-#     print(evaluate_board(b))
+    b = init_empty_board()
+    print_board(b)    
+    print(evaluate_board(b))
 
-#     b = make_move(b, "A2A3")
-#     print_board(b)
-#     print(evaluate_board(b))
+    b, _ = make_move(b, "A2A3")
+    print_board(b)
+    print(evaluate_board(b))
     
-#     b = make_move(b, "A1B1")
-#     print_board(b)
-#     print(evaluate_board(b))
+    b, _ = make_move(b, "A1B1")
+    print_board(b)
+    print(evaluate_board(b))
     
-#     b = make_move(b, "B1C1")
-#     print_board(b)
+    b, _ = make_move(b, "B1C1")
+    print_board(b)
+    print(evaluate_board(b))
 
-#     print(evaluate_board(b))
+    b, _ = make_move(b, "D1D8")
+    print_board(b)
+    print(evaluate_board(b))

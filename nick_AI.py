@@ -6,16 +6,28 @@ import random
 import time
 
 class AI :
-    def __init__(self):
+    def __init__(self, DEBUG: bool=True):
+        self.debug = DEBUG
         self.g = GameState()
+        self.last_move = None
         
     # Recieve updated move from the other player ai
     def recieve(self, move):
-        if move is not None: self.g.update(move)  
+        if move is not None:
+            self.g.update(move)
+            self.last_move = move 
+            # if self.debug:
+            #     print("RECIEVE")
+            #     print_board(self.g.board)
+            #     print("-----------------------------------")
+            #     print(f"NICK RECIEVED MOVE: {move}")
 
     def get_random_move(self, valid_moves):
-        print(f"NICK_BOT: {evaluate_board(self.g.board)}")
-        print("-----------------------------------")
+        # if self.debug:
+        #     print("ai board")
+        #     print_board(self.g.board)
+        #     print("-----------------------------------")
+
         keys = list(valid_moves.keys())
 
         # get all possible moves evaluations
@@ -26,7 +38,6 @@ class AI :
 
         for i in keys:
             for j in valid_moves[i]:
-                # print(f"\n\nfrom {i} to {j}")
                 pos_from = i
                 pos_to = j
                 
@@ -37,17 +48,15 @@ class AI :
                 evals[notation] = b_eval
 
         # find the best move
-        # if white, get highest evaluation
+        # if black, get lowest evaluation
         if self.g.player_turn:
-            # print(f"best as white")
-            max_value = np.max(list(evals.values()))
+            max_value = np.min(list(evals.values()))
             best = [key for key, value in evals.items() if value == max_value]
 
-        # if black, get the lowest eval
+        # if white, get the highest eval
         else:
-            min_value = np.min(list(evals.values()))
+            min_value = np.max(list(evals.values()))
             best = [key for key, value in evals.items() if value == min_value]
-            # print(f"NICK BOT best as black : {best}")
 
         # extract to string
         if len(best) > 1:
@@ -55,11 +64,7 @@ class AI :
         else:
             best = best[0]
 
-        tturn = "BLACK" if self.g.player_turn else "WHITE"
-
-        # print(f"{tturn}\t{self.g.turn_num}:\t{best} @ {evals[best]}")
         self.g.update(best)
-        # print_board(self.g.board)
         return best
 
         # pick randomly

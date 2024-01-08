@@ -68,7 +68,7 @@ class GameState:
             self.board_dict[board_str] = 1
 
     def update(self, move):
-        move = translate_move_s2t(move)
+        # move = translate_move_s2t(move)
         self.board, self.en_passant = make_move(self.board, move)
 
         self.update_castling_rights()
