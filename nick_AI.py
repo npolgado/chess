@@ -9,33 +9,16 @@ class AI :
     def __init__(self, DEBUG: bool=True):
         self.debug = DEBUG
         self.g = GameState()
-        self.last_move = None
-        
-    # Recieve updated move from the other player ai
-    def recieve(self, move):
-        if move is not None:
-            self.g.update(move)
-            self.last_move = move 
-            # if self.debug:
-            #     print("RECIEVE")
-            #     print_board(self.g.board)
-            #     print("-----------------------------------")
-            #     print(f"NICK RECIEVED MOVE: {move}")
+        self.last_opponent_move = None
 
-    def get_random_move(self, valid_moves):
-        # if self.debug:
-        #     print("ai board")
-        #     print_board(self.g.board)
-        #     print("-----------------------------------")
-
+    def get_evals(self, valid_moves, board):
+        # get_evals
+        # given a board and valid moves, return a dict of move: evaluation
         keys = list(valid_moves.keys())
-
-        # get all possible moves evaluations
         evals = {}
+        curr_board = np.copy(board)
 
-        # print_board(self.g.board)
-        curr_board = np.copy(self.g.board)
-
+        # make each valid move and evaluate the board
         for i in keys:
             for j in valid_moves[i]:
                 pos_from = i
@@ -45,9 +28,39 @@ class AI :
 
                 b, _ = make_move(curr_board, notation)
                 b_eval = evaluate_board(b)
-                evals[notation] = b_eval
 
-        # find the best move
+                # if not in the dict, add it
+                if not evals[notation]: evals[notation] = b_eval
+        
+        return evals
+
+    def recieve(self, move):
+        if move is not None:
+            self.g.update(move)
+            self.last_opponent_move = move 
+
+    def get_ai_move(self, valid_moves):
+        keys = list(valid_moves.keys())
+        curr_board = np.copy(self.g.board)
+
+        # 1. Get all possible moves evaluations
+        evals = self.get_evals(valid_moves, curr_board)
+
+        # 2. Find the best move
+        for evaluation, notation in evals.items():
+            print(f"{notation}: {evaluation}")
+
+            # fake update 
+            b, _ = make_move(curr_board, notation)
+            self.g.player_turn = not self.g.player_turn
+
+            # get valid moves for the other player
+            valid_opponent_moves = self.g.get_valid_moves(b)
+
+            # undo gs update
+            self.g.player_turn = not self.g.player_turn
+            self.g.board = np.copy(curr_board)
+
         # if black, get lowest evaluation
         if self.g.player_turn:
             max_value = np.min(list(evals.values()))
@@ -58,6 +71,9 @@ class AI :
             min_value = np.max(list(evals.values()))
             best = [key for key, value in evals.items() if value == min_value]
 
+
+        # 3. Format and return target move
+
         # extract to string
         if len(best) > 1:
             best = random.choice(best)
@@ -66,6 +82,10 @@ class AI :
 
         self.g.update(best)
         return best
+
+    def get_random_move(self, valid_moves):
+
+        keys = list(valid_moves.keys())
 
         # pick randomly
         from_pos = random.choice(keys)
