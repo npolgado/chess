@@ -181,7 +181,7 @@ class GameState:
 
         for opp_piece_char in opp_pieces:
             a = self.get_piece_moves(board_, king_row, king_col, opp_piece_char, not player_turn_)
-            print(f"\tKing | {opp_piece_char} | {a}")
+            # print(f"\tKing | {opp_piece_char} | {a}")
             for r_c in a:
                 if board_[r_c[0]][r_c[1]] == opp_piece_char:
                     print(f"\tFound opponent piece at {r_c[0]}, {r_c[1]}")
@@ -302,8 +302,7 @@ class GameState:
         
         if no_valid_moves:
             # king_row, king_col = self.get_king_position(self.board, self.player_turn)
-
-            if self.is_king_safe(self.board, self.player_turn):
+            if not self.is_king_safe(self.board, self.player_turn):
                 print("Checkmate")
                 self.end_game("checkmate", not self.player_turn)
 
