@@ -32,7 +32,7 @@ class AI:
             self.target_move = None
             return a
 
-    def get_random_move(self, valid_moves) -> tuple:
+    def get_ai_move(self, valid_moves) -> tuple:
         count = 0
         for key in valid_moves:
             count += len(valid_moves[key])

@@ -48,9 +48,9 @@ def run(DEBUG=False):
 
     p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
-    p2 = nick_bot.AI(DEBUG)
+    p2 = nick_bot.AI(True)
 
-    players = (p1, p2)
+    players = (p2, p1)
 
     move = None
 
@@ -72,7 +72,7 @@ def run(DEBUG=False):
 
 
         # get potential move from player
-        move = players[turn].get_random_move(valid_moves)
+        move = players[turn].get_ai_move(valid_moves)
 
         # If the players move is None, we have not received a new move, so just draw
         if move is None:  # TODO: this needs to check if the move is the same as the last?
@@ -109,4 +109,5 @@ if __name__ == "__main__":
     # import cProfile
     # import re
     # cProfile.run('run()', sort='tottime')
+    # for i in range(10):
     run()

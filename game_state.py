@@ -242,8 +242,10 @@ class GameState:
         pass
 
     def end_game(self, status_string, winner_player=-1):
+        side = "White" if winner_player == 0 else "Black"
+
         print(
-            f"Game Ended in {status_string}. Player {winner_player} wins!")  # TODO: player_turn doesnt matter if stalemate
+            f"Game Ended in {status_string}. Player {side} wins!")  # TODO: player_turn doesnt matter if stalemate
 
         time.sleep(1000)
 
