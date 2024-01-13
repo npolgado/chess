@@ -46,11 +46,16 @@ def run(DEBUG=False):
     # Check and verify initial board state
     valid_moves = gs.get_valid_moves()
 
-    p1 = eric_bot.AI()
-    # p2 = eric_bot.AI()
-    p2 = nick_bot.AI(True)
+
+    p1 = eric_bot.AI(gs)
+    p2 = eric_bot.AI(gs)
+    p1.start()
+    p2.start()
+    # p2 = nick_bot.AI(True)
 
     players = (p2, p1)
+
+    time.sleep(5)
 
     move = None
 
@@ -69,8 +74,6 @@ def run(DEBUG=False):
         gs.tick()
         turn = gs.get_player_turn()
 
-
-
         # get potential move from player
         move = players[turn].get_ai_move(valid_moves)
 
@@ -83,12 +86,13 @@ def run(DEBUG=False):
         move_from = move_tuple[0]
         move_to = move_tuple[1]
 
+
         if move_to in valid_moves[move_from]:
             # Update game board state
             gs.update(move)
             # Send updated move to the other player ai
             # NOTE: on turn 1, white's move is None at this line, so black will not recieve the first move... 
-            players[not turn].recieve(move)
+            players[not turn].receive(move)
             graphics.draw(gs)
             
             # Checks new board state for valid moves

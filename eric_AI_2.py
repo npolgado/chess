@@ -3,6 +3,8 @@ import copy
 import math
 from __init__ import *
 
+import game_state
+
 
 # Agent that plays chess
 
@@ -13,79 +15,83 @@ from __init__ import *
 # when a new move is made, remove all other nodes (set move to root) and calculate another layer.
 # when you make a move, remove all other nodes (set move to root) and calculate another layer
 
-class AI:
+import threading
 
-    def __init__(self):
+class AI(threading.Thread):
+
+    def __init__(self, gs):
+
+        super().__init__()
+
+        self.gs = gs
+
         self.current_board_state = init_empty_board()
+        self.root = self.Node(gs_=copy.deepcopy(gs), parent=None, children=[])
 
-        # variable to keep
-        self.target_move = None
 
-        self.root = self.Node(self.current_board_state)
 
-    def target_move(self):
-        # when ready, return move. If not ready, return None
-        if self.target_move is None:
-            return None
+    def run(self):
+        for i in range(5):
+            print(f"DEPTH = {i}")
+            self.generate_next_level(self.root)
+            print_tree(self.root)
+            print("\n----------------------------\n")
+
+
+
+
+
+    def generate_next_level(self, cur_node):
+        if cur_node.children == []:
+            self.create_children(cur_node)
+
         else:
-            a = self.target_move
-            self.target_move = None
-            return a
+            for ch in cur_node.children:
+                self.generate_next_level(ch)
+        
 
-    def get_ai_move(self, valid_moves) -> tuple:
-        count = 0
-        for key in valid_moves:
-            count += len(valid_moves[key])
+    def create_children(self, cur_node):
 
-        if count > 0:
-            random_index = random.choice(range(count))
-        else:
-            return None
+        moves = cur_node.gs_.get_valid_moves()
 
-        for key in valid_moves:
-            for value in valid_moves[key]:
-                if random_index == 0:
-                    random_move = (key, value)
-                random_index -= 1
+        for start in moves:
+            for end in moves[start]:
+                mv = (start, end)
 
-        move = translate_move_t2s(random_move[0][0], random_move[0][1], random_move[1][0], random_move[1][1])
+                new_gs = copy.deepcopy(cur_node.gs_)
+                new_gs.update(mv)
+                # new_board = make_move(b_, mv)[0]
+                n = self.Node(gs_=new_gs, parent=cur_node, children=[])
+                cur_node.children.append(n)
 
-        return move
-
-    def recieve(self, game_state):
-        return None
-
+    
     class Node:
-        def __init__(self, board_state, children=[]):
+        def __init__(self, gs_, parent, children):
+            self.gs_ = gs_
+            
+            self.parent = parent
+            self.children = children
 
-            self.board_state = board_state
-            score = self.calculate_score()
 
-            # TODO: add logic for children (PREREQ: game_state class, update_game(move))
+def print_tree(n, depth=0):
+    # print("\t"*depth, board_to_string(n.gs_.board))
+    for r in n.gs_.board:
+        print(r)
+    print()
+    for ch in n.children:
+        print_tree(ch, depth+1)
 
-        def calculate_score(self):
 
-            # is_game_over, mat_diff, king_safety, piece_activity, pawn_structure, center_control = self.analyze_board()
-            mat_diff = self.analyze_board()
 
-            overall_score = mat_diff  # TODO: this will comebine metrics to create an ultimate score
-            return overall_score
 
-        def analyze_board(self):
-            piece_points_dict = {'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 10}
 
-            mat_diff = 0
 
-            for row in range(8):
-                for col in range(8):
-                    # material difference
-                    piece_char = self.board_state[row][col]
-                    if piece_char == "-":
-                        continue
-                    piece_point = piece_points_dict[piece_char.lower()]
-                    if piece_char.isupper():
-                        piece_point *= -1
-                    mat_diff += piece_point
+if __name__ == "__main__":
 
-            return mat_diff
+    gs = game_state.GameState()
 
+    p1 = AI(gs)
+
+    p1.start()
+
+    # print(string_to_board("rnbqkbnr/ppppppp1/8/8/7p/7N/PPPPPPPP/RNBQKBR1"))
