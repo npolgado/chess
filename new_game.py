@@ -33,24 +33,19 @@ move: str
 '''
 
 
-def run(DEBUG=False):
+def run(p1, p2, DEBUG=False):
     # Initialize board state and turn counter 
     gs = GameState()
 
     graphics = Graphics(
-        display_index=1,
+        display_index=0,
         fullscreen=False
     )
     
-
     # Check and verify initial board state
     valid_moves = gs.get_valid_moves()
 
-    p1 = eric_bot.AI()
-    # p2 = eric_bot.AI()
-    p2 = nick_bot.AI(True)
-
-    players = (p2, p1)
+    players = (p1, p2)
 
     move = None
 
@@ -68,8 +63,6 @@ def run(DEBUG=False):
         # Update game time
         gs.tick()
         turn = gs.get_player_turn()
-
-
 
         # get potential move from player
         move = players[turn].get_ai_move(valid_moves)
@@ -101,13 +94,19 @@ def run(DEBUG=False):
             print("gs board")
             print_board(gs.board)
             print("-----------------------------------")
-        
-        time.sleep(.3)
-
 
 if __name__ == "__main__":
     # import cProfile
     # import re
     # cProfile.run('run()', sort='tottime')
     # for i in range(10):
-    run()
+
+    p1 = eric_bot.AI()
+    # p2 = eric_bot.AI()
+    p2 = nick_bot.AI(True)
+
+    try:
+        run(p1, p2, False)
+    except KeyboardInterrupt:
+        p2.on_exit()
+        sys.exit()
