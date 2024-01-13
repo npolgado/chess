@@ -302,8 +302,7 @@ class GameState:
         
         if no_valid_moves:
             # king_row, king_col = self.get_king_position(self.board, self.player_turn)
-
-            if self.is_king_safe(self.board, self.player_turn):
+            if not self.is_king_safe(self.board, self.player_turn):
                 print("Checkmate")
                 self.end_game("checkmate", not self.player_turn)
 
