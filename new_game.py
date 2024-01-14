@@ -92,30 +92,30 @@ def run(p1, p2, DEBUG=False):
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             gs.handle_end_game(valid_moves)
 
-        print(f"[GAME] Turn: {gs.turn_num} | Player: {side} | Move: {move} | Move Tuple: {move_tuple}")       
+            print(f"[GAME] Turn: {gs.turn_num} | Player: {side} | Move: {move} | Move Tuple: {move_tuple}")       
 
-        if DEBUG: 
-            print("gs board")
-            print_board(gs.board)
-            print("-----------------------------------")
+            if DEBUG:
+                print("-----------------------------------")
+                print_board(gs.board)
+                print("-----------------------------------")
 
 if __name__ == "__main__":
     import cProfile
     import re
     import threading
 
-    # lock = threading.Lock()
+    lock = threading.Lock()
 
     # p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
-    p1 = nick_bot.AI(True)
-    p2 = nick_bot.AI(True)
+    p1 = nick_bot.AI(True, lock)
+    p2 = nick_bot.AI(False, lock)
     
     try:
         p1.start()
         p2.start()
         # cProfile.run('run()', sort='tottime')
-        run(p1, p2, False)
+        run(p1, p2, True)
     except Exception as e:
         print(e)
         p1.on_exit()
