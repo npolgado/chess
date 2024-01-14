@@ -63,12 +63,14 @@ def run(p1, p2, DEBUG=False):
         # Update game time
         gs.tick()
         turn = gs.get_player_turn()
+        side = "Black" if turn else "White"
 
         # get potential move from player
-        move = players[turn].get_ai_move(valid_moves)
+        move = players[turn].get_move(valid_moves)
 
         # If the players move is None, we have not received a new move, so just draw
-        if move is None:  # TODO: this needs to check if the move is the same as the last?
+        # TODO: this needs to check if the move is the same as the last?
+        if move is None:  
             graphics.draw(gs)
             continue
 
@@ -90,23 +92,32 @@ def run(p1, p2, DEBUG=False):
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
             gs.handle_end_game(valid_moves)
 
-        if DEBUG:        
+        print(f"[GAME] Turn: {gs.turn_num} | Player: {side} | Move: {move} | Move Tuple: {move_tuple}")       
+
+        if DEBUG: 
             print("gs board")
             print_board(gs.board)
             print("-----------------------------------")
 
 if __name__ == "__main__":
-    # import cProfile
-    # import re
-    # cProfile.run('run()', sort='tottime')
-    # for i in range(10):
+    import cProfile
+    import re
+    import threading
 
-    p1 = eric_bot.AI()
+    # lock = threading.Lock()
+
+    # p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
+    p1 = nick_bot.AI(True)
     p2 = nick_bot.AI(True)
-
+    
     try:
+        p1.start()
+        p2.start()
+        # cProfile.run('run()', sort='tottime')
         run(p1, p2, False)
-    except KeyboardInterrupt:
+    except Exception as e:
+        print(e)
+        p1.on_exit()
         p2.on_exit()
         sys.exit()

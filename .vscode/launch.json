@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/new_game.py",
-            "console": "externalTerminal",
+            "console": "internalConsole",
             "justMyCode": true,
             "stopOnEntry": false
         }
