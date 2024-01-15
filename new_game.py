@@ -50,11 +50,6 @@ def run(p1, p2, DEBUG=False):
     move = None
 
     while True:
-        if DEBUG: 
-            print(f"PLAYER: {gs.get_player_turn()}")
-            print("-----------------------------------")
-            print("-----------------------------------")
-
         if not graphics.running:
             gs.tick()
             graphics.draw(gs)
@@ -67,6 +62,12 @@ def run(p1, p2, DEBUG=False):
 
         # get potential move from player
         move = players[turn].get_move(valid_moves)
+
+        if DEBUG:
+            print("-----------------------------------") 
+            print(f"PLAYER: {side}")
+            print(f"MOVE: {move}")
+            print("-----------------------------------")
 
         # If the players move is None, we have not received a new move, so just draw
         # TODO: this needs to check if the move is the same as the last?
@@ -108,8 +109,8 @@ if __name__ == "__main__":
 
     # p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
-    p1 = nick_bot.AI(True, lock)
-    p2 = nick_bot.AI(False, lock)
+    p1 = nick_bot.AI(True, lock) # ) # 
+    p2 = nick_bot.AI(True, lock) # ) # 
     
     try:
         p1.start()

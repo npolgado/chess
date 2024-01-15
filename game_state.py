@@ -84,7 +84,7 @@ class GameState:
             starting_row = 1
         else:
             direc = -1
-            starting_row = 7
+            starting_row = 6
 
         moves = []
 

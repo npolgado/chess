@@ -7,7 +7,7 @@ import time
 import copy
 
 class AI(threading.Thread):
-    def __init__(self, DEBUG=False, lock=None):
+    def __init__(self, DEBUG=False, lock=None): # ): # 
         super().__init__()
         
         self.send_move = False
@@ -27,52 +27,59 @@ class AI(threading.Thread):
 
     def run(self):
         while True:
-            with self.lock:               
-                if self.stop_thread: 
-                    self.stop_thread = False
-                    return
-                
-                if self.recieved_move:
-                    self.recieved_move = False
-                    
-                    self.aip(f"AI THREAD recieved move {self.last_opponent_move}")
-                    
-                    v_m = self.g.get_valid_moves()
-                    # move = self.calculate_move(v_m)
-                    move = self.get_random_move(v_m)
-
-                    self.aip(f"AI THREAD calculated move {move}", True)
-                    
-                    self.target_move = move
-                    self.send_move = True
+            # with self.lock:               
+            if self.stop_thread: 
+                self.stop_thread = False
+                return
             
-            time.sleep(0.01)
+            if self.recieved_move:
+                self.recieved_move = False
+                
+                self.g.update(self.last_opponent_move)
+                side = "Black" if self.g.player_turn else "White"
+                self.aip(f"{side} AI THREAD recieved move {self.last_opponent_move}")
+                self.last_opponent_move = None
 
-    def recieve(self, move):
-        with self.lock:
-            if move is not None:            
+                v_m = self.g.get_valid_moves()
+                # move = self.calculate_move(v_m)
+                
+                move = self.get_random_move(v_m)
                 self.g.update(move)
 
-                self.last_opponent_move = move
-                self.recieved_move = True
+                self.aip(f"{side} AI THREAD calculated move {move}")
                 
-                self.aip(f"AI Game State Updated\n\tPlayer: {self.g.player_turn} | Turn: {self.g.turn_num}", True)
+                self.target_move = move
+                self.send_move = True
+        
+            time.sleep(0.1)
+
+    def recieve(self, move):
+        # with self.lock:
+        if move is not None:
+
+            self.last_opponent_move = move
+            self.recieved_move = True
             
-            else: self.aip("Recieved None")
+            # self.aip(f"AI Game State Updated\n\tPlayer: {self.g.player_turn} | Turn: {self.g.turn_num}", True)
+        
+        else: self.aip("Recieved None")
 
     def get_move(self, valid_moves):
-        with self.lock:
-            if self.send_move:
-                self.send_move = False
-                tmp = self.target_move
-                self.target_move = None
-                if self.target_move in valid_moves: return tmp
-                else: return None
-            
-            elif self.g.turn_num == 1:
-                return self.get_random_move(valid_moves)
-            
-            else: return None
+        # pprint(valid_moves)
+        # with self.lock:
+        if self.send_move:
+            self.send_move = False
+            # self.aip(f"AI Sending Move {self.target_move}", True)
+            tmp = self.target_move
+            self.target_move = None
+            return tmp
+        
+        elif self.g.turn_num == 1:
+            move = self.get_random_move(valid_moves)
+            self.g.update(move)
+            return move
+        
+        else: return None
 
     def aip(self, message:str, sep=False, end="\n"):
         if self.debug: 
@@ -171,7 +178,6 @@ class AI(threading.Thread):
         if len(best) > 1: best = random.choice(best)
         else: best = best[0]
 
-        self.g.update(best)
         return best
 
     def on_exit(self): 
