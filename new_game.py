@@ -53,6 +53,7 @@ def run(p1, p2, DEBUG=False):
         if not graphics.running:
             gs.tick()
             graphics.draw(gs)
+            gs.handle_end_game(valid_moves)
             continue
 
         # Update game time
@@ -94,11 +95,16 @@ def run(p1, p2, DEBUG=False):
             gs.handle_end_game(valid_moves)
 
             print(f"[GAME] Turn: {gs.turn_num} | Player: {side} | Move: {move} | Move Tuple: {move_tuple}")       
+        else:
+            print(f"[GAME] Invalid Move: {move} | Move Tuple: {move_tuple}")
+            raise SystemError("Invalid Move")
+        
+        time.sleep(.1)
 
-            if DEBUG:
-                print("-----------------------------------")
-                print_board(gs.board)
-                print("-----------------------------------")
+        if DEBUG:
+            print("-----------------------------------")
+            print_board(gs.board)
+            print("-----------------------------------")
 
 if __name__ == "__main__":
     import cProfile
@@ -109,7 +115,7 @@ if __name__ == "__main__":
 
     # p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
-    p1 = nick_bot.AI(True, lock) # ) # 
+    p1 = nick_bot.AI(False, lock) # ) # 
     p2 = nick_bot.AI(True, lock) # ) # 
     
     try:

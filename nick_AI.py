@@ -6,6 +6,14 @@ import random
 import time
 import copy
 
+class Tree:
+    def __init__(self, board, parent=None, move=None, depth=0):
+        self.board = board
+        self.parent = parent
+        self.move = move
+        self.depth = depth
+        self.children = []
+
 class AI(threading.Thread):
     def __init__(self, DEBUG=False, lock=None): # ): # 
         super().__init__()
@@ -27,59 +35,62 @@ class AI(threading.Thread):
 
     def run(self):
         while True:
-            # with self.lock:               
-            if self.stop_thread: 
-                self.stop_thread = False
-                return
+            with self.lock:               
+                if self.stop_thread: 
+                    self.stop_thread = False
+                    return
+                
+                if self.recieved_move:
+                    self.recieved_move = False
+                    
+                    self.g.update(self.last_opponent_move)
+                    
+                    side = "Black" if self.g.player_turn else "White"
+                    self.aip(f"{side} AI THREAD recieved move {self.last_opponent_move}")
+                    
+                    self.last_opponent_move = None
+
+                    pprint(self.g.board)
+
+                    v_m = self.g.get_valid_moves()
+                    move = self.calculate_move(v_m)
+                    
+                    self.g.update(move)
+
+                    self.aip(f"{side} AI THREAD calculated move {move}")
+                    
+                    self.target_move = move
+                    self.send_move = True
             
-            if self.recieved_move:
-                self.recieved_move = False
-                
-                self.g.update(self.last_opponent_move)
-                side = "Black" if self.g.player_turn else "White"
-                self.aip(f"{side} AI THREAD recieved move {self.last_opponent_move}")
-                self.last_opponent_move = None
-
-                v_m = self.g.get_valid_moves()
-                # move = self.calculate_move(v_m)
-                
-                move = self.get_random_move(v_m)
-                self.g.update(move)
-
-                self.aip(f"{side} AI THREAD calculated move {move}")
-                
-                self.target_move = move
-                self.send_move = True
-        
-            time.sleep(0.1)
+            time.sleep(0.001)
 
     def recieve(self, move):
-        # with self.lock:
-        if move is not None:
+        with self.lock:
+            if move is not None:
 
-            self.last_opponent_move = move
-            self.recieved_move = True
+                self.last_opponent_move = move
+                self.recieved_move = True
+                
+                # self.aip(f"AI Game State Updated\n\tPlayer: {self.g.player_turn} | Turn: {self.g.turn_num}", True)
             
-            # self.aip(f"AI Game State Updated\n\tPlayer: {self.g.player_turn} | Turn: {self.g.turn_num}", True)
-        
-        else: self.aip("Recieved None")
+            else: self.aip("Recieved None")
 
     def get_move(self, valid_moves):
         # pprint(valid_moves)
-        # with self.lock:
-        if self.send_move:
-            self.send_move = False
-            # self.aip(f"AI Sending Move {self.target_move}", True)
-            tmp = self.target_move
-            self.target_move = None
-            return tmp
-        
-        elif self.g.turn_num == 1:
-            move = self.get_random_move(valid_moves)
-            self.g.update(move)
-            return move
-        
-        else: return None
+        with self.lock:
+            if self.send_move:
+                self.send_move = False
+                # self.aip(f"AI Sending Move {self.target_move}", True)
+                tmp = self.target_move
+                self.target_move = None
+                return tmp
+            
+            elif self.g.turn_num == 1:
+                move = self.get_random_move(valid_moves)
+                self.g.update(move)
+                return move
+            
+            else: return None
 
     def aip(self, message:str, sep=False, end="\n"):
         if self.debug: 
@@ -96,7 +107,7 @@ class AI(threading.Thread):
 
         # make each valid move and evaluate the board
         for i in keys:
-            for j in valid_moves[i]:                
+            for j in valid_moves[i]:
                 notation = translate_move_t2s(*i, *j)
                 b, _ = make_move(curr_board, notation)
                 if notation not in evals.keys(): evals[notation] = evaluate_board(b)
@@ -104,13 +115,13 @@ class AI(threading.Thread):
         return evals
         
     def calculate_move(self, valid_moves):
+        # with self.lock:
         # Save current board state
         side = "Black" if self.g.player_turn else "White"
         curr_board = copy.deepcopy(self.g.board)
         curr_evaluation = evaluate_board(curr_board)
-        curr_en_passant = self.g.en_passant
 
-        self.aip(f"Getting Target Move\n\tTurn {self.g.turn_num} | {side}'s Turn | Eval = {curr_evaluation}")
+        # self.aip(f"Getting Target Move\n\tTurn {self.g.turn_num} | {side}'s Turn | Eval = {curr_evaluation}")
 
         # 1. Get all possible moves evaluations
         evals = self.get_evals(valid_moves, curr_board)
@@ -119,24 +130,15 @@ class AI(threading.Thread):
         # 2. Find the best move
         #   a. go through possible moves
         for notation, evaluation in evals.items():
-            self.aip(f"\tPossible Move {notation}: {evaluation}")
+            # self.aip(f"\tPossible Move {notation}: {evaluation}")
 
+            branch = copy.deepcopy(self.g)
+            branch.update(notation)
 
-            b, _ = make_move(curr_board, notation)
-
-            # fake turn change to get opponent moves
-            self.g.player_turn = not self.g.player_turn
-            self.g.board = copy.deepcopy(b)
-            self.g.en_passant = _
-            
-            valid_opponent_moves = self.g.get_valid_moves()
-            
-            self.g.player_turn = not self.g.player_turn
-            self.g.board = copy.deepcopy(curr_board)
-            self.g.en_passant = curr_en_passant
+            valid_opponent_moves = branch.get_valid_moves()
 
             # go through opponent moves and get the worst case scenario
-            opponent_evals = self.get_evals(valid_opponent_moves, b)
+            opponent_evals = self.get_evals(valid_opponent_moves, branch.board)
             opponent_evaluation = None
             
             for i in opponent_evals.values():
@@ -164,13 +166,13 @@ class AI(threading.Thread):
                     if opponent_evaluation <= curr_evaluation: best_moves[notation] = evaluation
                     # self.aip(f"Found a good evaluation as black\n")
 
-            self.aip(f"\t\tO.Eval = {opponent_evaluation} | Curr.Eval = {curr_evaluation} | INDEX = {i}", True)
+            # self.aip(f"{side}\t\tO.Eval = {opponent_evaluation} | Curr.Eval = {curr_evaluation} | INDEX = {i}", True)
 
         # if black, get lowest evaluation
-        if self.g.player_turn: index_value = np.max(list(evals.values()))
+        if self.g.player_turn: index_value = np.min(list(evals.values()))
         
         # if white, get the highest eval
-        else: index_value = np.min(list(evals.values()))
+        else: index_value = np.max(list(evals.values()))
         
         best = [key for key, value in evals.items() if value == index_value]
 
