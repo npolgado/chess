@@ -14,12 +14,23 @@ new_game.py is much better than game.py
     - Wouldn't make a huge difference. Is it cleaner though?
 
 
-# TODO:
 
-- [ ] King Logic (Eric)
-    - [x] Move can't put/keep King in check
-    - [ ] Castling logic
-	- [x] change end_game() logic
+# ERIC:
+- [ ] Evaluate board (upon creation)
+
+- [ ] Minimax (called upon pick_move())
+
+- [ ] Prune: 
+    - During minimax, remove the bottom 10% of each layer. This way it'll remove more nodes higher on the tree as it calculates deeper (which is good since more information is found. ex: queen sacrifice makes the next position look horrible, but a move or too later and its good again)
+        - note: a layer will be processed many times, initially at the bottom, then at the second to bottom, etc.
+
+- [ ] GS for ea. Node: Holding the gamestate for each node takes a lot of memory and probably time
+    - imitate get_valid_moves() manually since thats all you need it for (board, player_turn, en_passant, etc.)
+
+- [ ] Partial next layer?: Partial instead of all at once (since cant return or do anything while calculating)
+
+
+# TODO:
 
 - Tests outline (Nick)
     - [x] helpers testing

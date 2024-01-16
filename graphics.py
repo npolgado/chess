@@ -16,6 +16,7 @@ from pygame.locals import (
 from __init__ import *
 import numpy as np
 import time
+import threading
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

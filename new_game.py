@@ -1,4 +1,4 @@
-import eric_AI_2 as eric_bot
+import scratch_2 as eric_bot
 import nick_AI as nick_bot
 import time
 import sys
@@ -42,20 +42,17 @@ def run(DEBUG=False):
         fullscreen=False
     )
     
-
     # Check and verify initial board state
     valid_moves = gs.get_valid_moves()
 
 
-    p1 = eric_bot.AI(gs)
-    p2 = eric_bot.AI(gs)
+    p1 = eric_bot.AI(gs, 0) # white
+    p2 = eric_bot.AI(gs, 1) # black
     p1.start()
     p2.start()
     # p2 = nick_bot.AI(True)
 
-    players = (p2, p1)
-
-    time.sleep(5)
+    players = (p1, p2)
 
     move = None
 
@@ -75,17 +72,18 @@ def run(DEBUG=False):
         turn = gs.get_player_turn()
 
         # get potential move from player
-        move = players[turn].get_ai_move(valid_moves)
+        move = players[turn].get_move()
+
 
         # If the players move is None, we have not received a new move, so just draw
         if move is None:  # TODO: this needs to check if the move is the same as the last?
             graphics.draw(gs)
             continue
 
-        move_tuple = translate_move_s2t(move)
+        # move_tuple = translate_move_s2t(move)
+        move_tuple = move
         move_from = move_tuple[0]
         move_to = move_tuple[1]
-
 
         if move_to in valid_moves[move_from]:
             # Update game board state
@@ -105,13 +103,9 @@ def run(DEBUG=False):
             print("gs board")
             print_board(gs.board)
             print("-----------------------------------")
-        
-        time.sleep(.3)
 
 
 if __name__ == "__main__":
-    # import cProfile
-    # import re
-    # cProfile.run('run()', sort='tottime')
-    # for i in range(10):
-    run()
+    import cProfile
+    cProfile.run('run()', sort='tottime')
+    # run()
