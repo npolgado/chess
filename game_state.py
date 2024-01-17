@@ -25,7 +25,7 @@ class GameState:
         }
         self.time = (0, 0)
         self.start_time = time.monotonic()
-        self.time_control = 10 * 60
+        self.time_control = 30 * 60
 
         self.time_white = 0
         self.time_black = 0
@@ -241,16 +241,6 @@ class GameState:
         # TODO
         pass
 
-    def end_game(self, status_string, winner_player=-1):
-        side = "White" if winner_player == 0 else "Black"
-
-        print(
-            f"Game Ended in {status_string}. Player {side} wins!")  # TODO: player_turn doesnt matter if stalemate
-
-        time.sleep(1000)
-
-        sys.exit()
-
     def validate_valid_moves(self, valid_moves_dict):
         # for el in self.board:
         #     print(el)
@@ -295,8 +285,9 @@ class GameState:
         validated_valid_moves = self.validate_valid_moves(valid_moves)
         return validated_valid_moves
 
-    def handle_end_game(self, valid_moves):
+    def handle_end_game(self, valid_moves, p_turn):
         # if there are no valid moves, it's either checkmate and stalemate
+        
         no_valid_moves = True
         for k in valid_moves:
             if valid_moves[k] != []:
@@ -304,25 +295,22 @@ class GameState:
         
         if no_valid_moves:
             # king_row, king_col = self.get_king_position(self.board, self.player_turn)
-            if not self.is_king_safe(self.board, self.player_turn):
-                print("Checkmate")
-                self.end_game("checkmate", not self.player_turn)
+            if not self.is_king_safe(self.board, p_turn):
+                return p_turn, "checkmate"
 
             else:
-                print("No valid moves")
-                self.end_game("stalemate")
+                return 3, "No valid moves"
 
         if self.is_three_fold_repetition:
-            print("3 fold repitition")
-            self.end_game("stalemate")
+            return 3, "3 fold repitition"
 
         if self.is_insufficient_material():
-            print("Insufficient Material")
-            self.end_game("stalemate")
+            return 3, "Insufficient Material"
 
         if self.is_fifty_move_rule():
-            print("50 move rule")
-            self.end_game("stalemate")
+            return 3, "50 move rule"
+        
+        return -1, ""
         
     def get_player_turn(self):
         return self.player_turn

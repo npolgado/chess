@@ -20,14 +20,14 @@ class AI(threading.Thread):
         self.your_turn = team == 0
         self.root = self.Node(gs_=copy.deepcopy(gs), parent=None, children=[], move=None)
 
-
     def run(self):
+        tree_depth = 4
         while True:
             d = self.get_depth(self.root)
-            if d < 3:
+            if d < tree_depth:
                 self.generate_next_level(self.root)
                 self.minimax_traverse(self.root)
-                print(f"\t(Depth = {d})  (Team= {self.team_}) (Your Turn= {self.your_turn})")
+                # print(f"\t(Depth = {d})  (Team= {self.team_}) (Your Turn= {self.your_turn})")
 
             if self.your_turn and d == 3 and self.target_move is None:
                 self.target_move = self.pick_move()
@@ -42,17 +42,19 @@ class AI(threading.Thread):
         mv_start = ret_move[0]
         mv_end = ret_move[1]
 
-        # print_tree(copy.deepcopy(self.gs.board), self.root)
         print()
         for r in self.gs.board:
             print(r)
         print()
-        print(f"MOVE: {self.gs.board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}")
+        print(f"MOVE: {self.gs.board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}   (cur_mat = {evaluate_board(self.gs.board)})")
         s = "WHITE" if self.team_ == 0 else "BLACK"
         print(f"===Team: {s}===\n")
         print("\n---------------------------------------\n")
         
         self.root = self.root.get_child(ret_move)
+        
+        print_tree(copy.deepcopy(self.gs.board), self.root)
+
         return ret_move
 
     def get_depth(self, cur_node, depth=0):
@@ -65,8 +67,8 @@ class AI(threading.Thread):
         if not cur_node.children:
             # if cur_node is self.root:
             #     print("reached")
-            #     start = (0, 1)
-            #     end = (4, 5)
+            #     start = (1, 0)
+            #     end = (2, 0)
             #     mv = (start, end)
             #     new_gs = copy.deepcopy(cur_node.gs_)
             #     new_gs.update(mv)
@@ -145,6 +147,18 @@ class AI(threading.Thread):
             raise Exception("No Child with that Move:", move_)
 
         def get_score(self):
+            end_status, string_status = self.gs_.handle_end_game(self.gs_.get_valid_moves(), not self.gs_.get_player_turn)
+            if end_status != -1:
+                # print(f"REACHED ({end_status}   {string_status})")
+                # for r in self.gs_.board:
+                #     print(r)
+                # print()
+                if end_status == 3:
+                    return 0
+                elif end_status == 0:
+                    return 100
+                elif end_status == 1:
+                    return -100
             return evaluate_board(self.gs_.board)
 
         def get_min_or_max_of_children(self, max_player):
@@ -153,15 +167,16 @@ class AI(threading.Thread):
 
 
 def print_tree(board, n, depth=0):
-    # if depth >= 2:
-    #     return
+    if depth >= 2:
+        return
     
     if n.move is not None:
         mv_start = n.move[0]
         mv_end = n.move[1]
+        s = "\t" * depth
         print(f"{s} {board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}  =  {n.score}")
     for ch in n.children:
-        print_tree(board, ch, depth+1)
+        print_tree(n.gs_.board, ch, depth+1)
 
 
 if __name__ == "__main__":

@@ -192,8 +192,8 @@ class Graphics:
                 
     def draw(self, gs):
         # update state
-        self.game_time_white = "00:00:00" if gs.time is None else self.format_elapsed_time(gs.time[0])
-        self.game_time_black = "00:00:00" if gs.time is None else self.format_elapsed_time(gs.time[1])
+        self.game_time_white = "00:00" if gs.time is None else self.format_elapsed_time(gs.time[0])
+        self.game_time_black = "00:00" if gs.time is None else self.format_elapsed_time(gs.time[1])
         self.board = np.flip(gs.board, axis=0)
 
         self.handle_game_events()
@@ -250,9 +250,9 @@ class Graphics:
     def format_elapsed_time(self, elapsed_time_seconds):
         hours, remainder = divmod(elapsed_time_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        milliseconds = int((elapsed_time_seconds - int(elapsed_time_seconds)) * 1000)
+        # milliseconds = int((elapsed_time_seconds - int(elapsed_time_seconds)) * 1000)
         
-        return "{:02d}:{:02d}:{:02d}.{:03d}".format(int(hours), int(minutes), int(seconds), milliseconds)
+        return "{:02d}:{:02d}:{:02d}".format(int(hours), int(minutes), int(seconds)) #, milliseconds)
 
     def get_square_from_mouse_pos(self, mouse_pos: tuple) -> tuple: # TODO: this
         pass

@@ -97,7 +97,11 @@ def run(DEBUG=False):
             valid_moves = gs.get_valid_moves()
 
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
-            gs.handle_end_game(valid_moves)
+            end_game_status, status_string = gs.handle_end_game(valid_moves, not gs.player_turn)
+
+            if end_game_status != -1:
+                end_game(end_game_status, status_string)
+
 
         if DEBUG:        
             print("gs board")
@@ -105,7 +109,55 @@ def run(DEBUG=False):
             print("-----------------------------------")
 
 
+
+def end_game(end_game_status, status_string):
+    print(
+        f"Game Ended in {status_string}. Result: {end_game_status} (0: white, 1:black, 3:tie) !")
+
+    time.sleep(1000)
+
+    sys.exit()
+
+
+import sys
+
+import sys
+
+class Tee:
+    def __init__(self, file_name, mode='w'):
+        self.file_name = file_name
+        self.mode = mode
+        self.stdout = sys.stdout
+        self.file = None
+
+    def __enter__(self):
+        self.file = open(self.file_name, self.mode)
+        sys.stdout = self
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        sys.stdout = self.stdout
+        if self.file:
+            self.file.close()
+
+    def write(self, data):
+        self.file.write(data)
+        self.stdout.write(data)
+
+    def flush(self):
+        self.file.flush()
+        self.stdout.flush()
+
+
+
 if __name__ == "__main__":
-    import cProfile
-    cProfile.run('run()', sort='tottime')
-    # run()
+
+    # Usage example
+    with Tee('output.txt', 'w') as tee:
+        print('This will be printed to both stdout and output.txt')
+        print('You can add more lines.')
+        run()
+
+    # After the block, printing will be back to normal
+    print('This will only be printed to stdout')
+        
