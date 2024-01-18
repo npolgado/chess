@@ -97,7 +97,7 @@ def run(DEBUG=False):
             valid_moves = gs.get_valid_moves()
 
             # Check for endgame conditions TODO: remove this it is being called in gs.draw()
-            end_game_status, status_string = gs.handle_end_game(valid_moves, not gs.player_turn)
+            end_game_status, status_string = gs.handle_end_game(not gs.player_turn)
 
             if end_game_status != -1:
                 end_game(end_game_status, status_string)

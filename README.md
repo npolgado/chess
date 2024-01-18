@@ -16,6 +16,10 @@ new_game.py is much better than game.py
 
 
 # ERIC:
+
+- [ ] figure out player turn logic (why is it backward what you think - gs.player_turn == white should be trying to maximize)
+
+
 - [ ] Evaluate board (upon creation)
 
 - [ ] Minimax (called upon pick_move())

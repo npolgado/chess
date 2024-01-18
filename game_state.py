@@ -14,6 +14,8 @@ class GameState:
 
         self.board = init_empty_board()
 
+        self.valid_moves = None
+
         self.board_history = []
         self.board_dict = {}
         self.is_three_fold_repetition = False
@@ -285,12 +287,15 @@ class GameState:
         validated_valid_moves = self.validate_valid_moves(valid_moves)
         return validated_valid_moves
 
-    def handle_end_game(self, valid_moves, p_turn):
+    def handle_end_game(self, p_turn):
         # if there are no valid moves, it's either checkmate and stalemate
+
+        if self.valid_moves is None:
+            self.valid_moves = self.get_valid_moves()
         
         no_valid_moves = True
-        for k in valid_moves:
-            if valid_moves[k] != []:
+        for k in self.valid_moves:
+            if self.valid_moves[k] != []:
                 no_valid_moves = False
         
         if no_valid_moves:

@@ -21,7 +21,7 @@ class AI(threading.Thread):
         self.root = self.Node(gs_=copy.deepcopy(gs), parent=None, children=[], move=None)
 
     def run(self):
-        tree_depth = 4
+        tree_depth = 3
         while True:
             d = self.get_depth(self.root)
             if d < tree_depth:
@@ -147,7 +147,7 @@ class AI(threading.Thread):
             raise Exception("No Child with that Move:", move_)
 
         def get_score(self):
-            end_status, string_status = self.gs_.handle_end_game(self.gs_.get_valid_moves(), not self.gs_.get_player_turn)
+            end_status, string_status = self.gs_.handle_end_game(not self.gs_.get_player_turn)
             if end_status != -1:
                 # print(f"REACHED ({end_status}   {string_status})")
                 # for r in self.gs_.board:
