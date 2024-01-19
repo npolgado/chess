@@ -6,13 +6,23 @@ import random
 import time
 import copy
 
-class Tree:
-    def __init__(self, board, parent=None, move=None, depth=0):
-        self.board = board
-        self.parent = parent
-        self.move = move
-        self.depth = depth
-        self.children = []
+''' 
+Ai has a background task always running
+
+AI: 
+    - recieves move from game
+    - updates game state internally
+    - calculates bext response
+    - sends move to game
+
+AI needs a tree of possible moves and their evaluations
+    - each move has a board state
+    - each board state has a list of possible moves
+    - each possible move has an evaluation
+
+
+
+'''
 
 class AI(threading.Thread):
     def __init__(self, DEBUG=False, lock=None): # ): # 
@@ -25,9 +35,8 @@ class AI(threading.Thread):
         self.target_move = None
 
         # self.thread = threading.Thread(target=self.run)
-        if lock:
-            self.lock = lock
-        else: self.lock = threading.Lock()
+        if lock:    self.lock = lock
+        else:       self.lock = threading.Lock()
         
         self.stop_thread = False
         self.debug = DEBUG
@@ -43,24 +52,24 @@ class AI(threading.Thread):
                 if self.recieved_move:
                     self.recieved_move = False
                     
+                    side = "Black" if self.g.player_turn else "White"
+
                     self.g.update(self.last_opponent_move)
                     
-                    side = "Black" if self.g.player_turn else "White"
                     self.aip(f"{side} AI THREAD recieved move {self.last_opponent_move}")
                     
                     self.last_opponent_move = None
-
-                    pprint(self.g.board)
 
                     v_m = self.g.get_valid_moves()
                     move = self.calculate_move(v_m)
                     
                     self.g.update(move)
-
-                    self.aip(f"{side} AI THREAD calculated move {move}")
                     
                     self.target_move = move
+                    
                     self.send_move = True
+
+                    self.aip(f"{side} AI THREAD calculated move {move}")
             
             time.sleep(0.001)
 
@@ -182,10 +191,6 @@ class AI(threading.Thread):
 
         return best
 
-    def on_exit(self): 
-        self.stop_thread = True
-        self.join()
-
     def get_random_move(self, valid_moves):
         # pprint(valid_moves)
         side = self.g.player_turn
@@ -203,3 +208,7 @@ class AI(threading.Thread):
         to_pos = random.choice(valid_moves[from_pos]) 
         
         return translate_move_t2s(from_pos[0], from_pos[1], to_pos[0], to_pos[1])
+    
+    def on_exit(self): 
+        self.stop_thread = True
+        self.join()
