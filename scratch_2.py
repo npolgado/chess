@@ -65,16 +65,6 @@ class AI(threading.Thread):
     def generate_next_level(self, cur_node):
 
         if not cur_node.children:
-            # if cur_node is self.root:
-            #     print("reached")
-            #     start = (1, 0)
-            #     end = (2, 0)
-            #     mv = (start, end)
-            #     new_gs = copy.deepcopy(cur_node.gs_)
-            #     new_gs.update(mv)
-            #     n = self.Node(gs_=new_gs, parent=cur_node, children=[], move=mv)
-            #     cur_node.children.append(n)
-            # else:
             self.create_children(cur_node)
         else:
             for ch in cur_node.children:
@@ -109,6 +99,10 @@ class AI(threading.Thread):
         node.parent.score = node.parent.get_min_or_max_of_children(max_player)
         self.minimax(node.parent)
 
+    def prune(self, node):
+        pass
+
+
     def pick_move(self):
         scores = [ch for ch in self.root.children]
         if self.team_ == 0:
@@ -136,10 +130,6 @@ class AI(threading.Thread):
             self.children = children
 
         def get_child(self, move_):
-            
-            # for row in self.gs_.board:
-            #     print(row)
-            # print()
             for ch in self.children:
                 # print("\t", ch.move)
                 if ch.move == move_:
@@ -149,10 +139,6 @@ class AI(threading.Thread):
         def get_score(self):
             end_status, string_status = self.gs_.handle_end_game(not self.gs_.get_player_turn)
             if end_status != -1:
-                # print(f"REACHED ({end_status}   {string_status})")
-                # for r in self.gs_.board:
-                #     print(r)
-                # print()
                 if end_status == 3:
                     return 0
                 elif end_status == 0:
@@ -174,7 +160,8 @@ def print_tree(board, n, depth=0):
         mv_start = n.move[0]
         mv_end = n.move[1]
         s = "\t" * depth
-        print(f"{s} {board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}  =  {n.score}")
+        col = "B" if n.gs_.get_player_turn() == 1 else "W"
+        print(f"{s} {col} {board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}  =  {n.score}    d={depth}")
     for ch in n.children:
         print_tree(n.gs_.board, ch, depth+1)
 

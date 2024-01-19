@@ -19,19 +19,14 @@ new_game.py is much better than game.py
 
 - [ ] figure out player turn logic (why is it backward what you think - gs.player_turn == white should be trying to maximize)
 
-
-- [ ] Evaluate board (upon creation)
-
-- [ ] Minimax (called upon pick_move())
-
-- [ ] Prune: 
-    - During minimax, remove the bottom 10% of each layer. This way it'll remove more nodes higher on the tree as it calculates deeper (which is good since more information is found. ex: queen sacrifice makes the next position look horrible, but a move or too later and its good again)
-        - note: a layer will be processed many times, initially at the bottom, then at the second to bottom, etc.
+- [ ] Prune: create method that runs after minimax 
+    - print out tree at each depth
 
 - [ ] GS for ea. Node: Holding the gamestate for each node takes a lot of memory and probably time
     - imitate get_valid_moves() manually since thats all you need it for (board, player_turn, en_passant, etc.)
+    - can identical GS objects be combined in the tree?
+    - get valid moves should be part of init and should take in a board, en_passant, and castling rights
 
-- [ ] Partial next layer?: Partial instead of all at once (since cant return or do anything while calculating)
 
 
 # TODO:

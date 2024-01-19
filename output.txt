@@ -1,0 +1,2 @@
+This will be printed to both stdout and output.txt
+You can add more lines.
