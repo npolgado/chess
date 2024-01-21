@@ -9,20 +9,46 @@ import copy
 ''' 
 Ai has a background task always running
 
-AI: 
-    - recieves move from game
-    - updates game state internally
-    - calculates bext response
-    - sends move to game
-
-AI needs a tree of possible moves and their evaluations
-    - each move has a board state
-    - each board state has a list of possible moves
-    - each possible move has an evaluation
-
-
+Need to make a class that abstracts the search space given a board state
 
 '''
+
+class Node:
+    def __init__(self, gs: GameState, move=None, parent=None, children=None):
+        self.gs = copy.deepcopy(gs)
+        self.board = self.gs.board
+        
+        self.move = move
+        
+        self.parent = parent
+        self.children = children
+        self.depth = self.get_depth()
+
+    def get_depth(self, depth=0):
+        # Recursive function to get the depth of the node
+        if self.parent is None: return depth
+        else:                   return self.parent.get_depth(depth+1)
+
+    def get_parent(self):   return self.parent
+    def get_board(self):    return self.board
+    def get_move(self):     return self.move
+    def get_gs(self):       return self.gs
+
+    def get_children(self):
+        if self.children is None:
+            self.children = []
+            valid_moves = self.gs.get_valid_moves()
+            
+            for i in valid_moves.keys():
+                for j in valid_moves[i]:
+
+                    notation = translate_move_t2s(*i, *j)
+                    new_gs = copy.deepcopy(self.gs)
+                    new_gs.update(notation)
+
+                    self.children.append(Node(new_gs, notation, self))
+        
+        return self.children
 
 class AI(threading.Thread):
     def __init__(self, DEBUG=False, lock=None): # ): # 
@@ -41,6 +67,7 @@ class AI(threading.Thread):
         self.stop_thread = False
         self.debug = DEBUG
         self.g = GameState()
+        self.root = Node(self.g)
 
     def run(self):
         while True:
@@ -212,3 +239,74 @@ class AI(threading.Thread):
     def on_exit(self): 
         self.stop_thread = True
         self.join()
+
+
+if __name__ == "__main__":
+    gs = GameState()
+    n = Node(gs)
+
+    # 100 moves
+    for mo in range(100):
+        tmp = copy.deepcopy(n)
+        depth = 5
+        curr_eval = evaluate_board(n.board)
+        side = n.gs.player_turn
+        side_txt = "Black" if side else "White"
+        print(f"Move {mo} | Turn {n.gs.turn_num} | {side_txt}'s Turn | Eval = {curr_eval}\n-----------------------------------")
+
+        while depth > 0:
+            # generate layer of children
+            tmp.get_children()
+
+            # Get evals for all children
+            evals = {}
+            for i in tmp.children: 
+                evals[i.get_move()] = evaluate_board(i.get_board())
+ 
+            # Get best move for layer
+            best_eval = curr_eval
+            index_value = curr_eval
+            for notation, evaluation in evals.items(): 
+                # print(f"\t{notation} | {evaluation}")
+
+                # IF BLACK
+                if tmp.gs.player_turn:
+                    # if the evaluation is better than the current evaluation, set the index value to the evaluation
+                    if evaluation <= curr_eval and evaluation < best_eval: 
+                        index_value = evaluation
+                        best_eval = evaluation
+                
+                # IF WHITE
+                else:
+                    # if the evaluation is better than the current evaluation, set the index value to the evaluation
+                    if evaluation >= curr_eval and evaluation > best_eval: 
+                        index_value = evaluation
+                        best_eval = evaluation
+            
+            # Get best move notation
+            best = [key for key, value in evals.items() if value == index_value]
+            if len(best) > 1: best = random.choice(best)
+            else: best = best[0]
+
+            print(f'Depth {depth} | Best Eval {index_value} | Best Move {best}')
+
+            # set tmp equal to the child of temp that has the best move
+            for i in tmp.get_children():
+                if i.get_move() == best: tmp = i
+
+            depth -= 1
+
+        # TMP is now the best move after depth
+        # we need to get the best move from the children of tmp
+        
+
+
+        print(f"Found best move {best} with eval {index_value}")
+        print("-----------------------------------")
+
+        
+        
+        
+        time.sleep(0.1)
+
+

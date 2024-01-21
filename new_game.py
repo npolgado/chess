@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # p1 = eric_bot.AI()
     # p2 = eric_bot.AI()
     p1 = nick_bot.AI(False, lock) # ) # 
-    p2 = nick_bot.AI(True, lock) # ) # 
+    p2 = nick_bot.AI(False, lock) # ) # 
     
     try:
         p1.start()
