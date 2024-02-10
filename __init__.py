@@ -1,15 +1,6 @@
 import numpy as np
 from pprint import pprint
 
-PIECE_VALUES = {
-    'p': 1,
-    'n': 3, # up for debate
-    'b': 3.5, # up for debate
-    'r': 5,
-    'q': 9,
-    'k': 500
-}
-
 def board_to_string(board_state) -> str:
     string = ""
 
@@ -143,27 +134,21 @@ def init_empty_board():
         ['R', '-', 'B', 'Q', 'R', 'K', '-', '-']
     ]
     
-    return puzzle_1
+    return init_array
 
 def evaluate_board(board):
-    # given the board and player's turn, return a score
-    ans = 0
+    # Evaluate based on piece values
+    piece_values = {'P': 1, 'N': 3, 'B': 3.25, 'R': 5, 'Q': 9, 'K': 100}
+    total_value = 0
 
-    for i in range(8):
-        for j in range(8):
-            piece = board[i][j]
+    for row in board:
+        for square in row:
+            if square.isupper():  # White piece
+                total_value += piece_values[square]
+            elif square.islower():  # Black piece
+                total_value -= piece_values[square.upper()]
 
-            if piece == '-':
-                continue
-
-            if piece.isupper():
-                key = piece.lower()
-                ans -= PIECE_VALUES[key]
-                # print(f"{piece} @ {i}, {j} = {PIECE_VALUES[key]} -- {ans}")
-            else:
-                ans += PIECE_VALUES[piece]
-                # print(f"{piece} @ {i}, {j} = {PIECE_VALUES[piece]} -- {ans}")
-    return ans
+    return total_value
 
 def make_move(board, move):
     # given a board array and move of notation "A1H8", make the move and return the new board

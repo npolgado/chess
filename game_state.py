@@ -27,7 +27,7 @@ class GameState:
         }
         self.time = (0, 0)
         self.start_time = time.monotonic()
-        self.time_control = 30 * 60
+        self.time_control = 3 * 60 * 60
 
         self.time_white = 0
         self.time_black = 0

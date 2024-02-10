@@ -10,6 +10,9 @@ from __init__ import *
 
 from operator import attrgetter
 
+# TODO: look up how pruning works and compare it to my attempts. Am I doing it right? If so, why does it feel underwhelming (little time difference)
+
+
 class AI(threading.Thread):
 
     def __init__(self, gs, team):
@@ -21,13 +24,20 @@ class AI(threading.Thread):
         self.root = self.Node(gs_=copy.deepcopy(gs), parent=None, children=[], move=None)
 
     def run(self):
-        tree_depth = 3
+        tree_depth = 4
         while True:
             d = self.get_depth(self.root)
             if d < tree_depth:
-                self.generate_next_level(self.root)
+                print(f"Generating Level {d}")
+                self.generate_next_levl(self.root)
+                print("Miniax Traverse")
                 self.minimax_traverse(self.root)
-                # print(f"\t(Depth = {d})  (Team= {self.team_}) (Your Turn= {self.your_turn})")
+                
+                if self.team_ == 0 and self.gs.turn_num >= 9 and d == 3:
+                    print(f"(Depth = {d})  (Team= {self.team_}) (Your Turn= {self.your_turn})")
+                    print_tree(copy.deepcopy(self.gs.board), self.root)
+                else:
+                    print(f"Turn Num: {self.gs.turn_num}, Depth: {d}, Team: {self.team_}")
 
             if self.your_turn and d == 3 and self.target_move is None:
                 self.target_move = self.pick_move()
@@ -52,8 +62,6 @@ class AI(threading.Thread):
         print("\n---------------------------------------\n")
         
         self.root = self.root.get_child(ret_move)
-        
-        print_tree(copy.deepcopy(self.gs.board), self.root)
 
         return ret_move
 
@@ -97,10 +105,7 @@ class AI(threading.Thread):
 
         max_player = node.gs_.player_turn != 0
         node.parent.score = node.parent.get_min_or_max_of_children(max_player)
-        self.minimax(node.parent)
-
-    def prune(self, node):
-        pass
+        self.minimax(node.parent)            
 
 
     def pick_move(self):
@@ -153,15 +158,18 @@ class AI(threading.Thread):
 
 
 def print_tree(board, n, depth=0):
-    if depth >= 2:
-        return
-    
+    # if depth >= 2:
+    #     return
+
     if n.move is not None:
         mv_start = n.move[0]
         mv_end = n.move[1]
         s = "\t" * depth
-        col = "B" if n.gs_.get_player_turn() == 1 else "W"
+        col = "(B)" if n.gs_.get_player_turn() == 1 else "(W)"
         print(f"{s} {col} {board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}  =  {n.score}    d={depth}")
+
+    else:
+        print(f"ROOT =  {n.score}")
     for ch in n.children:
         print_tree(n.gs_.board, ch, depth+1)
 
