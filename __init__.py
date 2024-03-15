@@ -134,7 +134,7 @@ def init_empty_board():
         ['R', '-', 'B', 'Q', 'R', 'K', '-', '-']
     ]
     
-    return init_array
+    return puzzle_1
 
 def evaluate_board(board):
     # Evaluate based on piece values
@@ -143,10 +143,10 @@ def evaluate_board(board):
 
     for row in board:
         for square in row:
-            if square.isupper():  # White piece
-                total_value += piece_values[square]
-            elif square.islower():  # Black piece
-                total_value -= piece_values[square.upper()]
+            if square.islower():  # White piece
+                total_value += piece_values[square.upper()]
+            elif square.isupper():  # Black piece
+                total_value -= piece_values[square]
 
     return total_value
 

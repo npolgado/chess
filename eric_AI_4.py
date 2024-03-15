@@ -7,12 +7,12 @@ import multiprocessing
 from graphics import Graphics
 import game_state
 from __init__ import *
-
 import logging, os
 
 from operator import attrgetter
 
 # TODO: look up how pruning works and compare it to my attempts. Am I doing it right? If so, why does it feel underwhelming (little time difference)
+# Configure logging
 
 log_filename = "output.log"
 if os.path.exists(log_filename):
@@ -28,25 +28,16 @@ logging.basicConfig(
     ]
 )
 
-
+custom_count = 0
 def custom_print(*args, **kwargs):
+    global custom_count
     log_message = " ".join(map(str, args))
-    print(log_message, **kwargs)
+    # print(log_message, **kwargs)
+    if custom_count % 100 == 0:
+        print(f"{100*custom_count/80000}%")
+    custom_count += 1
     with open(log_filename, "a") as log_file:
         print(log_message, file=log_file, **kwargs)
-
-
-transposition_table = {}
-
-def lookup_transposition_table(position_hash, depth):
-    if position_hash in transposition_table:
-        entry = transposition_table[position_hash]
-        if entry['depth'] >= depth:
-            return entry['score']
-    return None
-
-def store_transposition_table(position_hash, depth, score):
-    transposition_table[position_hash] = {'depth': depth, 'score': score}
 
 
 class AI(threading.Thread):
@@ -60,21 +51,29 @@ class AI(threading.Thread):
         self.root = self.Node(gs_=copy.deepcopy(gs), parent=None, children=[], move=None)
 
     def run(self):
-        tree_depth = 4
+        tree_depth = 3
         while True:
             d = self.get_depth(self.root)
             if d < tree_depth:
                 self.generate_next_level(self.root)
-                self.minimax_traverse(self.root)
+
+
+                if self.team_ == 0:
+            
+                    custom_print("Depth:", d, "Team:", "black" if self.team_ else "white")
+                    custom_print("BEFORE MINIMAX")
+                    print_tree(copy.deepcopy(self.gs.board), self.root)
+
+                    self.minimax(self.root, not self.team_)
                 
-                # if self.team_ == 0 and self.gs.turn_num >= 9 and d == tree_depth - 1:
-                #     print_tree(copy.deepcopy(self.gs.board), self.root)
-            else:
-                print_tree(copy.deepcopy(self.gs.board), self.root)
+                    custom_print("AFTER MINIMAX")
+                    print_tree(copy.deepcopy(self.gs.board), self.root)
 
             if self.your_turn and d == tree_depth-1 and self.target_move is None:
                 self.target_move = self.pick_move()
-
+                print("Sleeping...")
+                print(f"Chosen move: {self.target_move}")
+                time.sleep(10000000)
             
 
     def get_move(self):
@@ -112,25 +111,36 @@ class AI(threading.Thread):
                 n = self.Node(gs_=new_gs, parent=cur_node, children=[], move=mv)
                 cur_node.children.append(n)
 
-    
-    def minimax_traverse(self, node):
-        if node.children:
+    def minimax(self, node, maximizing_player, alpha=1000, beta=-1000):
+        if not node.children:
+            return node.get_score()
+
+        if maximizing_player:
+            best = beta
             for ch in node.children:
-                self.minimax_traverse(ch)
+                val = self.minimax(ch, False, alpha, beta)
+                best = max(best, val)
+                alpha = max(alpha, best)
+                if best <= alpha:
+                    break
+            node.score = best
+            return best
+
         else:
-            self.minimax(node)
+            best = alpha
+            for ch in node.children:
+                val = self.minimax(ch, True, alpha, beta)
+                best = min(best, val)
+                beta = min(beta, best)
+                if best <= beta:
+                    print("--BROKEN--", beta, alpha)
+                    break
+            if node.score != best:
+                print(f"REACHED - {ch.move}  (ch score: {ch})  {node.score} -> {best}")
+            node.score = best
+            return best
 
-    def minimax(self, node):
-        if node is self.root:
-            return
-        if node is None:
-            return
-        if node.parent is None:
-            return
-
-        max_player = node.gs_.player_turn != 0
-        node.parent.score = node.parent.get_min_or_max_of_children(max_player)
-        self.minimax(node.parent)            
+    
 
 
     def pick_move(self):
@@ -181,15 +191,14 @@ class AI(threading.Thread):
 
 
 def print_tree(board, n, depth=0):
-    if depth >= 2:
-        return
+    # if depth >= 3:
+    #     return
 
     if n.move is not None:
         mv_start = n.move[0]
         mv_end = n.move[1]
         s = "\t" * depth
-        col = "(B)" if n.gs_.get_player_turn() == 1 else "(W)"
-        custom_print(f"{s} {col} {board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}  =  {n.score}    d={depth}")
+        custom_print(f"{s} {board[mv_start[0]][mv_start[1]]} {mv_start[0]},{mv_start[1]} => {mv_end[0]},{mv_end[1]}  =  {n.score}    d={depth}")
 
     else:
         custom_print(f"ROOT =  {n.score}")
@@ -198,6 +207,8 @@ def print_tree(board, n, depth=0):
 
 
 if __name__ == "__main__":
+
+    custom_print("Starting...")
 
     gs = game_state.GameState()
     p1 = AI(gs, 0)

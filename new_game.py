@@ -1,4 +1,4 @@
-import scratch_2 as eric_bot
+import eric_AI_4 as eric_bot
 import nick_AI as nick_bot
 import time
 import sys
